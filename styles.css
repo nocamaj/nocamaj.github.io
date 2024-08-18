@@ -1,23 +1,20 @@
 body {
     font-family: Courier, monospace; /* Set the font to Courier */
-    text-align: left;
+    text-align: center;
     margin: 0;
-    padding-left: 20px;
     background-color: #000; /* Set the background color to black */
     color: #fff; /* Set all text color to white */
 }
 
 h1 {
     text-align: left;
-    padding-left: 20px;
     color: #fff; /* Set header text color to white */
 }
 
 .age-timer {
     font-size: 2em;            /* Adjust the font size to make it prominent */
     color: #fff;               /* Set the text color to white */
-    text-align: left;        /* Center the text within the parent container */
+    text-align: center;        /* Center the text within the parent container */
     margin-top: 5px;         /* Add some margin on top to create space (adjust as needed) */
-    padding-left: 20px;
     font-family: Courier, monospace; /* Set the font family to Courier */
 }
