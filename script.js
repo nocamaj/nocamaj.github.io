@@ -73,20 +73,16 @@ function pad(value) {
 
 function updateTable() {
     let tbody = document.getElementById('timeTable').getElementsByTagName('tbody')[0];
+    if (tbody.rows.length === 0) {
+        addRowToTable();
+    }
+
     let currentRow = tbody.rows[tbody.rows.length - 1];
-    
+
     for (let category in elapsedTimes) {
         let index = Object.keys(elapsedTimes).indexOf(category) + 1; // +1 because the date is in the first cell
-        currentRow.cells[index].textContent = formatTime(elapsedTimes[category]);
+        currentRow.cells[index].textContent = (elapsedTimes[category] / 3600).toFixed(2); // Convert seconds to hours
     }
-}
-
-function formatTime(seconds) {
-    let hours = Math.floor(seconds / 3600);
-    let minutes = Math.floor((seconds % 3600) / 60);
-    let sec = seconds % 60;
-
-    return `${pad(hours)}:${pad(minutes)}:${pad(sec)}`;
 }
 
 function addRowToTable() {
@@ -98,7 +94,7 @@ function addRowToTable() {
 
     for (let category in elapsedTimes) {
         const cell = newRow.insertCell();
-        cell.textContent = "00:00:00";
+        cell.textContent = "0.00";
     }
 }
 
