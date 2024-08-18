@@ -10,6 +10,39 @@
     <p>Current Age:</p>
     <div class="age-timer" id="ageTimer"></div>
 
+    <h1>Daily Time Tracker</h1>
+    <div class="button-container">
+        <button onclick="startTimer('working')">Working</button>
+        <button onclick="startTimer('learning')">Learning</button>
+        <button onclick="startTimer('building')">Building</button>
+        <button onclick="startTimer('training')">Training</button>
+        <button onclick="startTimer('socializing')">Socializing</button>
+        <button onclick="startTimer('maintaining')">Maintaining</button>
+        <button onclick="startTimer('inTransit')">In Transit</button>
+        <button onclick="startTimer('slacking')">Slacking</button>
+        <button onclick="startTimer('resting')">Resting</button>
+    </div>
+
+    <table id="timeTable">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Working</th>
+                <th>Learning</th>
+                <th>Building</th>
+                <th>Training</th>
+                <th>Socializing</th>
+                <th>Maintaining</th>
+                <th>In Transit</th>
+                <th>Slacking</th>
+                <th>Resting</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Rows will be added dynamically -->
+        </tbody>
+    </table>
+
 
     <script src="script.js"></script>
 </body>
