@@ -10,7 +10,12 @@ h1 {
     color: #333;
 }
 
-button {
-    padding: 10px 20px;
-    font-size: 16px;
+.age-timer {
+    font-size: 2em;            /* Adjust the font size to make it prominent */
+    font-weight: bold;         /* Make the text bold */
+    color: #333;               /* Set the text color (you can customize this to match your design) */
+    text-align: center;        /* Center the text within the parent container */
+    margin-top: 20px;          /* Add some margin on top to create space (adjust as needed) */
+    font-family: Arial, sans-serif; /* Set the font family */
 }
+
