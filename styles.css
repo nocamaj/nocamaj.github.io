@@ -17,3 +17,40 @@ h1 {
     margin-top: 5px;         /* Add some margin on top to create space (adjust as needed) */
     font-family: Courier, monospace; /* Set the font family to Courier */
 }
+
+.button-container button {
+    margin: 10px;
+    padding: 15px 30px;
+    font-size: 1em;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+}
+
+.button-container button:hover {
+    background-color: #555;
+}
+
+table {
+    width: 100%;
+    margin-top: 30px;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid #fff;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+}
+
+thead {
+    background-color: #333;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #222;
+}
