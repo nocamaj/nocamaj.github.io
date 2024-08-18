@@ -12,7 +12,6 @@ h1 {
 }
 
 .age-timer {
-    font-size: 2em;            /* Adjust the font size to make it prominent */
     color: #fff;               /* Set the text color to white */
     text-align: center;        /* Center the text within the parent container */
     margin-top: 5px;         /* Add some margin on top to create space (adjust as needed) */
