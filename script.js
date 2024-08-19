@@ -11,3 +11,4 @@ function updateAge() {
 // Update the timer every 10 milliseconds
 setInterval(updateAge, 10);
 
+}
