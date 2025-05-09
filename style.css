@@ -3,7 +3,7 @@ body, html {
     padding: 0;
     height: 100%;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #36454F; /* Charcoal Grey */
+    background-color: #1a1a1a; /* Much darker charcoal, almost black */
     color: #F5F5F5; /* Slightly Off-White */
     overflow: hidden; /* Prevent scrollbars from background animation */
 }
@@ -24,28 +24,43 @@ header {
     top: 0;
     left: 0;
     width: 100%;
-    background-color: rgba(54, 69, 79, 0.7); /* Semi-transparent Charcoal */
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px); /* For Safari */
-    padding: 15px 30px;
+    background-color: rgba(26, 26, 26, 0.5); /* Semi-transparent dark background */
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px); /* For Safari */
+    padding: 15px 20px; /* Reduced horizontal padding */
     box-shadow: 0 2px 10px rgba(0,0,0,0.3);
     z-index: 1000;
+    box-sizing: border-box; /* Include padding in width calculation */
 }
 
 nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    max-width: 1200px; /* Prevent excessive stretching on wide screens */
+    margin: 0 auto; /* Center the nav */
+    width: 100%;
+}
+
+.nav-left {
+    display: flex;
+}
+
+.nav-right {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: nowrap; /* Prevent wrapping */
 }
 
 .nav-left .nav-button,
 .nav-right .nav-button {
     color: #F5F5F5;
     text-decoration: none;
-    padding: 10px 15px;
+    padding: 8px 12px; /* Slightly reduced padding */
     margin: 0 5px;
     border-radius: 5px;
     transition: background-color 0.3s ease;
+    white-space: nowrap; /* Prevent text wrapping */
 }
 
 .nav-left .nav-button:hover,
@@ -66,11 +81,12 @@ footer {
     left: 0;
     width: 100%;
     padding: 20px 0;
-    background-color: #2C3E50; /* Darker charcoal for footer */
+    background-color: rgba(26, 26, 26, 0.7); /* Darker semi-transparent footer */
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    box-sizing: border-box; /* Include padding in width calculation */
 }
 
 .search-container input[type="text"] {
@@ -78,11 +94,12 @@ footer {
     padding: 12px 20px;
     border: 1px solid #555;
     border-radius: 25px;
-    background-color: #36454F; /* Charcoal */
+    background-color: rgba(54, 69, 79, 0.4); /* Semi-transparent input background */
     color: #F5F5F5; /* Off-white text */
     font-size: 16px;
     outline: none;
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    max-width: 90vw; /* Prevent overflow on small screens */
 }
 
 .search-container input[type="text"]::placeholder {
@@ -94,24 +111,48 @@ footer {
     box-shadow: 0 0 8px rgba(119, 119, 119, 0.5);
 }
 
-/* Styles for the Matrix-like background characters will be added via JavaScript */
+/* Styles for the Matrix-like background characters */
 .matrix-column {
     position: absolute;
     top: 0;
     font-family: 'Courier New', Courier, monospace; /* Monospaced font for Matrix effect */
     font-size: 16px; /* Adjust as needed */
     color: #00FF41; /* Matrix green */
+    opacity: 0.7; /* Make more visible */
     writing-mode: vertical-rl;
     text-orientation: upright;
     white-space: nowrap;
     user-select: none;
-    opacity: 0;
     animation: fall linear;
 }
 
 @keyframes fall {
+    from {
+        transform: translateY(-100vh);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.7;
+    }
     to {
         transform: translateY(100vh);
-        opacity: 1;
+        opacity: 0.5;
+    }
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+    .nav-right {
+        justify-content: flex-end;
+    }
+    
+    .nav-left .nav-button,
+    .nav-right .nav-button {
+        padding: 6px 8px;
+        margin: 0 2px;
+    }
+    
+    .search-container input[type="text"] {
+        width: 80vw;
     }
 } 
