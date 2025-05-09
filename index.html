@@ -3,26 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Website</title>
+    <title>Noah's Site</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="background-animation">
+        <!-- This div will be used for the animated background -->
+    </div>
     <header>
         <nav>
-            <ul>
-                <li><a href="index.html">Home</a></li>
-                <li><a href="travel.html">Travel</a></li>
-                <li><a href="writings.html">Writings</a></li>
-                <li><a href="metrics.html">Metrics</a></li>
-            </ul>
+            <div class="nav-left">
+                <a href="#" class="nav-button">Home</a>
+            </div>
+            <div class="nav-right">
+                <a href="#" class="nav-button">Metrics</a>
+                <a href="#" class="nav-button">Ideas</a>
+                <a href="#" class="nav-button">Travel</a>
+            </div>
         </nav>
     </header>
+
     <main>
-        <h1>Welcome to My Website!</h1>
-        <p>Navigate using the links above.</p>
+        <!-- Main content will go here if any is added later -->
     </main>
+
     <footer>
-        <p>&copy; 2024 My Website</p>
+        <div class="search-container">
+            <input type="text" placeholder="What would you like to know about Noah...">
+        </div>
     </footer>
+
+    <script src="script.js"></script>
 </body>
 </html>
