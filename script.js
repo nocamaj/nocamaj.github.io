@@ -49,7 +49,7 @@
                 canvasClearColor: 'rgba(10, 10, 25, 1)', 
                 noiseScale: 0.08, timeScale: 0.08, activationThreshold: 0.3, highlightThreshold: 0.65, 
                 fadeSpeed: 0.15, charChangeProbability: 0.03,
-                phraseStableDisplayDuration: 7000, // Increased to 7 seconds
+                phraseStableDisplayDuration: 6000, // Increased to 6 seconds
                 textTransitionDuration: 300,    // Faster transition (was 600ms)
                 textAreaWidthRatio: 0.375, textAreaHeightRatio: 0.15, textPaddingRatio: 0.1,
                 cursorInteractionRadius: 70, 
