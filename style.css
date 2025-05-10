@@ -3,9 +3,9 @@ body, html {
     padding: 0;
     height: 100%;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #121212; /* Pure black background */
-    color: #F5F5F5; /* Slightly Off-White */
-    overflow: hidden; /* Prevent scrollbars */
+    background-color: #121212; 
+    color: #F5F5F5; 
+    overflow: hidden; 
 }
 
 .background-animation {
@@ -34,7 +34,6 @@ header {
     top: 0;
     left: 0;
     width: 100%;
-    /* Increased transparency: alpha from 0.20 to 0.00 (fully transparent) */
     background-color: rgba(18, 18, 18, 0.00); 
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -45,7 +44,7 @@ header {
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-nav {
+nav { /* ... rest of nav styles ... */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -54,126 +53,55 @@ nav {
     margin: 0 auto;
 }
 
-.nav-left {
-    display: flex;
-    margin-right: auto;
+.nav-left { display: flex; margin-right: auto; }
+.nav-right { display: flex; margin-left: auto; }
+.nav-left .nav-button, .nav-right .nav-button {
+    color: #F5F5F5; text-decoration: none; padding: 8px 15px; margin: 0 8px;
+    border-radius: 5px; transition: all 0.3s ease; white-space: nowrap;
+    letter-spacing: 0.5px; font-weight: 500; position: relative; overflow: hidden; z-index: 1;
+}
+.nav-left .nav-button::before, .nav-right .nav-button::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(255, 255, 255, 0.1); transform: translateY(100%);
+    transition: transform 0.3s ease; z-index: -1; border-radius: 5px;
+}
+.nav-left .nav-button:hover, .nav-right .nav-button:hover {
+    color: #ffffff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.nav-left .nav-button:hover::before, .nav-right .nav-button:hover::before { transform: translateY(0); }
+
+
+main { /* ... rest of main styles ... */
+    position: relative; padding-top: 80px; padding-bottom: 80px;
+    min-height: calc(100vh - 160px); z-index: 5; 
 }
 
-.nav-right {
-    display: flex;
-    margin-left: auto;
-}
-
-.nav-left .nav-button,
-.nav-right .nav-button {
-    color: #F5F5F5;
-    text-decoration: none;
-    padding: 8px 15px;
-    margin: 0 8px;
-    border-radius: 5px;
-    transition: all 0.3s ease;
-    white-space: nowrap;
-    letter-spacing: 0.5px;
-    font-weight: 500;
-    position: relative;
-    overflow: hidden;
-    z-index: 1;
-}
-
-.nav-left .nav-button::before,
-.nav-right .nav-button::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.1);
-    transform: translateY(100%);
-    transition: transform 0.3s ease;
-    z-index: -1;
-    border-radius: 5px;
-}
-
-.nav-left .nav-button:hover,
-.nav-right .nav-button:hover {
-    color: #ffffff;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.nav-left .nav-button:hover::before,
-.nav-right .nav-button:hover::before {
-    transform: translateY(0);
-}
-
-main {
-    position: relative;
-    padding-top: 80px;
-    padding-bottom: 80px;
-    min-height: calc(100vh - 160px);
-    z-index: 5; 
-}
-
-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 20px 0;
-    /* Increased transparency: alpha from 0.20 to 0.00 (fully transparent) */
+footer { /* ... rest of footer styles ... */
+    position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px 0;
     background-color: rgba(18, 18, 18, 0.00);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10; 
-    box-sizing: border-box;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 10; box-sizing: border-box;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.search-container input[type="text"] {
-    width: 400px;
-    padding: 12px 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 25px;
-    background-color: rgba(18, 18, 18, 0.5);
-    color: #F5F5F5;
-    font-size: 16px;
-    outline: none;
-    transition: all 0.3s ease;
-    max-width: 90vw;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
-    backdrop-filter: blur(5px);
+.search-container input[type="text"] { /* ... rest of search styles ... */
+    width: 400px; padding: 12px 20px; border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 25px; background-color: rgba(18,18,18,0.5); color: #F5F5F5;
+    font-size: 16px; outline: none; transition: all 0.3s ease; max-width: 90vw;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15); backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
 }
-
-.search-container input[type="text"]::placeholder {
-    color: rgba(255, 255, 255, 0.6);
-}
-
+.search-container input[type="text"]::placeholder { color: rgba(255,255,255,0.6); }
 .search-container input[type="text"]:focus {
-    border-color: rgba(255, 255, 255, 0.3);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-    background-color: rgba(26, 26, 26, 0.7);
-    transform: translateY(-2px);
+    border-color: rgba(255,255,255,0.3); box-shadow: 0 0 15px rgba(255,255,255,0.1);
+    background-color: rgba(26,26,26,0.7); transform: translateY(-2px);
 }
 
-@media (max-width: 768px) {
-    nav {
-        padding: 0 5px;
-    }
-    .nav-right {
-        justify-content: flex-end;
-    }
-    .nav-left .nav-button,
-    .nav-right .nav-button {
-        padding: 6px 10px;
-        margin: 0 3px;
-    }
-    .search-container input[type="text"] {
-        width: 80vw;
-    }
+@media (max-width: 768px) { /* ... rest of media query styles ... */
+    nav { padding: 0 5px; }
+    .nav-right { justify-content: flex-end; }
+    .nav-left .nav-button, .nav-right .nav-button { padding: 6px 10px; margin: 0 3px; }
+    .search-container input[type="text"] { width: 80vw; }
 }
