@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Noah's Travel</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <!-- Animation container - for consistent background -->
+    <div class="background-animation">
+        <!-- Canvas will be created by JavaScript -->
+    </div>
+    
+    <header>
+        <nav>
+            <div class="nav-left">
+                <a href="index.html" class="nav-button">Home</a>
+            </div>
+            <div class="nav-right">
+                <a href="#" class="nav-button">Metrics</a>
+                <a href="#" class="nav-button">Ideas</a>
+                <a href="travel.html" class="nav-button">Travel</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="map-container">
+            <!-- 
+              SVG World Map 
+              IMPORTANT: The following SVG is a highly simplified placeholder for demonstration.
+              For a real application, you would use a detailed and geographically accurate SVG
+              world map where each country <path> has an 'id' attribute corresponding to its
+              ISO 3166-1 alpha-2 code (e.g., id="US" for USA, id="CA" for Canada).
+            -->
+            <svg id="world-map" viewBox="0 0 960 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+                <!-- Placeholder landmasses (very abstract shapes) -->
+                <path id="continent-africa" d="M420 220 q60 -70 120 0 q-20 150 -60 180 q-40 -30 -60 -180 Z" />
+                <path id="continent-south-america" d="M280 270 q50 -20 80 30 q-10 100 -40 120 q-40 -30 -40 -150 Z" />
+                <path id="continent-oceania" d="M750 350 q80 0 100 50 q-50 30 -100 20 q-30 -40 0 -70 Z" />
+                <path id="continent-europe-asia-combined" d="M400 80 q200 -40 450 30 q20 150 -150 180 q-200 0 -300 -100 Z" />
+
+                <!-- Traveled Countries (super-simplified placeholder shapes with correct IDs) -->
+                <!-- North America -->
+                <path id="CA" d="M100,50 h180 v80 h-40 v-30 h-100 v30 h-40 Z" /> <!-- Canada -->
+                <path id="US" d="M90,130 h200 v120 h-200 Z" /> <!-- USA -->
+                
+                <!-- South America -->
+                <path id="PE" d="M290,340 h40 v50 h-40 Z" /> <!-- Peru -->
+                
+                <!-- Europe -->
+                <path id="ES" d="M425,170 h40 v35 h-40 Z" /> <!-- Spain -->
+                <path id="RS" d="M510,185 h25 v15 h-25 Z" /> <!-- Serbia -->
+                <path id="HR" d="M495,165 h25 v18 h-25 Z" /> <!-- Croatia -->
+                <path id="AL" d="M515,205 h20 v15 h-20 Z" /> <!-- Albania -->
+                
+                <!-- Asia -->
+                <path id="CN" d="M650,100 h150 v100 h-150 Z" /> <!-- China -->
+                <path id="AE" d="M590,230 h30 v20 h-30 Z" /> <!-- UAE -->
+            </svg>
+        </div>
+    </main>
+
+    <footer>
+        <div class="search-container">
+            <input type="text" placeholder="What would you like to know about Noah...">
+        </div>
+    </footer>
+
+</body>
+</html>
