@@ -21,13 +21,12 @@ body, html {
 }
 
 .background-animation canvas {
-    display: block !important; 
+    display: block !important;
     position: absolute !important;
     top: 0 !important;
     left: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    /* No z-index here; it's governed by parent .background-animation */
 }
 
 header {
@@ -35,7 +34,8 @@ header {
     top: 0;
     left: 0;
     width: 100%;
-    background-color: rgba(18, 18, 18, 0.35);
+    /* Increased transparency: alpha from 0.35 to 0.20 */
+    background-color: rgba(18, 18, 18, 0.20);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     padding: 15px 20px;
@@ -109,9 +109,9 @@ nav {
 
 main {
     position: relative;
-    padding-top: 80px; 
+    padding-top: 80px;
     padding-bottom: 80px;
-    min-height: calc(100vh - 160px); 
+    min-height: calc(100vh - 160px);
     z-index: 5; /* Above background but below header/footer */
 }
 
@@ -121,7 +121,8 @@ footer {
     left: 0;
     width: 100%;
     padding: 20px 0;
-    background-color: rgba(18, 18, 18, 0.35);
+    /* Increased transparency: alpha from 0.35 to 0.20 */
+    background-color: rgba(18, 18, 18, 0.20);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     display: flex;

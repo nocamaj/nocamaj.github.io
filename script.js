@@ -40,55 +40,46 @@
             }
         }
         
-        // Call shuffle an extra time on init to ensure better randomness at start
         shufflePermutations();
 
 
         function noise3D(xin, yin, zin) {
-            let n0, n1, n2, n3; // Noise contributions from the four corners
-            // Skew the input space to determine which simplex cell we're in
-            const s = (xin + yin + zin) * F3; // Very nice and simple skew factor for 3D
+            let n0, n1, n2, n3; 
+            const s = (xin + yin + zin) * F3; 
             const i = Math.floor(xin + s);
             const j = Math.floor(yin + s);
             const k = Math.floor(zin + s);
             const t = (i + j + k) * G3;
-            const X0 = i - t; // Unskew the cell origin back to (x,y,z) space
+            const X0 = i - t; 
             const Y0 = j - t;
             const Z0 = k - t;
-            const x0 = xin - X0; // The x,y,z distances from the cell origin
+            const x0 = xin - X0; 
             const y0 = yin - Y0;
             const z0 = zin - Z0;
 
-            // For the 3D case, the simplex shape is a slightly irregular tetrahedron.
-            // Determine which simplex we are in.
-            let i1, j1, k1; // Offsets for second corner of simplex in (i,j,k) coords
-            let i2, j2, k2; // Offsets for third corner of simplex in (i,j,k) coords
+            let i1, j1, k1; 
+            let i2, j2, k2; 
 
             if (x0 >= y0) {
-                if (y0 >= z0) { i1 = 1; j1 = 0; k1 = 0; i2 = 1; j2 = 1; k2 = 0; } // X Y Z order
-                else if (x0 >= z0) { i1 = 1; j1 = 0; k1 = 0; i2 = 1; j2 = 0; k2 = 1; } // X Z Y order
-                else { i1 = 0; j1 = 0; k1 = 1; i2 = 1; j2 = 0; k2 = 1; } // Z X Y order
-            } else { // x0 < y0
-                if (y0 < z0) { i1 = 0; j1 = 0; k1 = 1; i2 = 0; j2 = 1; k2 = 1; } // Z Y X order
-                else if (x0 < z0) { i1 = 0; j1 = 1; k1 = 0; i2 = 0; j2 = 1; k2 = 1; } // Y Z X order
-                else { i1 = 0; j1 = 1; k1 = 0; i2 = 1; j2 = 1; k2 = 0; } // Y X Z order
+                if (y0 >= z0) { i1 = 1; j1 = 0; k1 = 0; i2 = 1; j2 = 1; k2 = 0; } 
+                else if (x0 >= z0) { i1 = 1; j1 = 0; k1 = 0; i2 = 1; j2 = 0; k2 = 1; } 
+                else { i1 = 0; j1 = 0; k1 = 1; i2 = 1; j2 = 0; k2 = 1; } 
+            } else { 
+                if (y0 < z0) { i1 = 0; j1 = 0; k1 = 1; i2 = 0; j2 = 1; k2 = 1; } 
+                else if (x0 < z0) { i1 = 0; j1 = 1; k1 = 0; i2 = 0; j2 = 1; k2 = 1; } 
+                else { i1 = 0; j1 = 1; k1 = 0; i2 = 1; j2 = 1; k2 = 0; } 
             }
 
-            // A step of (1,0,0) in (i,j,k) means a step of (1-c,-c,-c) in (x,y,z),
-            // a step of (0,1,0) in (i,j,k) means a step of (-c,1-c,-c) in (x,y,z), and
-            // a step of (0,0,1) in (i,j,k) means a step of (-c,-c,1-c) in (x,y,z), where
-            // c = 1/6.
-            const x1 = x0 - i1 + G3; // Offsets for second corner in (x,y,z) coords
+            const x1 = x0 - i1 + G3; 
             const y1 = y0 - j1 + G3;
             const z1 = z0 - k1 + G3;
-            const x2 = x0 - i2 + 2.0 * G3; // Offsets for third corner in (x,y,z) coords
+            const x2 = x0 - i2 + 2.0 * G3; 
             const y2 = y0 - j2 + 2.0 * G3;
             const z2 = z0 - k2 + 2.0 * G3;
-            const x3 = x0 - 1.0 + 3.0 * G3; // Offsets for last corner in (x,y,z) coords
+            const x3 = x0 - 1.0 + 3.0 * G3; 
             const y3 = y0 - 1.0 + 3.0 * G3;
             const z3 = z0 - 1.0 + 3.0 * G3;
 
-            // Work out the hashed gradient indices of the four simplex corners
             const ii = i & 255;
             const jj = j & 255;
             const kk = k & 255;
@@ -98,7 +89,6 @@
             const gi2 = permMod12[ii + i2 + perm[jj + j2 + perm[kk + k2]]];
             const gi3 = permMod12[ii + 1 + perm[jj + 1 + perm[kk + 1]]];
 
-            // Calculate the contribution from the four corners
             let t0 = 0.6 - x0 * x0 - y0 * y0 - z0 * z0;
             if (t0 < 0) n0 = 0.0;
             else {
@@ -123,8 +113,6 @@
                 t3 *= t3;
                 n3 = t3 * t3 * dot(grad3, gi3 * 3, x3, y3, z3);
             }
-            // Add contributions from each corner to get the final noise value.
-            // The result is scaled to stay just inside [-1,1]
             return 32.0 * (n0 + n1 + n2 + n3);
         }
         
@@ -158,21 +146,21 @@
             let animationFrameId;
             let grid = [];
             let numCols, numRows;
-            let time = Math.random() * 1000; // Start time at a random offset
+            let time = Math.random() * 1000;
 
             const config = {
-                fontSize: 14, // Fixed size for all characters
-                // Katakana, Alphanumeric, common symbols, and some Midjourney-esque words/fragments
-                charSet: "アァカサタナハマヤラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズヅブプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$()*&%#@!?<>[]{}|/\\-_+=imagine prompt art ai stable diffusion render",
-                baseColor: 'rgba(180, 200, 255, VAL)', // VAL will be replaced by alpha
+                fontSize: 12, // Reduced by ~15% from 14 (11.9 -> 12)
+                // Updated character set: letters, numbers, special symbols
+                charSet: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$()*&%#@!?<>[]{}|/\\-_+=^~`:;\",.'",
+                baseColor: 'rgba(180, 200, 255, VAL)', 
                 highlightColor: 'rgba(230, 240, 255, VAL)', 
-                canvasClearColor: 'rgba(10, 10, 25, 1)', // Very dark, slightly blue
-                noiseScale: 0.06,       // How "zoomed in" the noise pattern is
-                timeScale: 0.08,        // How fast the animation evolves
-                activationThreshold: 0.25, // Noise value above which cells activate
-                highlightThreshold: 0.6, // Noise value above which cells get highlightColor
-                fadeSpeed: 0.15,         // How quickly characters fade in/out
-                charChangeProbability: 0.02 // Chance to change character while active
+                canvasClearColor: 'rgba(10, 10, 25, 1)', 
+                noiseScale: 0.06,       
+                timeScale: 0.08,        
+                activationThreshold: 0.25, 
+                highlightThreshold: 0.6, 
+                fadeSpeed: 0.15,         
+                charChangeProbability: 0.02 
             };
             
             class GridCell {
@@ -187,7 +175,6 @@
 
                 update(noiseValue) {
                     if (noiseValue > config.activationThreshold) {
-                        // Use the noise value to determine target brightness, scaled
                         this.targetAlpha = Math.min(1, (noiseValue - config.activationThreshold) / (1 - config.activationThreshold) * 1.5); 
                         
                         if (this.currentAlpha < 0.1 || Math.random() < config.charChangeProbability) {
@@ -199,7 +186,6 @@
                         this.targetAlpha = 0;
                     }
 
-                    // Smoothly transition alpha
                     if (Math.abs(this.currentAlpha - this.targetAlpha) < 0.01) {
                         this.currentAlpha = this.targetAlpha;
                     } else {
@@ -212,8 +198,8 @@
                         ctx.fillStyle = this.colorTemplate.replace('VAL', this.currentAlpha.toFixed(2));
                         ctx.fillText(
                             this.char,
-                            this.col * config.fontSize + config.fontSize * 0.5, // Center char in cell
-                            this.row * config.fontSize + config.fontSize * 0.7 // Adjust vertical alignment
+                            this.col * config.fontSize + config.fontSize * 0.5, 
+                            this.row * config.fontSize + config.fontSize * 0.7 
                         );
                     }
                 }
@@ -226,7 +212,7 @@
             function setupGridAndRun() {
                 if (animationFrameId) cancelAnimationFrame(animationFrameId);
                 
-                SimplexNoise.shufflePermutations(); // Re-shuffle noise on resize for variety
+                SimplexNoise.shufflePermutations();
 
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
@@ -243,19 +229,18 @@
                     }
                     grid.push(rowCells);
                 }
-                console.log(`Grid initialized: ${numCols}x${numRows} cells`);
+                console.log(`Grid initialized: ${numCols}x${numRows} cells, font size: ${config.fontSize}px`);
 
-                // Set font properties once
                 ctx.font = `${config.fontSize}px monospace`;
                 ctx.textAlign = 'center';
-                ctx.textBaseline = 'alphabetic'; // 'middle' or 'alphabetic' can be tweaked
+                ctx.textBaseline = 'alphabetic';
 
-                time = Math.random() * 1000; // Reset time slightly on resize for visual change
+                time = Math.random() * 1000; 
                 animate();
             }
             
             let lastFrameTime = performance.now();
-            const targetFPS = 30; // Target FPS
+            const targetFPS = 30; 
             const frameInterval = 1000 / targetFPS;
 
             function animate() {
@@ -266,16 +251,14 @@
 
                 if (elapsed > frameInterval) {
                     lastFrameTime = now - (elapsed % frameInterval);
-
-                    time += config.timeScale * 0.1; // Adjust time increment for desired evolution speed
+                    time += config.timeScale * 0.1; 
 
                     ctx.fillStyle = config.canvasClearColor;
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                     for (let r = 0; r < numRows; r++) {
                         for (let c = 0; c < numCols; c++) {
-                            // SimplexNoise.noise3D returns values roughly in [-1, 1]
-                            const noiseVal = (SimplexNoise.noise3D(c * config.noiseScale, r * config.noiseScale, time) + 1) / 2; // Normalize to [0, 1]
+                            const noiseVal = (SimplexNoise.noise3D(c * config.noiseScale, r * config.noiseScale, time) + 1) / 2; 
                             grid[r][c].update(noiseVal);
                             grid[r][c].draw();
                         }
