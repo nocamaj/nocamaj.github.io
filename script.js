@@ -1,6 +1,6 @@
 // Wrap in an IIFE
 (function() {
-    console.log('Hybrid Grid ASCII with Cursor Interaction & Refined Text loading...');
+    console.log('Hybrid Grid ASCII with Cursor & Pixel Scramble Text loading...');
 
     const SimplexNoise = (() => { // ... (Simplex Noise code - remains unchanged)
         const F2=0.5*(Math.sqrt(3.0)-1.0);const G2=(3.0-Math.sqrt(3.0))/6.0;const F3=1.0/3.0;const G3=1.0/6.0;
@@ -35,80 +35,79 @@
             if (!ctx || !offCtx) throw new Error('Failed to get 2D context');
 
             let animationFrameId; let grid = []; let numCols, numRows; let time = Math.random() * 1000;
-            let mouseX = -1000, mouseY = -1000; // For cursor interaction
+            let mouseX = -10000, mouseY = -10000; // Initial position far off-screen
 
             const config = {
                 backgroundFontSize: 12, textPixelSize: 2, 
                 nativeTextRenderFontFamily: "Arial, Noto Sans, Noto Sans JP, Noto Sans SC, Noto Sans KR, Noto Naskh Arabic, sans-serif",
-                // Target height for native text relative to content area height
-                nativeTextTargetHeightRatio: 0.80, // Try to make text glyphs 80% of the inner box height
-                minNativeRenderFontSize: 10, // Minimum font size for native text
+                nativeTextTargetHeightRatio: 0.80, minNativeRenderFontSize: 10,
                 charSet: "ABCDEFGHIJKLMN0PQRSTUVWXYZ123456789$*#@&?", 
                 baseColor: 'rgba(180, 200, 255, VAL)', highlightColor: 'rgba(230, 240, 255, VAL)',
                 borderColor: 'rgba(220, 220, 255, 0.8)',
                 borderChar: { corner:'+', top_bottom:'-', side:'|' },
-                textPixelOnColor: 'rgba(250, 250, 255, VAL_ALPHA)',
+                textPixelOnColor: 'rgba(250, 250, 255, 1)', // Solid color, no VAL_ALPHA needed for scramble
                 canvasClearColor: 'rgba(10, 10, 25, 1)', 
                 noiseScale: 0.08, timeScale: 0.08, activationThreshold: 0.3, highlightThreshold: 0.65, 
-                fadeSpeed: 0.1, charChangeProbability: 0.03,
-                phraseStableDisplayDuration: 4000, 
-                textTransitionDuration: 200, // 80% faster: 1000ms * 0.2 = 200ms
-                textAreaWidthRatio: 0.375, textAreaHeightRatio: 0.15, textPaddingRatio: 0.1, // Slightly increased padding ratio for smaller box
-                cursorInteractionRadius: 60, // pixels 
-                cursorVanishStrength: 0.9, // How strongly cursor makes chars vanish (0 to 1)
-                cursorVanishFalloff: 2, // Higher means sharper falloff
+                fadeSpeed: 0.15, // Slightly faster general fade for background chars
+                charChangeProbability: 0.03,
+                phraseStableDisplayDuration: 3000, // Reduced stable time
+                textTransitionDuration: 600, // Transition time for scramble effect
+                textAreaWidthRatio: 0.375, textAreaHeightRatio: 0.15, textPaddingRatio: 0.1,
+                cursorInteractionRadius: 70, 
+                cursorVanishStrength: 1.0, // Max strength, will make them fully transparent
+                cursorVanishFalloff: 1.5,  // How sharply the effect drops off
             };
             
             let currentPhraseIndex = 0; let lastPhraseChangeTime = 0;
             let currentPixelatedTextData = { width:0,height:0,data:[] }; 
             let outgoingPixelatedTextData = null; 
+            let transitionDisplayPixelData = { width:0,height:0,data:[] }; // For scramble effect
             let isTextTransitioning = false; let textTransitionProgress = 0;
 
             let textDisplayArea = { x:0,y:0,width:0,height:0,padding:0 };
             let borderRectCells = { startCol:0,endCol:0,startRow:0,endRow:0 };
 
             class GridCell {
-                constructor(col, row) {
+                constructor(col, row) { /* ... constructor unchanged ... */
                     this.col=col; this.row=row; this.char=getRandomChar(); this.currentAlpha=0; this.targetAlpha=0;
                     this.colorTemplate=config.baseColor; this.isBorder=false; this.borderRole=null; this.isWithinTextDisplayInterior=false;
                 }
                 update(noiseValue) {
-                    const isTopB = this.row===borderRectCells.startRow; const isBottomB = this.row===borderRectCells.endRow-1;
-                    const isLeftB = this.col===borderRectCells.startCol; const isRightB = this.col===borderRectCells.endCol-1;
-                    this.isBorder = (isLeftB||isRightB)&&(this.row>=borderRectCells.startRow&&this.row<borderRectCells.endRow) || (isTopB||isBottomB)&&(this.col>=borderRectCells.startCol&&this.col<borderRectCells.endCol);
-                    this.isWithinTextDisplayInterior = this.col>borderRectCells.startCol && this.col<borderRectCells.endCol-1 && this.row>borderRectCells.startRow && this.row<borderRectCells.endRow-1;
+                    const isTopB=this.row===borderRectCells.startRow;const isBottomB=this.row===borderRectCells.endRow-1;
+                    const isLeftB=this.col===borderRectCells.startCol;const isRightB=this.col===borderRectCells.endCol-1;
+                    this.isBorder=(isLeftB||isRightB)&&(this.row>=borderRectCells.startRow&&this.row<borderRectCells.endRow)||(isTopB||isBottomB)&&(this.col>=borderRectCells.startCol&&this.col<borderRectCells.endCol);
+                    this.isWithinTextDisplayInterior=this.col>borderRectCells.startCol&&this.col<borderRectCells.endCol-1&&this.row>borderRectCells.startRow&&this.row<borderRectCells.endRow-1;
                     
                     let noiseDrivenTargetAlpha = 0;
                     if (noiseValue > config.activationThreshold) {
                         noiseDrivenTargetAlpha = Math.min(1, (noiseValue - config.activationThreshold) / (1 - config.activationThreshold) * 1.2);
                     }
 
-                    if (this.isBorder) {
-                        this.targetAlpha = 0.7 + (Math.sin(time * 2.5 + this.col * 0.2 + this.row * 0.3) + 1) * 0.15; // Slightly different pulse
+                    if (this.isBorder) { /* ... border logic unchanged ... */
+                        this.targetAlpha = 0.7 + (Math.sin(time * 2.5 + this.col * 0.2 + this.row * 0.3) + 1) * 0.15; 
                         this.colorTemplate = config.borderColor.replace('VAL', this.targetAlpha.toFixed(2));
                         if((isTopB&&isLeftB)||(isTopB&&isRightB)||(isBottomB&&isLeftB)||(isBottomB&&isRightB)){this.char=config.borderChar.corner;}
                         else if(isTopB||isBottomB){this.char=config.borderChar.top_bottom;} else if(isLeftB||isRightB){this.char=config.borderChar.side;}
                     } else if (this.isWithinTextDisplayInterior) {
-                        this.targetAlpha = 0; this.char = '';
-                    } else { // Regular background cell, potentially affected by cursor
-                        this.targetAlpha = noiseDrivenTargetAlpha;
+                        this.targetAlpha = 0; this.char = ''; // Strictly clear interior
+                    } else { 
+                        this.targetAlpha = noiseDrivenTargetAlpha; // Start with noise-driven alpha
                         if (this.targetAlpha > 0.01 && (this.currentAlpha < 0.1 || Math.random() < config.charChangeProbability)) { this.char = getRandomChar(); }
                         this.colorTemplate = (noiseValue > config.highlightThreshold && this.targetAlpha > 0.5) ? config.highlightColor : config.baseColor;
 
-                        // Cursor Interaction
+                        // Cursor Interaction - applied to the noise-driven targetAlpha
                         const cellX = (this.col + 0.5) * config.backgroundFontSize;
                         const cellY = (this.row + 0.5) * config.backgroundFontSize;
                         const distToCursor = Math.sqrt(Math.pow(cellX - mouseX, 2) + Math.pow(cellY - mouseY, 2));
                         
                         if (distToCursor < config.cursorInteractionRadius) {
-                            const proximityFactor = 1 - (distToCursor / config.cursorInteractionRadius); // 1 at center, 0 at edge
-                            // Use Math.pow for falloff, then scale by strength
+                            const proximityFactor = Math.max(0, 1 - (distToCursor / config.cursorInteractionRadius));
                             const vanishAmount = Math.pow(proximityFactor, config.cursorVanishFalloff) * config.cursorVanishStrength;
-                            this.targetAlpha = Math.max(0, this.targetAlpha * (1 - vanishAmount) );
+                            this.targetAlpha *= (1 - vanishAmount); // Reduce targetAlpha
                         }
                     }
                     this.currentAlpha += (this.targetAlpha - this.currentAlpha) * config.fadeSpeed;
-                    if (Math.abs(this.currentAlpha-this.targetAlpha)<0.01) this.currentAlpha=this.targetAlpha;
+                    if(Math.abs(this.currentAlpha-this.targetAlpha)<0.01)this.currentAlpha=this.targetAlpha;
                 }
                 draw() { /* ... draw logic unchanged ... */
                     if (this.currentAlpha > 0.001) { 
@@ -120,85 +119,81 @@
             }
 
             function getRandomChar() { return config.charSet.charAt(Math.floor(Math.random()*config.charSet.length)); }
-            function clonePixelatedData(dataToClone) { if(!dataToClone||!dataToClone.data)return{width:0,height:0,data:[]}; return{width:dataToClone.width,height:dataToClone.height,data:dataToClone.data.slice()};}
-
-            function renderAndPixelateCurrentPhrase(targetDataStore) {
-                const phraseObj = phrases[currentPhraseIndex]; const textToRender = phraseObj.text;
-                const contentRenderWidth = textDisplayArea.width - 2*textDisplayArea.padding;
-                const contentRenderHeight = textDisplayArea.height - 2*textDisplayArea.padding;
+            function clonePixelatedData(dataToClone) { /* ... unchanged ... */ if(!dataToClone||!dataToClone.data)return{width:0,height:0,data:[]}; return{width:dataToClone.width,height:dataToClone.height,data:dataToClone.data.slice()};}
+            function renderAndPixelateCurrentPhrase(targetDataStore) { /* ... unchanged (text sizing and centering) ... */
+                const phraseObj=phrases[currentPhraseIndex];const textToRender=phraseObj.text;
+                const contentRenderWidth=textDisplayArea.width-2*textDisplayArea.padding;const contentRenderHeight=textDisplayArea.height-2*textDisplayArea.padding;
                 if(contentRenderWidth<=0||contentRenderHeight<=0){targetDataStore.width=0;targetDataStore.height=0;targetDataStore.data=[];return;}
-
-                let dynamicFontSize = config.minNativeRenderFontSize; // Start with min
-                
-                // Iteratively find font size to match target height ratio
-                // This is a simplified approach; robust text fitting is complex.
-                let textHeight = 0;
-                for (let fs = config.minNativeRenderFontSize; fs < 200; fs++) { // Max iteration check
-                    offCtx.font = `bold ${fs}px ${config.nativeTextRenderFontFamily}`;
-                    const metrics = offCtx.measureText("Tg"); // Use character with ascender/descender
-                    textHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
-                    if (textHeight >= contentRenderHeight * config.nativeTextTargetHeightRatio || textHeight >= contentRenderHeight) {
-                        dynamicFontSize = fs;
-                        break;
-                    }
-                    dynamicFontSize = fs; // In case loop finishes early
-                }
-                // Ensure it's not too small if target ratio was too aggressive for min font size
-                dynamicFontSize = Math.max(config.minNativeRenderFontSize, dynamicFontSize);
-                
-                // Now check width with this font size
-                offCtx.font = `bold ${dynamicFontSize}px ${config.nativeTextRenderFontFamily}`;
-                let textMetrics = offCtx.measureText(textToRender);
-                let textWidth = textMetrics.width;
-
-                if (textWidth > contentRenderWidth && contentRenderWidth > 0) {
-                    dynamicFontSize = Math.floor(dynamicFontSize * (contentRenderWidth / textWidth));
-                }
-                dynamicFontSize = Math.max(config.minNativeRenderFontSize, dynamicFontSize);
-
-                // Final font setting for offscreen rendering
-                offCtx.font = `bold ${dynamicFontSize}px ${config.nativeTextRenderFontFamily}`;
-                textMetrics = offCtx.measureText(textToRender);
-                textWidth = textMetrics.width;
-                textHeight = (textMetrics.actualBoundingBoxAscent + textMetrics.actualBoundingBoxDescent);
-                textHeight = (textHeight && !isNaN(textHeight) && textHeight > 0) ? textHeight : dynamicFontSize;
-                
-                offscreenCanvas.width = Math.max(1, Math.ceil(textWidth));
-                offscreenCanvas.height = Math.max(1, Math.ceil(textHeight));
-                
-                offCtx.font = `bold ${dynamicFontSize}px ${config.nativeTextRenderFontFamily}`;
-                offCtx.fillStyle = '#FFFFFF'; offCtx.textAlign = 'center'; offCtx.textBaseline = 'middle';
-                offCtx.clearRect(0,0,offscreenCanvas.width,offscreenCanvas.height);
-                offCtx.fillText(textToRender, offscreenCanvas.width/2, offscreenCanvas.height/2); // Centered
-
+                let dynamicFontSize=config.minNativeRenderFontSize;let textHeight=0;
+                for(let fs=config.minNativeRenderFontSize;fs<200;fs++){offCtx.font=`bold ${fs}px ${config.nativeTextRenderFontFamily}`;const metrics=offCtx.measureText("Tg");textHeight=metrics.actualBoundingBoxAscent+metrics.actualBoundingBoxDescent;if(textHeight>=contentRenderHeight*config.nativeTextTargetHeightRatio||textHeight>=contentRenderHeight){dynamicFontSize=fs;break;}dynamicFontSize=fs;}
+                dynamicFontSize=Math.max(config.minNativeRenderFontSize,dynamicFontSize);
+                offCtx.font=`bold ${dynamicFontSize}px ${config.nativeTextRenderFontFamily}`;let textMetrics=offCtx.measureText(textToRender);let textWidth=textMetrics.width;
+                if(textWidth>contentRenderWidth&&contentRenderWidth>0){dynamicFontSize=Math.floor(dynamicFontSize*(contentRenderWidth/textWidth));}dynamicFontSize=Math.max(config.minNativeRenderFontSize,dynamicFontSize);
+                offCtx.font=`bold ${dynamicFontSize}px ${config.nativeTextRenderFontFamily}`;textMetrics=offCtx.measureText(textToRender);textWidth=textMetrics.width;textHeight=(textMetrics.actualBoundingBoxAscent+textMetrics.actualBoundingBoxDescent);textHeight=(textHeight&&!isNaN(textHeight)&&textHeight>0)?textHeight:dynamicFontSize;
+                offscreenCanvas.width=Math.max(1,Math.ceil(textWidth));offscreenCanvas.height=Math.max(1,Math.ceil(textHeight));
+                offCtx.font=`bold ${dynamicFontSize}px ${config.nativeTextRenderFontFamily}`;offCtx.fillStyle='#FFFFFF';offCtx.textAlign='center';offCtx.textBaseline='middle';offCtx.clearRect(0,0,offscreenCanvas.width,offscreenCanvas.height);offCtx.fillText(textToRender,offscreenCanvas.width/2,offscreenCanvas.height/2);
                 const iData=offCtx.getImageData(0,0,offscreenCanvas.width,offscreenCanvas.height);const d=iData.data;
                 const nPC=Math.floor(contentRenderWidth/config.textPixelSize);const nPR=Math.floor(contentRenderHeight/config.textPixelSize);
                 if(nPC<=0||nPR<=0){targetDataStore.width=0;targetDataStore.height=0;targetDataStore.data=[];return;}
                 targetDataStore.width=nPC;targetDataStore.height=nPR;targetDataStore.data=[];
-                for(let r=0;r<nPR;r++){for(let c=0;c<nPC;c++){
-                    const sX=Math.floor(c*(offscreenCanvas.width/nPC));const sY=Math.floor(r*(offscreenCanvas.height/nPR));
-                    const sSX=Math.min(offscreenCanvas.width-1,Math.floor(sX+(offscreenCanvas.width/nPC)*0.5));
-                    const sSY=Math.min(offscreenCanvas.height-1,Math.floor(sY+(offscreenCanvas.height/nPR)*0.5));
-                    const aI=(sSY*offscreenCanvas.width+sSX)*4+3;const aV=d[aI];targetDataStore.data.push(aV>128?1:0);
-                }}
+                for(let r=0;r<nPR;r++){for(let c=0;c<nPC;c++){const sX=Math.floor(c*(offscreenCanvas.width/nPC));const sY=Math.floor(r*(offscreenCanvas.height/nPR));const sSX=Math.min(offscreenCanvas.width-1,Math.floor(sX+(offscreenCanvas.width/nPC)*0.5));const sSY=Math.min(offscreenCanvas.height-1,Math.floor(sY+(offscreenCanvas.height/nPR)*0.5));const aI=(sSY*offscreenCanvas.width+sSX)*4+3;const aV=d[aI];targetDataStore.data.push(aV>128?1:0);}}
             }
 
-            function drawPixelatedTextInstance(pixelData, alphaMultiplier = 1) {
-                if(!pixelData||!pixelData.data.length||pixelData.width===0)return;
-                const totalPixelatedWidth=pixelData.width*config.textPixelSize;const totalPixelatedHeight=pixelData.height*config.textPixelSize;
-                const contentRenderWidth=textDisplayArea.width-2*textDisplayArea.padding;const contentRenderHeight=textDisplayArea.height-2*textDisplayArea.padding;
-                const startDrawX=textDisplayArea.x+textDisplayArea.padding+Math.floor((contentRenderWidth-totalPixelatedWidth)/2);
-                const startDrawY=textDisplayArea.y+textDisplayArea.padding+Math.floor((contentRenderHeight-totalPixelatedHeight)/2);
-                const baseColor=config.textPixelOnColor.substring(0,config.textPixelOnColor.lastIndexOf(','))
-                ctx.fillStyle=`${baseColor}, ${Math.min(1, Math.max(0, alphaMultiplier)).toFixed(2)})`; // Ensure alpha is between 0 and 1
-                for(let r=0;r<pixelData.height;r++){for(let c=0;c<pixelData.width;c++){
-                    if(pixelData.data[r*pixelData.width+c]===1){
-                        ctx.fillRect(startDrawX+c*config.textPixelSize,startDrawY+r*config.textPixelSize,config.textPixelSize,config.textPixelSize);
+            function drawPixelatedTextScramble() {
+                if (!transitionDisplayPixelData.data.length || transitionDisplayPixelData.width === 0) return;
+                
+                const totalPixelatedWidth = transitionDisplayPixelData.width * config.textPixelSize;
+                const totalPixelatedHeight = transitionDisplayPixelData.height * config.textPixelSize;
+                const contentRenderWidth = textDisplayArea.width - 2 * textDisplayArea.padding;
+                const contentRenderHeight = textDisplayArea.height - 2 * textDisplayArea.padding;
+                const startDrawX = textDisplayArea.x + textDisplayArea.padding + Math.floor((contentRenderWidth - totalPixelatedWidth) / 2);
+                const startDrawY = textDisplayArea.y + textDisplayArea.padding + Math.floor((contentRenderHeight - totalPixelatedHeight) / 2);
+                
+                ctx.fillStyle = config.textPixelOnColor; // Now solid, no VAL_ALPHA
+
+                for (let r = 0; r < transitionDisplayPixelData.height; r++) {
+                    for (let c = 0; c < transitionDisplayPixelData.width; c++) {
+                        if (transitionDisplayPixelData.data[r * transitionDisplayPixelData.width + c] === 1) {
+                            ctx.fillRect(startDrawX + c * config.textPixelSize, startDrawY + r * config.textPixelSize, config.textPixelSize, config.textPixelSize);
+                        }
                     }
-                }}
+                }
             }
             
-            function setupAndRun() { /* ... setupAndRun largely unchanged, uses new config values ... */
+            function computeTransitionFrame() {
+                if (!currentPixelatedTextData.data.length || !outgoingPixelatedTextData || !outgoingPixelatedTextData.data.length) {
+                    // Fallback if data is missing, just show current text
+                    transitionDisplayPixelData = clonePixelatedData(currentPixelatedTextData);
+                    return;
+                }
+
+                if (transitionDisplayPixelData.width !== currentPixelatedTextData.width || 
+                    transitionDisplayPixelData.height !== currentPixelatedTextData.height) {
+                    transitionDisplayPixelData.width = currentPixelatedTextData.width;
+                    transitionDisplayPixelData.height = currentPixelatedTextData.height;
+                    transitionDisplayPixelData.data = new Array(currentPixelatedTextData.width * currentPixelatedTextData.height).fill(0);
+                }
+
+                const totalPixels = transitionDisplayPixelData.width * transitionDisplayPixelData.height;
+                for (let i = 0; i < totalPixels; i++) {
+                    const oldOn = outgoingPixelatedTextData.data[i] === 1;
+                    const newOn = currentPixelatedTextData.data[i] === 1;
+                    let shouldBeOn = 0;
+
+                    if (oldOn && !newOn) { // Pixel was on, needs to turn off
+                        shouldBeOn = (Math.random() > textTransitionProgress) ? 1 : 0;
+                    } else if (!oldOn && newOn) { // Pixel was off, needs to turn on
+                        shouldBeOn = (Math.random() < textTransitionProgress) ? 1 : 0;
+                    } else if (newOn) { // Was on and stays on, or was off and becomes on (covered by above)
+                        shouldBeOn = 1; // If it's part of new text, it should try to be on
+                    } else { // Was off and stays off
+                        shouldBeOn = 0;
+                    }
+                    transitionDisplayPixelData.data[i] = shouldBeOn;
+                }
+            }
+
+            function setupAndRun() { /* ... setupAndRun largely unchanged ... */
                 if(animationFrameId)cancelAnimationFrame(animationFrameId);SimplexNoise.shufflePermutations();canvas.width=window.innerWidth;canvas.height=window.innerHeight;
                 numCols=Math.floor(canvas.width/config.backgroundFontSize);numRows=Math.floor(canvas.height/config.backgroundFontSize);
                 textDisplayArea.width=Math.floor(canvas.width*config.textAreaWidthRatio);textDisplayArea.height=Math.floor(canvas.height*config.textAreaHeightRatio);
@@ -208,51 +203,52 @@
                 borderRectCells.startRow=Math.max(0,Math.floor(textDisplayArea.y/config.backgroundFontSize)-1);borderRectCells.endRow=Math.min(numRows,Math.ceil((textDisplayArea.y+textDisplayArea.height)/config.backgroundFontSize)+1);
                 grid=[];for(let r=0;r<numRows;r++){let rowCells=[];for(let c=0;c<numCols;c++){rowCells.push(new GridCell(c,r));}grid.push(rowCells);}
                 renderAndPixelateCurrentPhrase(currentPixelatedTextData); 
+                transitionDisplayPixelData = clonePixelatedData(currentPixelatedTextData); // Initialize display with first phrase
                 lastPhraseChangeTime=performance.now(); isTextTransitioning=false; textTransitionProgress=0; outgoingPixelatedTextData=null;
                 ctx.font=`${config.backgroundFontSize}px monospace`;ctx.textAlign='center';ctx.textBaseline='alphabetic';time=Math.random()*1000;animate();
             }
             
             let lastFrameDrawnTime = performance.now(); 
-            const targetFPS = 30; // Increased target FPS slightly
-            const frameInterval = 1000 / targetFPS;
+            const targetFPS = 30; const frameInterval = 1000 / targetFPS;
 
-            function animate() { /* ... animate loop with transition logic largely unchanged, but uses new transition duration ... */
+            function animate() {
                 animationFrameId = requestAnimationFrame(animate);
                 const now = performance.now(); const elapsed = now - lastFrameDrawnTime;
+
                 if (elapsed >= frameInterval) {
-                    lastFrameDrawnTime = now - (elapsed % frameInterval); time += config.timeScale * 0.1 * (elapsed / frameInterval);
+                    lastFrameDrawnTime = now - (elapsed % frameInterval);
+                    time += config.timeScale * 0.1 * (elapsed / frameInterval);
+
                     if (isTextTransitioning) {
                         textTransitionProgress += (elapsed / config.textTransitionDuration);
-                        if (textTransitionProgress >= 1) { isTextTransitioning = false; textTransitionProgress = 0; outgoingPixelatedTextData = null; lastPhraseChangeTime = now; }
+                        computeTransitionFrame(); // Update transitionDisplayPixelData based on progress
+                        if (textTransitionProgress >= 1) {
+                            isTextTransitioning = false; textTransitionProgress = 0; outgoingPixelatedTextData = null;
+                            transitionDisplayPixelData = clonePixelatedData(currentPixelatedTextData); // Solidify new text
+                            lastPhraseChangeTime = now; 
+                        }
                     } else if (now - lastPhraseChangeTime > config.phraseStableDisplayDuration) {
-                        isTextTransitioning = true; textTransitionProgress = 0; outgoingPixelatedTextData = clonePixelatedData(currentPixelatedTextData);
-                        currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length; renderAndPixelateCurrentPhrase(currentPixelatedTextData);
+                        isTextTransitioning = true; textTransitionProgress = 0;
+                        outgoingPixelatedTextData = clonePixelatedData(currentPixelatedTextData);
+                        currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length;
+                        renderAndPixelateCurrentPhrase(currentPixelatedTextData);
+                        // Initial frame of transitionDisplayPixelData will be computed in next block
                     }
+
                     ctx.fillStyle = config.canvasClearColor; ctx.fillRect(0, 0, canvas.width, canvas.height);
                     ctx.font = `${config.backgroundFontSize}px monospace`; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
                     for(let r=0;r<numRows;r++){for(let c=0;c<numCols;c++){const noiseVal=(SimplexNoise.noise3D(c*config.noiseScale,r*config.noiseScale,time)+1)/2;grid[r][c].update(noiseVal);grid[r][c].draw();}}
-                    if (isTextTransitioning) {
-                        if (outgoingPixelatedTextData) { drawPixelatedTextInstance(outgoingPixelatedTextData, 1 - textTransitionProgress); }
-                        drawPixelatedTextInstance(currentPixelatedTextData, textTransitionProgress);
-                    } else { drawPixelatedTextInstance(currentPixelatedTextData, 1); }
+                    
+                    drawPixelatedTextScramble(); // Always draw based on transitionDisplayPixelData
                 }
             }
             
-            // Mouse move listener for cursor interaction
-            canvas.addEventListener('mousemove', (event) => {
-                const rect = canvas.getBoundingClientRect();
-                mouseX = event.clientX - rect.left;
-                mouseY = event.clientY - rect.top;
-            });
-            canvas.addEventListener('mouseleave', () => {
-                mouseX = -1000; mouseY = -1000; // Move cursor off-screen effectively
-            });
-
-
+            canvas.addEventListener('mousemove', (event) => { const rect = canvas.getBoundingClientRect(); mouseX = event.clientX - rect.left; mouseY = event.clientY - rect.top; });
+            canvas.addEventListener('mouseleave', () => { mouseX = -10000; mouseY = -10000; });
             setupAndRun();
             let resizeTimeout; window.addEventListener('resize', () => {clearTimeout(resizeTimeout); resizeTimeout = setTimeout(setupAndRun, 300);});
-            console.log('Hybrid animation with cursor interaction and refined text setup complete');
-        } catch (error) { /* ... error handling ... */
+            console.log('Hybrid animation with cursor & scramble text setup complete');
+        } catch (error) { /* ... error handling ... */ 
             console.error('Animation initialization failed:', error);
             const errorElement = document.createElement('div');
             Object.assign(errorElement.style, {position:'fixed',top:'10px',left:'10px',background:'rgba(255,0,0,0.8)',color:'white',padding:'15px',zIndex:'10000',border:'1px solid white',borderRadius:'5px',maxWidth:'calc(100% - 20px)',fontSize:'12px'});
