@@ -16,7 +16,10 @@ body, html {
     height: 100%;
     z-index: 1; 
     overflow: hidden; 
-    pointer-events: none; 
+    /* pointer-events: none;  <-- REMOVE THIS if you want cursor interaction directly on canvas,
+                                 but we will add listeners to window for broader coverage.
+                                 If keeping it, ensure background-animation div doesn't block mouse for body.
+                                 For this solution, we'll assume body/window listeners. */
     background-color: transparent; 
 }
 
@@ -35,8 +38,7 @@ header {
     left: 0;
     width: 100%;
     background-color: rgba(18, 18, 18, 0.00); 
-    /* Reduced blur from 10px to 8.5px */
-    backdrop-filter: blur(8.5px);
+    backdrop-filter: blur(8.5px); /* Already reduced */
     -webkit-backdrop-filter: blur(8.5px);
     padding: 15px 20px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
@@ -45,25 +47,20 @@ header {
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-nav { /* ... rest of nav styles ... */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    max-width: 1600px;
-    margin: 0 auto;
+nav { /* ... nav styles ... */
+    display: flex; justify-content: space-between; align-items: center;
+    width: 100%; max-width: 1600px; margin: 0 auto;
 }
-
 .nav-left { display: flex; margin-right: auto; }
 .nav-right { display: flex; margin-left: auto; }
 .nav-left .nav-button, .nav-right .nav-button {
     color: #F5F5F5; text-decoration: none; padding: 8px 15px; margin: 0 8px;
-    border-radius: 5px; transition: all 0.3s ease; white-space: nowrap;
+    border-radius: 5px; transition: all 0.3s ease; white-space: nowrap; cursor: pointer;
     letter-spacing: 0.5px; font-weight: 500; position: relative; overflow: hidden; z-index: 1;
 }
-.nav-left .nav-button::before, .nav-right .nav-button::before {
+.nav-left .nav-button::before, .nav-right .nav-button::before { /* ... button hover effect ... */
     content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(255, 255, 255, 0.1); transform: translateY(100%);
+    background-color: rgba(255,255,255,0.1); transform: translateY(100%);
     transition: transform 0.3s ease; z-index: -1; border-radius: 5px;
 }
 .nav-left .nav-button:hover, .nav-right .nav-button:hover {
@@ -71,40 +68,93 @@ nav { /* ... rest of nav styles ... */
 }
 .nav-left .nav-button:hover::before, .nav-right .nav-button:hover::before { transform: translateY(0); }
 
-
-main { /* ... rest of main styles ... */
-    position: relative; padding-top: 80px; padding-bottom: 80px;
-    min-height: calc(100vh - 160px); z-index: 5; 
+main {
+    position: relative;
+    padding-top: 70px; /* Adjusted for header height */
+    padding-bottom: 70px; /* Adjusted for footer height */
+    height: calc(100vh - 140px); /* Ensure main takes up available space */
+    box-sizing: border-box;
+    z-index: 5; 
+    overflow-y: auto; /* Allow scrolling if content exceeds viewport */
 }
 
-footer { /* ... rest of footer styles ... */
+.page-content {
+    padding: 20px;
+    text-align: center;
+    color: #F5F5F5; /* Ensure text in pages is visible */
+}
+
+#home-content { /* Styles for the default "empty" main area if needed */
+    /* display: none; /* Initially hidden if another page is default */
+}
+
+#travel-page {
+    /* display: none; /* Initially hidden */
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#world-map-container {
+    width: 90%;
+    max-width: 1200px; /* Max width for the map */
+    max-height: calc(100% - 40px); /* Max height considering padding */
+    margin: auto;
+    background-color: rgba(25, 25, 35, 0.3); /* Slight background for map area */
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+}
+
+#world-map-container svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* Scales SVG down to fit, preserving aspect ratio */
+}
+
+/* Styling for SVG paths - adjust selectors based on your SVG structure */
+#world-map-container svg .country { /* Assuming countries have class="country" */
+    stroke: #78909C;  /* A lighter, cool grey for borders */
+    stroke-width: 0.5; /* Use relative units if your SVG scales, or adjust px */
+    fill: #37474F;    /* Darker, muted blue-grey for non-visited */
+    transition: fill 0.2s ease-in-out;
+}
+
+#world-map-container svg .country.visited {
+    fill: #ECEFF1;    /* Off-white for visited countries */
+}
+
+#world-map-container svg .country:not(.visited):hover {
+    fill: #546E7A;    /* Hover effect for non-visited */
+}
+#world-map-container svg .country.visited:hover {
+    fill: #CFD8DC;   /* Slight hover change for visited */
+}
+
+
+footer { /* ... footer styles ... */
     position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px 0;
-    background-color: rgba(18, 18, 18, 0.00);
-    /* Reduced blur from 10px to 8.5px */
-    backdrop-filter: blur(8.5px); 
-    -webkit-backdrop-filter: blur(8.5px);
-    display: flex; justify-content: center; align-items: center;
-    z-index: 10; box-sizing: border-box;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+    background-color: rgba(18,18,18,0.00); backdrop-filter: blur(8.5px); -webkit-backdrop-filter: blur(8.5px);
+    display: flex; justify-content: center; align-items: center; z-index: 10; box-sizing: border-box;
+    border-top: 1px solid rgba(255,255,255,0.08); box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
 }
-
-.search-container input[type="text"] { /* ... rest of search styles ... */
+.search-container input[type="text"] { /* ... search input styles ... */
     width: 400px; padding: 12px 20px; border: 1px solid rgba(255,255,255,0.1);
     border-radius: 25px; background-color: rgba(18,18,18,0.5); color: #F5F5F5;
     font-size: 16px; outline: none; transition: all 0.3s ease; max-width: 90vw;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.15); backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
 }
 .search-container input[type="text"]::placeholder { color: rgba(255,255,255,0.6); }
 .search-container input[type="text"]:focus {
     border-color: rgba(255,255,255,0.3); box-shadow: 0 0 15px rgba(255,255,255,0.1);
     background-color: rgba(26,26,26,0.7); transform: translateY(-2px);
 }
-
-@media (max-width: 768px) { /* ... rest of media query styles ... */
-    nav { padding: 0 5px; }
-    .nav-right { justify-content: flex-end; }
+@media (max-width: 768px) { /* ... media query styles ... */
+    nav { padding: 0 5px; } .nav-right { justify-content: flex-end; }
     .nav-left .nav-button, .nav-right .nav-button { padding: 6px 10px; margin: 0 3px; }
     .search-container input[type="text"] { width: 80vw; }
+    #world-map-container { width: 95%; padding: 5px; }
 }
