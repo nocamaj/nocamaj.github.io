@@ -1,4 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Clear any potential unwanted content from main
+    const mainElement = document.querySelector('main');
+    if (mainElement) {
+        mainElement.innerHTML = '';
+    }
+
     const backgroundContainer = document.querySelector('.background-animation');
     if (!backgroundContainer) return;
 
