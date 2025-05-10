@@ -24,16 +24,7 @@
     function initAnimation() {
         try {
             const backgroundContainer = document.querySelector('.background-animation');
-            if (!backgroundContainer) {
-                // Don't throw an error if not found, just don't initialize animation.
-                // This allows pages without .background-animation to not run this.
-                // However, for this site, we assume it's on all pages.
-                // If it's truly optional, this check should be more nuanced or the script
-                // should only be included on pages that need it.
-                // For now, if it's missing, it will be caught by the error handler.
-                 console.warn('.background-animation container not found. Skipping animation init.');
-                 return; // Exit if the container isn't there.
-            }
+            if (!backgroundContainer) throw new Error('.background-animation not found!');
             backgroundContainer.innerHTML = ''; 
             
             const canvas = document.createElement('canvas');
@@ -54,23 +45,23 @@
                 baseColor: 'rgba(180, 200, 255, VAL)', highlightColor: 'rgba(230, 240, 255, VAL)',
                 borderColor: 'rgba(220, 220, 255, 0.8)',
                 borderChar: { corner:'+', top_bottom:'-', side:'|' },
-                textPixelOnColor: 'rgba(250, 250, 255, 1)',
+                textPixelOnColor: 'rgba(250, 250, 255, 1)', // Solid color, no VAL_ALPHA needed for scramble
                 canvasClearColor: 'rgba(10, 10, 25, 1)', 
                 noiseScale: 0.08, timeScale: 0.08, activationThreshold: 0.3, highlightThreshold: 0.65, 
-                fadeSpeed: 0.15, 
+                fadeSpeed: 0.15, // Slightly faster general fade for background chars
                 charChangeProbability: 0.03,
-                phraseStableDisplayDuration: 7000, // MODIFIED: Increased from 3000
-                textTransitionDuration: 400,    // MODIFIED: Reduced from 600 for faster/smoother transition
+                phraseStableDisplayDuration: 3000, // Reduced stable time
+                textTransitionDuration: 600, // Transition time for scramble effect
                 textAreaWidthRatio: 0.375, textAreaHeightRatio: 0.15, textPaddingRatio: 0.1,
                 cursorInteractionRadius: 70, 
-                cursorVanishStrength: 1.0, 
-                cursorVanishFalloff: 1.5,  
+                cursorVanishStrength: 1.0, // Max strength, will make them fully transparent
+                cursorVanishFalloff: 1.5,  // How sharply the effect drops off
             };
             
             let currentPhraseIndex = 0; let lastPhraseChangeTime = 0;
             let currentPixelatedTextData = { width:0,height:0,data:[] }; 
             let outgoingPixelatedTextData = null; 
-            let transitionDisplayPixelData = { width:0,height:0,data:[] }; 
+            let transitionDisplayPixelData = { width:0,height:0,data:[] }; // For scramble effect
             let isTextTransitioning = false; let textTransitionProgress = 0;
 
             let textDisplayArea = { x:0,y:0,width:0,height:0,padding:0 };
@@ -104,6 +95,7 @@
                         if (this.targetAlpha > 0.01 && (this.currentAlpha < 0.1 || Math.random() < config.charChangeProbability)) { this.char = getRandomChar(); }
                         this.colorTemplate = (noiseValue > config.highlightThreshold && this.targetAlpha > 0.5) ? config.highlightColor : config.baseColor;
 
+                        // Cursor Interaction - applied to the noise-driven targetAlpha
                         const cellX = (this.col + 0.5) * config.backgroundFontSize;
                         const cellY = (this.row + 0.5) * config.backgroundFontSize;
                         const distToCursor = Math.sqrt(Math.pow(cellX - mouseX, 2) + Math.pow(cellY - mouseY, 2));
@@ -111,7 +103,7 @@
                         if (distToCursor < config.cursorInteractionRadius) {
                             const proximityFactor = Math.max(0, 1 - (distToCursor / config.cursorInteractionRadius));
                             const vanishAmount = Math.pow(proximityFactor, config.cursorVanishFalloff) * config.cursorVanishStrength;
-                            this.targetAlpha *= (1 - vanishAmount); 
+                            this.targetAlpha *= (1 - vanishAmount); // Reduce targetAlpha
                         }
                     }
                     this.currentAlpha += (this.targetAlpha - this.currentAlpha) * config.fadeSpeed;
@@ -128,7 +120,7 @@
 
             function getRandomChar() { return config.charSet.charAt(Math.floor(Math.random()*config.charSet.length)); }
             function clonePixelatedData(dataToClone) { /* ... unchanged ... */ if(!dataToClone||!dataToClone.data)return{width:0,height:0,data:[]}; return{width:dataToClone.width,height:dataToClone.height,data:dataToClone.data.slice()};}
-            function renderAndPixelateCurrentPhrase(targetDataStore) { /* ... unchanged ... */
+            function renderAndPixelateCurrentPhrase(targetDataStore) { /* ... unchanged (text sizing and centering) ... */
                 const phraseObj=phrases[currentPhraseIndex];const textToRender=phraseObj.text;
                 const contentRenderWidth=textDisplayArea.width-2*textDisplayArea.padding;const contentRenderHeight=textDisplayArea.height-2*textDisplayArea.padding;
                 if(contentRenderWidth<=0||contentRenderHeight<=0){targetDataStore.width=0;targetDataStore.height=0;targetDataStore.data=[];return;}
@@ -157,7 +149,7 @@
                 const startDrawX = textDisplayArea.x + textDisplayArea.padding + Math.floor((contentRenderWidth - totalPixelatedWidth) / 2);
                 const startDrawY = textDisplayArea.y + textDisplayArea.padding + Math.floor((contentRenderHeight - totalPixelatedHeight) / 2);
                 
-                ctx.fillStyle = config.textPixelOnColor; 
+                ctx.fillStyle = config.textPixelOnColor; // Now solid, no VAL_ALPHA
 
                 for (let r = 0; r < transitionDisplayPixelData.height; r++) {
                     for (let c = 0; c < transitionDisplayPixelData.width; c++) {
@@ -170,6 +162,7 @@
             
             function computeTransitionFrame() {
                 if (!currentPixelatedTextData.data.length || !outgoingPixelatedTextData || !outgoingPixelatedTextData.data.length) {
+                    // Fallback if data is missing, just show current text
                     transitionDisplayPixelData = clonePixelatedData(currentPixelatedTextData);
                     return;
                 }
@@ -187,13 +180,13 @@
                     const newOn = currentPixelatedTextData.data[i] === 1;
                     let shouldBeOn = 0;
 
-                    if (oldOn && !newOn) { 
+                    if (oldOn && !newOn) { // Pixel was on, needs to turn off
                         shouldBeOn = (Math.random() > textTransitionProgress) ? 1 : 0;
-                    } else if (!oldOn && newOn) { 
+                    } else if (!oldOn && newOn) { // Pixel was off, needs to turn on
                         shouldBeOn = (Math.random() < textTransitionProgress) ? 1 : 0;
-                    } else if (newOn) { 
-                        shouldBeOn = 1; 
-                    } else { 
+                    } else if (newOn) { // Was on and stays on, or was off and becomes on (covered by above)
+                        shouldBeOn = 1; // If it's part of new text, it should try to be on
+                    } else { // Was off and stays off
                         shouldBeOn = 0;
                     }
                     transitionDisplayPixelData.data[i] = shouldBeOn;
@@ -209,23 +202,8 @@
                 borderRectCells.startCol=Math.max(0,Math.floor(textDisplayArea.x/config.backgroundFontSize)-1);borderRectCells.endCol=Math.min(numCols,Math.ceil((textDisplayArea.x+textDisplayArea.width)/config.backgroundFontSize)+1);
                 borderRectCells.startRow=Math.max(0,Math.floor(textDisplayArea.y/config.backgroundFontSize)-1);borderRectCells.endRow=Math.min(numRows,Math.ceil((textDisplayArea.y+textDisplayArea.height)/config.backgroundFontSize)+1);
                 grid=[];for(let r=0;r<numRows;r++){let rowCells=[];for(let c=0;c<numCols;c++){rowCells.push(new GridCell(c,r));}grid.push(rowCells);}
-                
-                // Only render pixelated text if we are on a page that intends to display it
-                // This could be checked by a specific element ID or class on index.html's main area for example
-                // For now, it assumes any page with the canvas will try to render text.
-                // If main content area exists on index.html but not on travel.html, this might need adjustment.
-                // The current structure with an empty <main> on index.html means textDisplayArea is central.
-                // On travel.html, <main> is filled with map, so textDisplayArea calculation might be over map.
-                // This is fine as drawPixelatedTextScramble uses textDisplayArea coords.
-                if (document.querySelector('main').innerHTML.trim() === '') { // Heuristic: if main is empty, it's probably index
-                    renderAndPixelateCurrentPhrase(currentPixelatedTextData); 
-                    transitionDisplayPixelData = clonePixelatedData(currentPixelatedTextData); 
-                } else {
-                    // On other pages like travel, we don't want the text phrase.
-                    currentPixelatedTextData = { width:0,height:0,data:[] }; 
-                    transitionDisplayPixelData = { width:0,height:0,data:[] };
-                }
-
+                renderAndPixelateCurrentPhrase(currentPixelatedTextData); 
+                transitionDisplayPixelData = clonePixelatedData(currentPixelatedTextData); // Initialize display with first phrase
                 lastPhraseChangeTime=performance.now(); isTextTransitioning=false; textTransitionProgress=0; outgoingPixelatedTextData=null;
                 ctx.font=`${config.backgroundFontSize}px monospace`;ctx.textAlign='center';ctx.textBaseline='alphabetic';time=Math.random()*1000;animate();
             }
@@ -240,34 +218,28 @@
                 if (elapsed >= frameInterval) {
                     lastFrameDrawnTime = now - (elapsed % frameInterval);
                     time += config.timeScale * 0.1 * (elapsed / frameInterval);
-                    
-                    // Only manage phrases if currentPixelatedTextData has width (i.e., we intend to show phrases)
-                    if (currentPixelatedTextData.width > 0) {
-                        if (isTextTransitioning) {
-                            textTransitionProgress += (elapsed / config.textTransitionDuration);
-                            computeTransitionFrame(); 
-                            if (textTransitionProgress >= 1) {
-                                isTextTransitioning = false; textTransitionProgress = 0; outgoingPixelatedTextData = null;
-                                transitionDisplayPixelData = clonePixelatedData(currentPixelatedTextData); 
-                                lastPhraseChangeTime = now; 
-                            }
-                        } else if (now - lastPhraseChangeTime > config.phraseStableDisplayDuration) {
-                            isTextTransitioning = true; textTransitionProgress = 0;
-                            outgoingPixelatedTextData = clonePixelatedData(currentPixelatedTextData);
-                            currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length;
-                            renderAndPixelateCurrentPhrase(currentPixelatedTextData);
-                        }
-                    }
 
+                    if (isTextTransitioning) {
+                        textTransitionProgress += (elapsed / config.textTransitionDuration);
+                        computeTransitionFrame(); // Update transitionDisplayPixelData based on progress
+                        if (textTransitionProgress >= 1) {
+                            isTextTransitioning = false; textTransitionProgress = 0; outgoingPixelatedTextData = null;
+                            transitionDisplayPixelData = clonePixelatedData(currentPixelatedTextData); // Solidify new text
+                            lastPhraseChangeTime = now; 
+                        }
+                    } else if (now - lastPhraseChangeTime > config.phraseStableDisplayDuration) {
+                        isTextTransitioning = true; textTransitionProgress = 0;
+                        outgoingPixelatedTextData = clonePixelatedData(currentPixelatedTextData);
+                        currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length;
+                        renderAndPixelateCurrentPhrase(currentPixelatedTextData);
+                        // Initial frame of transitionDisplayPixelData will be computed in next block
+                    }
 
                     ctx.fillStyle = config.canvasClearColor; ctx.fillRect(0, 0, canvas.width, canvas.height);
                     ctx.font = `${config.backgroundFontSize}px monospace`; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
                     for(let r=0;r<numRows;r++){for(let c=0;c<numCols;c++){const noiseVal=(SimplexNoise.noise3D(c*config.noiseScale,r*config.noiseScale,time)+1)/2;grid[r][c].update(noiseVal);grid[r][c].draw();}}
                     
-                    // Only draw if data exists
-                    if (transitionDisplayPixelData.width > 0) {
-                        drawPixelatedTextScramble(); 
-                    }
+                    drawPixelatedTextScramble(); // Always draw based on transitionDisplayPixelData
                 }
             }
             

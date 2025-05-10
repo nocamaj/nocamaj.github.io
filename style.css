@@ -35,6 +35,7 @@ header {
     left: 0;
     width: 100%;
     background-color: rgba(18, 18, 18, 0.00); 
+    /* Reduced blur from 10px to 8.5px */
     backdrop-filter: blur(8.5px);
     -webkit-backdrop-filter: blur(8.5px);
     padding: 15px 20px;
@@ -44,7 +45,7 @@ header {
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-nav {
+nav { /* ... rest of nav styles ... */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -71,21 +72,15 @@ nav {
 .nav-left .nav-button:hover::before, .nav-right .nav-button:hover::before { transform: translateY(0); }
 
 
-main {
-    position: relative; padding-top: 80px; padding-bottom: 80px; /* These define space for header/footer */
-    min-height: calc(100vh - 160px); /* Content area height excluding header/footer */
-    height: calc(100vh - 160px); /* Try to fix height */
-    box-sizing: border-box; /* Include padding in height calculation */
-    z-index: 5; 
-    display: flex; /* For centering map container */
-    flex-direction: column; /* For centering map container */
-    justify-content: center; /* For centering map container */
-    align-items: center; /* For centering map container */
+main { /* ... rest of main styles ... */
+    position: relative; padding-top: 80px; padding-bottom: 80px;
+    min-height: calc(100vh - 160px); z-index: 5; 
 }
 
-footer {
+footer { /* ... rest of footer styles ... */
     position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px 0;
     background-color: rgba(18, 18, 18, 0.00);
+    /* Reduced blur from 10px to 8.5px */
     backdrop-filter: blur(8.5px); 
     -webkit-backdrop-filter: blur(8.5px);
     display: flex; justify-content: center; align-items: center;
@@ -94,7 +89,7 @@ footer {
     box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.search-container input[type="text"] {
+.search-container input[type="text"] { /* ... rest of search styles ... */
     width: 400px; padding: 12px 20px; border: 1px solid rgba(255,255,255,0.1);
     border-radius: 25px; background-color: rgba(18,18,18,0.5); color: #F5F5F5;
     font-size: 16px; outline: none; transition: all 0.3s ease; max-width: 90vw;
@@ -107,78 +102,9 @@ footer {
     background-color: rgba(26,26,26,0.7); transform: translateY(-2px);
 }
 
-/* Travel Page Map Styles */
-.map-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%; 
-    height: 100%; /* Fill available space in main */
-    padding: 20px; /* Padding around the map SVG itself */
-    box-sizing: border-box;
-}
-
-#world-map {
-    max-width: 100%; /* Maximize within map-container's padding */
-    max-height: 100%;
-    width: auto;
-    height: auto;
-    display: block;
-}
-
-/* General country styling */
-#world-map path {
-    fill: #4a4a4a; /* Default color for countries not traveled (slightly lighter than #333 for better visibility) */
-    stroke: #121212; /* Border color for countries, matching body background */
-    stroke-width: 0.75; /* Slightly thicker border for clarity */
-    transition: fill 0.2s ease;
-}
-
-/* Optional: Hover effect for all countries */
-#world-map path:hover {
-    fill: #666;
-}
-
-/* Traveled countries - filled with white */
-/* IDs must match those in your SVG file. These are common ISO 3166-1 alpha-2 codes. */
-#world-map #US,  /* USA */
-#world-map #CA,  /* Canada */
-#world-map #PE,  /* Peru */
-#world-map #RS,  /* Serbia */
-#world-map #HR,  /* Croatia */
-#world-map #AL,  /* Albania */
-#world-map #CN,  /* China */
-#world-map #AE,  /* UAE (United Arab Emirates) */
-#world-map #ES   /* Spain */ {
-    fill: #F5F5F5; /* Use site's light text color for consistency */
-}
-
-/* Highlight traveled countries on hover too */
-#world-map #US:hover,
-#world-map #CA:hover,
-#world-map #PE:hover,
-#world-map #RS:hover,
-#world-map #HR:hover,
-#world-map #AL:hover,
-#world-map #CN:hover,
-#world-map #AE:hover,
-#world-map #ES:hover {
-    fill: #ffffff; /* Brighter white on hover for traveled */
-}
-
-
-@media (max-width: 768px) {
+@media (max-width: 768px) { /* ... rest of media query styles ... */
     nav { padding: 0 5px; }
     .nav-right { justify-content: flex-end; }
-    .nav-left .nav-button, .nav-right .nav-button { padding: 6px 10px; margin: 0 3px; font-size: 0.9em; }
-    .search-container input[type="text"] { width: 80vw; font-size: 14px; }
-    main {
-        padding-top: 70px; /* Adjust for potentially smaller header */
-        padding-bottom: 70px; /* Adjust for potentially smaller footer */
-        min-height: calc(100vh - 140px);
-        height: calc(100vh - 140px);
-    }
-    .map-container {
-        padding: 10px;
-    }
+    .nav-left .nav-button, .nav-right .nav-button { padding: 6px 10px; margin: 0 3px; }
+    .search-container input[type="text"] { width: 80vw; }
 }
