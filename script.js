@@ -1,19 +1,3 @@
-function updateAge() {
-    const birthDate = new Date('2001-04-22T00:00:00');
-    const now = new Date();
-    const ageInMilliseconds = now - birthDate;
-    const ageInYears = ageInMilliseconds / (1000 * 60 * 60 * 24 * 365.25);
-    const ageWithDecimal = ageInYears.toFixed(10);
-
-    const ageTimerElement = document.getElementById('ageTimer');
-    if (ageTimerElement) {
-        ageTimerElement.textContent = ageWithDecimal;
-    }
-}
-
-// Update the timer every 10 milliseconds
-setInterval(updateAge, 10);
-
 document.addEventListener('DOMContentLoaded', () => {
     const backgroundContainer = document.querySelector('.background-animation');
     if (!backgroundContainer) return;
@@ -45,20 +29,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Swirling text settings
     const textPool = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789<>/{[]}+*_-.?:;!@#$%^&()~`"\'⋆⟡⚡☆ⓃⓄⒶⒽoNo∀H★☽☾♡♥';
     const characters = [];
-    const totalCharacters = 150; // Adjust for desired density
-    const baseRotationSpeed = 0.2;
+    const totalCharacters = 200; // Increased density for more visible effect
+    const baseRotationSpeed = 0.3; // Increased speed for more noticeable movement
     
-    // Custom color palette with subtle blues and purples
+    // Custom color palette with more vibrant colors
     const colors = [
-        'rgba(123, 104, 238, 0.7)', // Light purple
-        'rgba(75, 0, 130, 0.7)',    // Indigo
-        'rgba(106, 90, 205, 0.7)',  // Slate blue
-        'rgba(138, 43, 226, 0.7)',  // Blue violet
-        'rgba(153, 50, 204, 0.7)',  // Dark orchid
-        'rgba(147, 112, 219, 0.7)', // Medium purple
-        'rgba(72, 61, 139, 0.7)',   // Dark slate blue
-        'rgba(25, 25, 112, 0.7)',   // Midnight blue
-        'rgba(0, 0, 139, 0.7)'      // Dark blue
+        'rgba(150, 130, 255, 0.8)', // Brighter purple
+        'rgba(100, 30, 180, 0.8)',  // Brighter indigo
+        'rgba(130, 110, 230, 0.8)', // Brighter slate blue
+        'rgba(160, 60, 255, 0.8)',  // Brighter blue violet
+        'rgba(180, 70, 230, 0.8)',  // Brighter dark orchid
+        'rgba(200, 180, 255, 0.8)', // Brighter medium purple
+        'rgba(100, 90, 180, 0.8)',  // Brighter dark slate blue
+        'rgba(50, 50, 160, 0.8)',   // Brighter midnight blue
+        'rgba(40, 80, 230, 0.8)'    // Brighter dark blue
     ];
 
     // Initialize characters
@@ -79,8 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Random font size based on distance from center for depth effect
             const distanceRatio = radius / (Math.min(canvas.width, canvas.height) * 0.45);
-            const minSize = 12;
-            const maxSize = 22;
+            const minSize = 14;  // Increased minimum size
+            const maxSize = 28;  // Increased maximum size
             const fontSize = Math.floor(minSize + (maxSize - minSize) * (1 - distanceRatio * 0.8));
             
             // Random rotation and animation parameters
@@ -99,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 orbitSpeed: orbitSpeed,
                 rotation: Math.random() * Math.PI * 2,
                 color: color,
-                alpha: 0.1 + Math.random() * 0.9,
+                alpha: 0.3 + Math.random() * 0.7, // Increased minimum alpha for better visibility
                 distanceRatio: distanceRatio
             });
         }
@@ -111,8 +95,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Animation loop
     function animate() {
-        // Clear canvas with semi-transparent background for trail effect
-        ctx.fillStyle = 'rgba(26, 26, 26, 0.05)';
+        // Clear canvas with fully opaque background to prevent trail effect
+        ctx.fillStyle = 'rgba(26, 26, 26, 1.0)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         // Center point for swirling
@@ -122,8 +106,8 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update and draw characters
         characters.forEach(char => {
             // Update orbit position
-            char.angle += char.orbitSpeed * 0.01;
-            char.rotation += char.rotationSpeed * 0.02;
+            char.angle += char.orbitSpeed * 0.02; // Doubled for more movement
+            char.rotation += char.rotationSpeed * 0.03; // Increased for more movement
             
             // Calculate new position based on orbit
             char.x = centerX + Math.cos(char.angle) * char.radius;
@@ -142,6 +126,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // Draw text centered on its position
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
+            ctx.fillText(char.char, 0, 0);
+            
+            // Optional: Add glow effect for better visibility
+            ctx.shadowColor = char.color;
+            ctx.shadowBlur = 5;
             ctx.fillText(char.char, 0, 0);
             
             ctx.restore();
