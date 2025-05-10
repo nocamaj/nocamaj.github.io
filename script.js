@@ -1,8 +1,8 @@
 // Wrap in an IIFE
 (function() {
-    console.log('Hybrid Grid ASCII with Pixelated Native Text animation loading...');
+    console.log('Hybrid Grid ASCII with LARGER Pixelated Native Text animation loading...');
 
-    const SimplexNoise = (() => { // ... (Simplex Noise code - remains unchanged)
+    const SimplexNoise = (() => { // ... (Simplex Noise code - remains unchanged from previous versions)
         const F2 = 0.5 * (Math.sqrt(3.0) - 1.0); const G2 = (3.0 - Math.sqrt(3.0)) / 6.0;
         const F3 = 1.0 / 3.0; const G3 = 1.0 / 6.0;
         const grad3 = new Float32Array([1,1,0,-1,1,0,1,-1,0,-1,-1,0,1,0,1,-1,0,1,1,0,-1,-1,0,-1,0,1,1,0,-1,1,0,1,-1,0,-1,-1,]);
@@ -16,13 +16,13 @@
         return{noise3D,shufflePermutations};
     })();
 
-    const phrases = [
+    const phrases = [ // Same phrases as before
         { lang: "English", text: "Hello, I'm Noah" },
-        { lang: "Chinese", text: "你好，我是诺亚" }, // Ni hao, wo shi Nuoya
-        { lang: "Russian", text: "Привет, я Ноа" },  // Privet, ya Noa
-        { lang: "Hindi", text: "नमस्ते, मैं नोआ हूँ" }, // Namaste, main Noa hun
-        { lang: "Japanese", text: "こんにちは、ノアです" }, // Konnichiwa, Noa desu
-        { lang: "Arabic", text: "مرحباً، أنا نوح" }, // Marhaban, ana Nuh (Ensure editor handles RTL)
+        { lang: "Chinese", text: "你好，我是诺亚" }, 
+        { lang: "Russian", text: "Привет, я Ноа" },  
+        { lang: "Hindi", text: "नमस्ते, मैं नोआ हूँ" }, 
+        { lang: "Japanese", text: "こんにちは、ノアです" }, 
+        { lang: "Arabic", text: "مرحباً، أنا نوح" }, 
         { lang: "Spanish", text: "Hola, soy Noah" },
         { lang: "French", text: "Bonjour, je suis Noah" },
         { lang: "German", text: "Hallo, ich bin Noah" }
@@ -40,28 +40,30 @@
             backgroundContainer.innerHTML = ''; 
             
             const canvas = document.createElement('canvas');
-            const offscreenCanvas = document.createElement('canvas'); // For rendering native text
+            const offscreenCanvas = document.createElement('canvas');
             backgroundContainer.appendChild(canvas);
-            const ctx = canvas.getContext('2d', { willReadFrequently: false }); // Main canvas
-            const offCtx = offscreenCanvas.getContext('2d', { willReadFrequently: true }); // Offscreen for getImageData
+            const ctx = canvas.getContext('2d', { willReadFrequently: false }); 
+            const offCtx = offscreenCanvas.getContext('2d', { willReadFrequently: true });
             if (!ctx || !offCtx) throw new Error('Failed to get 2D context');
 
             let animationFrameId;
-            let grid = []; // For background ASCII
+            let grid = []; 
             let numCols, numRows;
             let time = Math.random() * 1000;
 
             const config = {
-                backgroundFontSize: 12, // Font size for the swirling ASCII background
-                textPixelSize: 3,       // Size of each "pixel box" for native text (e.g., 3x3 actual pixels)
-                nativeTextRenderFont: "bold 48px Arial, Noto Sans, Noto Sans JP, Noto Sans SC, Noto Sans KR, Noto Naskh Arabic, sans-serif", // Font for offscreen rendering
-                charSet: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$*#@&?", // Simpler for background
+                backgroundFontSize: 12, 
+                textPixelSize: 2, // Smaller pixel size for denser, potentially more detailed text
+                // Increased base font size for offscreen rendering significantly
+                nativeTextRenderFontBaseSize: 96, // Base font size in px to aim for height
+                nativeTextRenderFontFamily: "Arial, Noto Sans, Noto Sans JP, Noto Sans SC, Noto Sans KR, Noto Naskh Arabic, sans-serif",
+                charSet: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$*#@&?", 
                 baseColor: 'rgba(180, 200, 255, VAL)', 
                 highlightColor: 'rgba(230, 240, 255, VAL)',
                 borderColor: 'rgba(220, 220, 255, 0.8)',
                 borderChar: { corner: '+', top_bottom: '-', side: '|' },
-                textPixelOnColor: 'rgba(250, 250, 255, 0.95)', // Color of the "on" pixel boxes
-                textPixelOffAlpha: 0.05, // Alpha for background cells within text area if not "on"
+                textPixelOnColor: 'rgba(250, 250, 255, 0.95)',
+                textPixelOffAlpha: 0.03, // Make background even dimmer under text
                 canvasClearColor: 'rgba(10, 10, 25, 1)', 
                 noiseScale: 0.08,       
                 timeScale: 0.08,        
@@ -70,91 +72,53 @@
                 fadeSpeed: 0.1,         
                 charChangeProbability: 0.03,
                 phraseChangeInterval: 5000, 
-                // Text Area dimensions (as a ratio of canvas size)
-                textAreaWidthRatio: 0.7,
-                textAreaHeightRatio: 0.25, 
-                textPaddingPx: 15, // Padding inside the text area for the native text
+                textAreaWidthRatio: 0.75, // Slightly wider text area
+                textAreaHeightRatio: 0.30, // Slightly taller text area
+                textPaddingRatio: 0.08, // Padding as a ratio of the smaller dimension of text area
             };
             
             let currentPhraseIndex = 0;
             let lastPhraseChangeTime = 0;
-            let pixelatedTextData = { width: 0, height: 0, data: [] }; // Stores 0s and 1s
+            let pixelatedTextData = { width: 0, height: 0, data: [] }; 
 
-            // Text Rectangle (in actual pixels on main canvas)
-            let textDisplayArea = { x: 0, y: 0, width: 0, height: 0 };
-            // Border Rectangle (in grid cell units for background ASCII)
+            let textDisplayArea = { x: 0, y: 0, width: 0, height: 0, padding: 0 };
             let borderRectCells = { startCol:0, endCol:0, startRow:0, endRow:0 };
 
 
-            class GridCell { // For background ASCII
+            class GridCell { // ... (GridCell class remains largely unchanged)
                 constructor(col, row) {
-                    this.col = col;
-                    this.row = row;
-                    this.char = getRandomChar();
-                    this.currentAlpha = 0;
-                    this.targetAlpha = 0;
-                    this.colorTemplate = config.baseColor;
-                    this.isBorder = false;
-                    this.borderRole = null; // 'corner', 'top_bottom', 'side'
-                    this.isWithinTextDisplay = false; // If cell falls within text pixel area
+                    this.col = col; this.row = row; this.char = getRandomChar();
+                    this.currentAlpha = 0; this.targetAlpha = 0;
+                    this.colorTemplate = config.baseColor; this.isBorder = false;
+                    this.borderRole = null; this.isWithinTextDisplay = false;
                 }
-
                 update(noiseValue) {
-                    this.isBorder = (this.col === borderRectCells.startCol || this.col === borderRectCells.endCol -1) && 
-                                    (this.row >= borderRectCells.startRow && this.row < borderRectCells.endRow) ||
-                                    (this.row === borderRectCells.startRow || this.row === borderRectCells.endRow -1) &&
-                                    (this.col >= borderRectCells.startCol && this.col < borderRectCells.endCol);
-                    
-                    const cellCenterX = (this.col + 0.5) * config.backgroundFontSize;
-                    const cellCenterY = (this.row + 0.5) * config.backgroundFontSize;
-                    this.isWithinTextDisplay = cellCenterX >= textDisplayArea.x && cellCenterX < textDisplayArea.x + textDisplayArea.width &&
-                                               cellCenterY >= textDisplayArea.y && cellCenterY < textDisplayArea.y + textDisplayArea.height;
-
-
+                    this.isBorder = (this.col === borderRectCells.startCol || this.col === borderRectCells.endCol -1) && (this.row >= borderRectCells.startRow && this.row < borderRectCells.endRow) || (this.row === borderRectCells.startRow || this.row === borderRectCells.endRow -1) && (this.col >= borderRectCells.startCol && this.col < borderRectCells.endCol);
+                    const cellCenterX = (this.col + 0.5) * config.backgroundFontSize; const cellCenterY = (this.row + 0.5) * config.backgroundFontSize;
+                    this.isWithinTextDisplay = cellCenterX >= textDisplayArea.x && cellCenterX < textDisplayArea.x + textDisplayArea.width && cellCenterY >= textDisplayArea.y && cellCenterY < textDisplayArea.y + textDisplayArea.height;
                     if (this.isBorder) {
-                        this.targetAlpha = 0.7 + (Math.sin(time * 2 + this.col + this.row) + 1) * 0.15; // Pulsating border
+                        this.targetAlpha = 0.7 + (Math.sin(time * 2 + this.col + this.row) + 1) * 0.15;
                         this.colorTemplate = config.borderColor.replace('VAL', this.targetAlpha.toFixed(2));
-                        // Determine border character
-                        const isTop = this.row === borderRectCells.startRow;
-                        const isBottom = this.row === borderRectCells.endRow - 1;
-                        const isLeft = this.col === borderRectCells.startCol;
-                        const isRight = this.col === borderRectCells.endCol - 1;
-
-                        if ((isTop && isLeft) || (isTop && isRight) || (isBottom && isLeft) || (isBottom && isRight)) {
-                            this.char = config.borderChar.corner;
-                        } else if (isTop || isBottom) {
-                            this.char = config.borderChar.top_bottom;
-                        } else if (isLeft || isRight) {
-                            this.char = config.borderChar.side;
-                        }
+                        const isTop = this.row === borderRectCells.startRow; const isBottom = this.row === borderRectCells.endRow - 1;
+                        const isLeft = this.col === borderRectCells.startCol; const isRight = this.col === borderRectCells.endCol - 1;
+                        if ((isTop && isLeft) || (isTop && isRight) || (isBottom && isLeft) || (isBottom && isRight)) { this.char = config.borderChar.corner; }
+                        else if (isTop || isBottom) { this.char = config.borderChar.top_bottom; } else if (isLeft || isRight) { this.char = config.borderChar.side; }
                     } else if (this.isWithinTextDisplay) {
-                        this.targetAlpha = config.textPixelOffAlpha; // Dim background cells under text area
-                         this.char = '.'; // or a very subtle char
-                         this.colorTemplate = config.baseColor;
-                    } else { // Regular background cell
+                        this.targetAlpha = config.textPixelOffAlpha; this.char = '·'; this.colorTemplate = config.baseColor;
+                    } else {
                         if (noiseValue > config.activationThreshold) {
                             this.targetAlpha = Math.min(1, (noiseValue - config.activationThreshold) / (1 - config.activationThreshold) * 1.2); 
-                            if (this.currentAlpha < 0.1 || Math.random() < config.charChangeProbability) {
-                                this.char = getRandomChar();
-                            }
+                            if (this.currentAlpha < 0.1 || Math.random() < config.charChangeProbability) { this.char = getRandomChar(); }
                             this.colorTemplate = (noiseValue > config.highlightThreshold) ? config.highlightColor : config.baseColor;
-                        } else {
-                            this.targetAlpha = 0;
-                        }
+                        } else { this.targetAlpha = 0; }
                     }
-
                     this.currentAlpha += (this.targetAlpha - this.currentAlpha) * config.fadeSpeed;
                     if (Math.abs(this.currentAlpha - this.targetAlpha) < 0.01) this.currentAlpha = this.targetAlpha;
                 }
-
                 draw() {
                     if (this.currentAlpha > 0.01) {
                         ctx.fillStyle = this.isBorder ? this.colorTemplate : this.colorTemplate.replace('VAL', this.currentAlpha.toFixed(2));
-                        ctx.fillText(
-                            this.char,
-                            this.col * config.backgroundFontSize + config.backgroundFontSize * 0.5, 
-                            this.row * config.backgroundFontSize + config.backgroundFontSize * 0.7 
-                        );
+                        ctx.fillText(this.char, this.col*config.backgroundFontSize + config.backgroundFontSize*0.5, this.row*config.backgroundFontSize + config.backgroundFontSize*0.7);
                     }
                 }
             }
@@ -167,89 +131,103 @@
                 const phraseObj = phrases[currentPhraseIndex];
                 const textToRender = phraseObj.text;
 
-                offCtx.font = config.nativeTextRenderFont;
-                const textMetrics = offCtx.measureText(textToRender);
-                let textWidth = textMetrics.width;
+                // Content area for text rendering (inside padding)
+                const contentRenderWidth = textDisplayArea.width - 2 * textDisplayArea.padding;
+                const contentRenderHeight = textDisplayArea.height - 2 * textDisplayArea.padding;
+
+                if (contentRenderWidth <= 0 || contentRenderHeight <= 0) {
+                    pixelatedTextData = { width: 0, height: 0, data: [] }; return;
+                }
+
+                // --- Determine optimal font size for offscreen rendering ---
+                let dynamicFontSize = config.nativeTextRenderFontBaseSize;
+                offCtx.font = `bold ${dynamicFontSize}px ${config.nativeTextRenderFontFamily}`;
+                let textMetrics = offCtx.measureText(textToRender);
                 let textHeight = textMetrics.actualBoundingBoxAscent + textMetrics.actualBoundingBoxDescent;
-                
-                // Ensure textHeight is not NaN (can happen with some fonts/empty strings)
-                textHeight = textHeight && !isNaN(textHeight) ? textHeight : parseInt(config.nativeTextRenderFont, 10) || 48;
+                textHeight = (textHeight && !isNaN(textHeight) && textHeight > 0) ? textHeight : dynamicFontSize; // Fallback if metrics fail
 
-
-                const availableWidth = textDisplayArea.width - 2 * config.textPaddingPx;
-                const availableHeight = textDisplayArea.height - 2 * config.textPaddingPx;
-
-                if (availableWidth <=0 || availableHeight <=0) {
-                    pixelatedTextData = { width: 0, height: 0, data: [] }; // Clear data if no space
-                    return;
+                // Adjust font size based on height first to fill most of the contentRenderHeight
+                if (textHeight > contentRenderHeight && contentRenderHeight > 0) {
+                    dynamicFontSize = Math.floor(dynamicFontSize * (contentRenderHeight / textHeight));
+                } else if (textHeight < contentRenderHeight * 0.7 && textHeight > 0) { // If too small, try to scale up
+                     dynamicFontSize = Math.floor(dynamicFontSize * (contentRenderHeight * 0.85 / textHeight)); // Aim for 85% height
                 }
+                dynamicFontSize = Math.max(10, dynamicFontSize); // Minimum font size
 
-                // Scale font size if text too wide for the available space
-                let dynamicFontSize = parseInt(config.nativeTextRenderFont, 10);
-                if (textWidth > availableWidth) {
-                    dynamicFontSize = Math.floor(dynamicFontSize * (availableWidth / textWidth));
-                    offCtx.font = `bold ${dynamicFontSize}px ${config.nativeTextRenderFont.split('px ')[1]}`;
-                    const newMetrics = offCtx.measureText(textToRender);
-                    textWidth = newMetrics.width;
-                    textHeight = newMetrics.actualBoundingBoxAscent + newMetrics.actualBoundingBoxDescent;
-                    textHeight = textHeight && !isNaN(textHeight) ? textHeight : dynamicFontSize;
-                }
+                offCtx.font = `bold ${dynamicFontSize}px ${config.nativeTextRenderFontFamily}`;
+                textMetrics = offCtx.measureText(textToRender);
+                textHeight = textMetrics.actualBoundingBoxAscent + textMetrics.actualBoundingBoxDescent;
+                textHeight = (textHeight && !isNaN(textHeight) && textHeight > 0) ? textHeight : dynamicFontSize;
+                let textWidth = textMetrics.width;
                 
-                // Fit into offscreenCanvas
+                // Adjust font size based on width if it overflows
+                if (textWidth > contentRenderWidth && contentRenderWidth > 0) {
+                    dynamicFontSize = Math.floor(dynamicFontSize * (contentRenderWidth / textWidth));
+                }
+                dynamicFontSize = Math.max(10, dynamicFontSize);
+
+                // Final font setting for offscreen rendering
+                offCtx.font = `bold ${dynamicFontSize}px ${config.nativeTextRenderFontFamily}`;
+                textMetrics = offCtx.measureText(textToRender);
+                textWidth = textMetrics.width;
+                textHeight = (textMetrics.actualBoundingBoxAscent + textMetrics.actualBoundingBoxDescent);
+                textHeight = (textHeight && !isNaN(textHeight) && textHeight > 0) ? textHeight : dynamicFontSize;
+                
                 offscreenCanvas.width = Math.max(1, Math.ceil(textWidth));
                 offscreenCanvas.height = Math.max(1, Math.ceil(textHeight));
                 
-                // Re-apply font after canvas resize
-                offCtx.font = `bold ${dynamicFontSize}px ${config.nativeTextRenderFont.split('px ')[1]}`;
-                offCtx.fillStyle = '#FFFFFF';
-                offCtx.textAlign = 'left';
-                offCtx.textBaseline = 'top'; // Render from top-left
-                
-                // Clear and draw
-                offCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+                // Re-apply font & draw (important after canvas resize)
+                offCtx.font = `bold ${dynamicFontSize}px ${config.nativeTextRenderFontFamily}`;
+                offCtx.fillStyle = '#FFFFFF'; // Render white text on transparent for sampling alpha
+                offCtx.textAlign = 'left'; 
+                offCtx.textBaseline = 'top';
+                offCtx.clearRect(0,0, offscreenCanvas.width, offscreenCanvas.height); // Clear with transparent
                 offCtx.fillText(textToRender, 0, 0);
 
                 const imageData = offCtx.getImageData(0, 0, offscreenCanvas.width, offscreenCanvas.height);
                 const data = imageData.data;
 
-                const numPixelCols = Math.floor(availableWidth / config.textPixelSize);
-                const numPixelRows = Math.floor(availableHeight / config.textPixelSize);
+                // Number of pixel boxes to fit into the *contentRender* area
+                const numPixelCols = Math.floor(contentRenderWidth / config.textPixelSize);
+                const numPixelRows = Math.floor(contentRenderHeight / config.textPixelSize);
                 
+                if (numPixelCols <= 0 || numPixelRows <=0) {
+                     pixelatedTextData = { width: 0, height: 0, data: [] }; return;
+                }
+
                 pixelatedTextData.width = numPixelCols;
                 pixelatedTextData.height = numPixelRows;
                 pixelatedTextData.data = [];
 
                 for (let r = 0; r < numPixelRows; r++) {
                     for (let c = 0; c < numPixelCols; c++) {
-                        // Map this pixel box (c,r) to a region in the offscreenCanvas imageData
                         const sourceX = Math.floor(c * (offscreenCanvas.width / numPixelCols));
                         const sourceY = Math.floor(r * (offscreenCanvas.height / numPixelRows));
-                        const sourceWidth = Math.ceil(offscreenCanvas.width / numPixelCols);
-                        const sourceHeight = Math.ceil(offscreenCanvas.height / numPixelRows);
                         
-                        let sumAlpha = 0;
-                        let count = 0;
-                        // Sample a few points within the source region or average alpha
-                        for(let sy = sourceY; sy < sourceY + sourceHeight && sy < offscreenCanvas.height; sy++){
-                            for(let sx = sourceX; sx < sourceX + sourceWidth && sx < offscreenCanvas.width; sx++){
-                                sumAlpha += data[(sy * offscreenCanvas.width + sx) * 4 + 3]; // Alpha channel
-                                count++;
-                            }
-                        }
-                        const avgAlpha = count > 0 ? sumAlpha / count : 0;
-                        pixelatedTextData.data.push(avgAlpha > 100 ? 1 : 0); // Threshold for "on"
+                        // More robust sampling: check center of source pixel mapped from target
+                        const sampleSourceX = Math.min(offscreenCanvas.width - 1, Math.floor(sourceX + (offscreenCanvas.width / numPixelCols) * 0.5));
+                        const sampleSourceY = Math.min(offscreenCanvas.height - 1, Math.floor(sourceY + (offscreenCanvas.height / numPixelRows) * 0.5));
+
+                        const alphaIndex = (sampleSourceY * offscreenCanvas.width + sampleSourceX) * 4 + 3;
+                        const alphaVal = data[alphaIndex];
+                        pixelatedTextData.data.push(alphaVal > 128 ? 1 : 0); // Threshold for "on"
                     }
                 }
-                 console.log(`Pixelated "${phraseObj.text}" to ${numPixelCols}x${numPixelRows} boxes.`);
+                console.log(`Pixelated "${phraseObj.text}" (font: ${dynamicFontSize}px) to ${numPixelCols}x${numPixelRows} boxes.`);
             }
 
             function drawPixelatedText() {
-                if (!pixelatedTextData.data.length) return;
+                if (!pixelatedTextData.data.length || pixelatedTextData.width === 0) return;
 
-                const startDrawX = textDisplayArea.x + config.textPaddingPx + 
-                                   Math.floor((textDisplayArea.width - 2*config.textPaddingPx - pixelatedTextData.width * config.textPixelSize) / 2);
-                const startDrawY = textDisplayArea.y + config.textPaddingPx +
-                                   Math.floor((textDisplayArea.height - 2*config.textPaddingPx - pixelatedTextData.height * config.textPixelSize) / 2);
+                const totalPixelatedWidth = pixelatedTextData.width * config.textPixelSize;
+                const totalPixelatedHeight = pixelatedTextData.height * config.textPixelSize;
+
+                // Centering within the padded content area
+                const contentRenderWidth = textDisplayArea.width - 2 * textDisplayArea.padding;
+                const contentRenderHeight = textDisplayArea.height - 2 * textDisplayArea.padding;
+
+                const startDrawX = textDisplayArea.x + textDisplayArea.padding + Math.floor((contentRenderWidth - totalPixelatedWidth) / 2);
+                const startDrawY = textDisplayArea.y + textDisplayArea.padding + Math.floor((contentRenderHeight - totalPixelatedHeight) / 2);
 
                 ctx.fillStyle = config.textPixelOnColor;
                 for (let r = 0; r < pixelatedTextData.height; r++) {
@@ -270,20 +248,19 @@
                 if (animationFrameId) cancelAnimationFrame(animationFrameId);
                 
                 SimplexNoise.shufflePermutations();
-
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
                 
                 numCols = Math.floor(canvas.width / config.backgroundFontSize);
                 numRows = Math.floor(canvas.height / config.backgroundFontSize);
                 
-                // Calculate Text Display Area (in actual pixels)
                 textDisplayArea.width = Math.floor(canvas.width * config.textAreaWidthRatio);
                 textDisplayArea.height = Math.floor(canvas.height * config.textAreaHeightRatio);
                 textDisplayArea.x = Math.floor((canvas.width - textDisplayArea.width) / 2);
                 textDisplayArea.y = Math.floor((canvas.height - textDisplayArea.height) / 2);
+                textDisplayArea.padding = Math.floor(Math.min(textDisplayArea.width, textDisplayArea.height) * config.textPaddingRatio);
 
-                // Calculate Border Rectangle (in grid cells)
+
                 borderRectCells.startCol = Math.max(0, Math.floor(textDisplayArea.x / config.backgroundFontSize) -1);
                 borderRectCells.endCol = Math.min(numCols, Math.ceil((textDisplayArea.x + textDisplayArea.width) / config.backgroundFontSize) +1);
                 borderRectCells.startRow = Math.max(0, Math.floor(textDisplayArea.y / config.backgroundFontSize) -1);
@@ -291,34 +268,28 @@
 
                 grid = [];
                 for (let r = 0; r < numRows; r++) {
-                    let rowCells = [];
-                    for (let c = 0; c < numCols; c++) {
-                        rowCells.push(new GridCell(c, r));
-                    }
+                    let rowCells = []; for (let c = 0; c < numCols; c++) { rowCells.push(new GridCell(c, r));}
                     grid.push(rowCells);
                 }
                 console.log(`BG Grid: ${numCols}x${numRows}, Font: ${config.backgroundFontSize}px. Pixel Box: ${config.textPixelSize}px`);
-                
+                console.log(`Text Area (pixels): x:${textDisplayArea.x}, y:${textDisplayArea.y}, w:${textDisplayArea.width}, h:${textDisplayArea.height}, pad:${textDisplayArea.padding}`);
+
                 renderAndPixelateCurrentPhrase(); 
                 lastPhraseChangeTime = performance.now();
 
                 ctx.font = `${config.backgroundFontSize}px monospace`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'alphabetic'; 
-
+                ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; 
                 time = Math.random() * 1000; 
                 animate();
             }
             
             let lastFrameTime = performance.now();
-            const targetFPS = 25; // Can be a bit lower for this complex scene
+            const targetFPS = 25; 
             const frameInterval = 1000 / targetFPS;
 
             function animate() {
                 animationFrameId = requestAnimationFrame(animate);
-                
-                const now = performance.now();
-                const elapsed = now - lastFrameTime;
+                const now = performance.now(); const elapsed = now - lastFrameTime;
 
                 if (elapsed > frameInterval) {
                     lastFrameTime = now - (elapsed % frameInterval);
@@ -329,59 +300,30 @@
                         renderAndPixelateCurrentPhrase();
                         lastPhraseChangeTime = now;
                     }
-
-                    // 1. Clear main canvas
-                    ctx.fillStyle = config.canvasClearColor;
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                    // 2. Draw background ASCII grid (GridCells will handle border/dimming)
-                    ctx.font = `${config.backgroundFontSize}px monospace`; // Ensure font is set for background
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'alphabetic';
+                    ctx.fillStyle = config.canvasClearColor; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.font = `${config.backgroundFontSize}px monospace`; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
                     for (let r = 0; r < numRows; r++) {
                         for (let c = 0; c < numCols; c++) {
-                            const noiseVal = (SimplexNoise.noise3D(c * config.noiseScale, r * config.noiseScale, time) + 1) / 2; 
-                            grid[r][c].update(noiseVal);
-                            grid[r][c].draw();
+                            const noiseVal = (SimplexNoise.noise3D(c*config.noiseScale,r*config.noiseScale,time)+1)/2; 
+                            grid[r][c].update(noiseVal); grid[r][c].draw();
                         }
                     }
-                    
-                    // 3. Draw the pixelated native text (fillRects)
                     drawPixelatedText();
                 }
             }
             
             setupAndRun();
-            
             let resizeTimeout;
-            window.addEventListener('resize', () => {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(setupAndRun, 300); // Slightly longer debounce
-            });
-            
-            console.log('Hybrid animation setup complete');
-
-        } catch (error) {
+            window.addEventListener('resize', () => {clearTimeout(resizeTimeout); resizeTimeout = setTimeout(setupAndRun, 300);});
+            console.log('Hybrid animation with larger text setup complete');
+        } catch (error) { /* ... error handling ... */
             console.error('Animation initialization failed:', error);
             const errorElement = document.createElement('div');
-            Object.assign(errorElement.style, {
-                position: 'fixed', top: '10px', left: '10px', background: 'rgba(255,0,0,0.8)', 
-                color: 'white', padding: '15px', zIndex: '10000', border: '1px solid white',
-                borderRadius: '5px', maxWidth: 'calc(100% - 20px)', fontSize: '12px'
-            });
+            Object.assign(errorElement.style, { position: 'fixed', top: '10px', left: '10px', background: 'rgba(255,0,0,0.8)', color: 'white', padding: '15px', zIndex: '10000', border: '1px solid white', borderRadius: '5px', maxWidth: 'calc(100% - 20px)', fontSize: '12px' });
             errorElement.innerHTML = `<strong>Animation Error:</strong><br>${error.message}<br><small>Check console (F12).</small>`;
-            if (document.body) document.body.appendChild(errorElement);
-            else document.addEventListener('DOMContentLoaded', () => document.body.appendChild(errorElement));
+            if (document.body) document.body.appendChild(errorElement); else document.addEventListener('DOMContentLoaded', () => document.body.appendChild(errorElement));
         }
     }
-    
     ready(initAnimation);
-    
-    window.addEventListener('load', () => {
-        const bgContainer = document.querySelector('.background-animation');
-        if (bgContainer && !bgContainer.querySelector('canvas')) {
-            initAnimation();
-        }
-    });
-
+    window.addEventListener('load', () => { const bgC = document.querySelector('.background-animation'); if (bgC && !bgC.querySelector('canvas')) { initAnimation(); } });
 })();
