@@ -1,23 +1,15 @@
 // Wrap in an IIFE to avoid global scope pollution
 (function() {
-    // Log that script has started loading
-    console.log('Midjourney-style animation script loading...');
+    console.log('Swirling ASCII animation script loading...');
 
-    // Function to check if DOM is ready
     function ready(callback) {
         if (document.readyState !== 'loading') {
-            console.log('Document already ready');
             callback();
         } else {
-            console.log('Adding DOMContentLoaded listener');
-            document.addEventListener('DOMContentLoaded', function() {
-                console.log('DOMContentLoaded fired');
-                callback();
-            });
+            document.addEventListener('DOMContentLoaded', callback);
         }
     }
 
-    // Main initialization function
     function initAnimation() {
         try {
             console.log('Animation initialization started');
@@ -26,23 +18,10 @@
             if (!backgroundContainer) {
                 throw new Error('Background container not found! (.background-animation)');
             }
-            console.log('Found background container:', backgroundContainer);
-
-            backgroundContainer.innerHTML = ''; // Clear existing content
+            backgroundContainer.innerHTML = ''; // Clear previous canvas if any
             
             const canvas = document.createElement('canvas');
-            // CSS will handle position, top, left, width, height, display.
-            // Pointer events are also handled by CSS.
-            // No inline zIndex for canvas here, it will be managed by parent's z-index.
-            Object.assign(canvas.style, {
-                position: 'absolute', // Ensures it adheres to parent's flow if parent is relative/absolute/fixed
-                top: '0',
-                left: '0',
-                width: '100%', 
-                height: '100%',
-                display: 'block',
-                pointerEvents: 'none' // Reinforce, though CSS should handle it
-            });
+            // Styles for position, size are handled by CSS for .background-animation and .background-animation canvas
             backgroundContainer.appendChild(canvas);
             console.log('Canvas element created and appended');
             
@@ -51,9 +30,137 @@
                 throw new Error('Failed to get canvas 2D context');
             }
 
-            let animationFrameId; // To control stopping/starting animation
+            let animationFrameId;
+            let particles = [];
+            let time = 0;
 
-            const setupAndRunAnimation = () => {
+            // --- Configuration ---
+            const config = {
+                particleCount: calculateParticleCount(), // Adjust based on screen size
+                baseCharSize: 12,
+                charSizeVariance: 6,
+                baseSpeed: 0.3,
+                speedVariance: 0.2,
+                colors: [
+                    'rgba(180, 180, 220, 0.7)', // Light lavender
+                    'rgba(200, 200, 220, 0.8)', // Lighter lavender
+                    'rgba(150, 180, 230, 0.7)', // Light blue
+                    'rgba(220, 220, 240, 0.9)', // Very light lavender/almost white
+                    'rgba(190, 190, 190, 0.6)'  // Grey
+                ],
+                charSet: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()-=_+[]{}|;:',./<>?`~ ",
+                canvasClearColor: 'rgba(10, 10, 20, 1)', // Very dark blue, opaque
+                noiseScale: 0.001, // For Perlin-like noise effect on movement
+                swirlStrength: 0.5, // How much particles adhere to a swirl pattern
+                depthEffect: 0.5 // How much z affects size and speed
+            };
+
+            function calculateParticleCount() {
+                // Simple heuristic: more particles for larger screens
+                return Math.floor((window.innerWidth * window.innerHeight) / 8000);
+            }
+            
+            function getRandomChar() {
+                return config.charSet.charAt(Math.floor(Math.random() * config.charSet.length));
+            }
+
+            class Particle {
+                constructor() {
+                    this.reset();
+                }
+
+                reset() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    // z represents depth: 0.5 (far) to 1.5 (near)
+                    this.z = (Math.random() * 1.0) + 0.5; 
+                    
+                    this.char = getRandomChar();
+                    this.color = config.colors[Math.floor(Math.random() * config.colors.length)];
+                    
+                    this.size = (config.baseCharSize + (Math.random() * config.charSizeVariance) - config.charSizeVariance / 2) * (1 + (this.z - 1) * config.depthEffect);
+                    this.size = Math.max(5, this.size); // Minimum size
+
+                    this.alpha = 0.1 + Math.random() * 0.8 * (1 + (this.z -1) * 0.3);
+
+
+                    // Velocity components
+                    this.vx = (Math.random() - 0.5) * (config.baseSpeed + Math.random() * config.speedVariance);
+                    this.vy = (Math.random() - 0.5) * (config.baseSpeed + Math.random() * config.speedVariance);
+
+                    // For more complex motion, store noise offsets
+                    this.noiseOffsetX = Math.random() * 1000;
+                    this.noiseOffsetY = Math.random() * 1000;
+                    this.life = 100 + Math.random() * 200; // Frames before potential change
+                }
+
+                update() {
+                    // Simple noise-based movement for a flowing effect
+                    const angleX = simpleNoise(this.noiseOffsetX + time * 0.002, this.y * config.noiseScale) * Math.PI * 2;
+                    const angleY = simpleNoise(this.noiseOffsetY + time * 0.002, this.x * config.noiseScale) * Math.PI * 2;
+
+                    this.vx += (Math.cos(angleX) - this.vx) * 0.05 * this.z;
+                    this.vy += (Math.sin(angleY) - this.vy) * 0.05 * this.z;
+                    
+                    // Swirl around center (optional, can be subtle)
+                    const dx = canvas.width / 2 - this.x;
+                    const dy = canvas.height / 2 - this.y;
+                    const dist = Math.sqrt(dx*dx + dy*dy) + 1; // +1 to avoid div by zero
+                    this.vx += (dy / dist) * config.swirlStrength * 0.01 * this.z;
+                    this.vy -= (dx / dist) * config.swirlStrength * 0.01 * this.z;
+
+
+                    // Max speed
+                    const maxSpeed = (config.baseSpeed + config.speedVariance) * this.z;
+                    const currentSpeed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+                    if (currentSpeed > maxSpeed) {
+                        this.vx = (this.vx / currentSpeed) * maxSpeed;
+                        this.vy = (this.vy / currentSpeed) * maxSpeed;
+                    }
+
+                    this.x += this.vx;
+                    this.y += this.vy;
+
+                    // Boundary check and reset
+                    if (this.x < -this.size || this.x > canvas.width + this.size ||
+                        this.y < -this.size || this.y > canvas.height + this.size) {
+                        this.reset();
+                        // Place on opposite edge for continuous flow
+                        if (this.vx > 0 && this.x > canvas.width) this.x = -this.size;
+                        else if (this.vx < 0 && this.x < 0) this.x = canvas.width + this.size;
+                        if (this.vy > 0 && this.y > canvas.height) this.y = -this.size;
+                        else if (this.vy < 0 && this.y < 0) this.y = canvas.height + this.size;
+                    }
+
+                    this.life--;
+                    if (this.life <= 0 || Math.random() < 0.01) { // Occasionally change char or fully reset
+                        this.char = getRandomChar();
+                        if (Math.random() < 0.05) this.reset(); // Full reset less often
+                        else this.life = 100 + Math.random() * 200;
+                    }
+                }
+
+                draw() {
+                    ctx.font = `bold ${Math.max(5, this.size)}px monospace`;
+                    ctx.fillStyle = this.color.replace(/,\s*\d(\.\d+)?\)/, `, ${this.alpha})`); // Update alpha in rgba string
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(this.char, this.x, this.y);
+                }
+            }
+            
+            // Basic pseudo-random noise function (not true Perlin, but helps create variety)
+            function simpleNoise(x, y = 0) {
+                const RND_A = 134775813;
+                const RND_M = 2147483647;
+                const RND_C = 1;
+                let seed = (Math.floor(x * 1000) + Math.floor(y * 1000)) % RND_M;
+                seed = (seed * RND_A + RND_C) % RND_M;
+                return (seed / RND_M);
+            }
+
+
+            function setupAndRunAnimation() {
                 if (animationFrameId) {
                     cancelAnimationFrame(animationFrameId);
                 }
@@ -61,71 +168,30 @@
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
                 console.log(`Canvas size set to ${canvas.width}x${canvas.height}`);
-
-                const fontSize = 14; // Adjust for character size and density
-                const columns = Math.floor(canvas.width / fontSize);
                 
-                const katakana = "アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズヅブプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン";
-                const latin = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-                const symbols = "$()*&%#@!?<>[]{}| stably"; // Added some keywords for Midjourney feel
-                const characters = (katakana + latin + symbols).split('');
-
-                const drops = [];
-                for (let i = 0; i < columns; i++) {
-                    drops[i] = 1 + Math.floor(Math.random() * (canvas.height / fontSize));
+                config.particleCount = calculateParticleCount();
+                particles = [];
+                for (let i = 0; i < config.particleCount; i++) {
+                    particles.push(new Particle());
                 }
+                console.log(`Initialized ${particles.length} particles.`);
 
-                const trailColor = 'rgba(18, 18, 18, 0.08)'; // For fading effect, matches body bg
-                const primaryCharColor = '#00CF4D'; // Vibrant green
-                const highlightCharColor = '#E0FFE0'; // Very light green / whitish
+                time = 0;
+                animate();
+            }
+            
+            function animate() {
+                time++;
+                ctx.fillStyle = config.canvasClearColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                let frameCount = 0;
-
-                function draw() {
-                    frameCount++;
+                particles.forEach(particle => {
+                    particle.update();
+                    particle.draw();
+                });
                 
-                    ctx.fillStyle = trailColor;
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                    ctx.font = `bold ${fontSize}px monospace`; // Added bold for better visibility
-                
-                    for (let i = 0; i < columns; i++) {
-                        const text = characters[Math.floor(Math.random() * characters.length)];
-                        const x = i * fontSize;
-                        const y = drops[i] * fontSize;
-
-                        // The character at the "bottom" of the drop (most recent) is often brightest
-                        // Or, randomly highlight a character in the stream
-                        if (Math.random() > 0.985) { // Small chance for a character to be a highlight
-                            ctx.fillStyle = highlightCharColor;
-                            ctx.shadowColor = highlightCharColor;
-                            ctx.shadowBlur = 8;
-                        } else {
-                            ctx.fillStyle = primaryCharColor;
-                            ctx.shadowColor = primaryCharColor;
-                            ctx.shadowBlur = 5; 
-                        }
-                        
-                        ctx.fillText(text, x, y);
-
-                        // Reset shadow for next char if not all have shadows or different settings
-                        ctx.shadowBlur = 0; 
-                
-                        if (y > canvas.height && Math.random() > 0.975) {
-                            drops[i] = 0;
-                        }
-                        drops[i]++;
-                    }
-                
-                    if (frameCount % 600 === 0) { // Log less frequently
-                        console.log(`Animation running - frame ${frameCount}`);
-                    }
-                
-                    animationFrameId = requestAnimationFrame(draw);
-                }
-                console.log('Starting animation loop');
-                draw();
-            };
+                animationFrameId = requestAnimationFrame(animate);
+            }
             
             setupAndRunAnimation();
             
@@ -140,33 +206,29 @@
             });
             
             console.log('Animation setup complete');
+
         } catch (error) {
             console.error('Animation initialization failed:', error);
             const errorElement = document.createElement('div');
-            errorElement.style.position = 'fixed';
-            errorElement.style.top = '50%';
-            errorElement.style.left = '50%';
-            errorElement.style.transform = 'translate(-50%, -50%)';
-            errorElement.style.background = 'red';
-            errorElement.style.color = 'white';
-            errorElement.style.padding = '20px';
-            errorElement.style.zIndex = '9999'; // Ensure error is visible
-            errorElement.textContent = `Animation Error: ${error.message}. Please check console.`;
+            Object.assign(errorElement.style, {
+                position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+                background: 'red', color: 'white', padding: '20px', zIndex: '9999',
+                border: '2px solid white', borderRadius: '5px', textAlign: 'center'
+            });
+            errorElement.innerHTML = `<strong>Animation Error:</strong><br>${error.message}<br><small>Please check the console (F12) for more details.</small>`;
             document.body.appendChild(errorElement);
         }
     }
     
     ready(initAnimation);
     
+    // Fallback for window.load if DOMContentLoaded didn't catch it or canvas isn't there
     window.addEventListener('load', function() {
-        console.log('Window load event fired');
         const backgroundContainer = document.querySelector('.background-animation');
-        if (backgroundContainer && !backgroundContainer.hasChildNodes()) {
-            console.log('No canvas found on load, trying to initialize animation again as a fallback.');
-            // Check if already initialized to prevent double animation if ready() also worked
-            if (!document.querySelector('.background-animation canvas')) {
-                 initAnimation();
-            }
+        if (backgroundContainer && !backgroundContainer.querySelector('canvas')) {
+            console.log('No canvas found on window.load, attempting to initialize animation.');
+            initAnimation();
         }
     });
+
 })();

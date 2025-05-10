@@ -5,7 +5,7 @@ body, html {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #121212; /* Pure black background */
     color: #F5F5F5; /* Slightly Off-White */
-    overflow: hidden; /* Prevent scrollbars from background animation */
+    overflow: hidden; /* Prevent scrollbars */
 }
 
 .background-animation {
@@ -14,14 +14,12 @@ body, html {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 1; /* Ensures it's behind main content (z-index 5) but above default body */
-    overflow: hidden; 
+    z-index: 1; /* Ensures it's behind main content but above default body background */
+    overflow: hidden; /* Crucial to contain the canvas */
     pointer-events: none; /* Make sure it doesn't interfere with clicks */
-    display: block !important; /* Force display */
-    background-color: transparent; /* Make background transparent to see animation */
+    background-color: transparent; /* Canvas will draw its own background */
 }
 
-/* Force canvas to be visible if it exists */
 .background-animation canvas {
     display: block !important; 
     position: absolute !important;
@@ -29,7 +27,7 @@ body, html {
     left: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    /* z-index removed; will be within the stacking context of .background-animation */
+    /* No z-index here; it's governed by parent .background-animation */
 }
 
 header {
@@ -37,14 +35,14 @@ header {
     top: 0;
     left: 0;
     width: 100%;
-    background-color: rgba(18, 18, 18, 0.35); /* More transparent for better glass effect */
+    background-color: rgba(18, 18, 18, 0.35);
     backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px); /* For Safari */
-    padding: 15px 20px; /* Reduced horizontal padding */
+    -webkit-backdrop-filter: blur(12px);
+    padding: 15px 20px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    z-index: 10; /* Higher than background animation and main content */
-    box-sizing: border-box; /* Include padding in width calculation */
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08); /* Subtle border for glass effect */
+    z-index: 10; /* Higher than animation and main content */
+    box-sizing: border-box;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 nav {
@@ -52,18 +50,18 @@ nav {
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    max-width: 1600px; /* Maximum width for very wide screens */
+    max-width: 1600px;
     margin: 0 auto;
 }
 
 .nav-left {
     display: flex;
-    margin-right: auto; /* Push to left */
+    margin-right: auto;
 }
 
 .nav-right {
     display: flex;
-    margin-left: auto; /* Push to right */
+    margin-left: auto;
 }
 
 .nav-left .nav-button,
@@ -74,7 +72,7 @@ nav {
     margin: 0 8px;
     border-radius: 5px;
     transition: all 0.3s ease;
-    white-space: nowrap; /* Prevent text wrapping */
+    white-space: nowrap;
     letter-spacing: 0.5px;
     font-weight: 500;
     position: relative;
@@ -111,11 +109,10 @@ nav {
 
 main {
     position: relative;
-    padding-top: 80px; /* Adjust based on header height */
-    padding-bottom: 80px; /* Adjust based on footer height */
-    min-height: calc(100vh - 160px); /* Ensure main content can fill screen */
+    padding-top: 80px; 
+    padding-bottom: 80px;
+    min-height: calc(100vh - 160px); 
     z-index: 5; /* Above background but below header/footer */
-    /* Add more styles if main content is expected */
 }
 
 footer {
@@ -124,36 +121,36 @@ footer {
     left: 0;
     width: 100%;
     padding: 20px 0;
-    background-color: rgba(18, 18, 18, 0.35); /* Match header transparency */
+    background-color: rgba(18, 18, 18, 0.35);
     backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px); /* For Safari */
+    -webkit-backdrop-filter: blur(12px);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 10; /* Higher than background animation and main content */
-    box-sizing: border-box; /* Include padding in width calculation */
-    border-top: 1px solid rgba(255, 255, 255, 0.08); /* Subtle border for glass effect */
-    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2); /* Shadow for glass effect */
+    z-index: 10; /* Higher than animation and main content */
+    box-sizing: border-box;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .search-container input[type="text"] {
-    width: 400px; /* Adjust width as needed */
+    width: 400px;
     padding: 12px 20px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 25px;
-    background-color: rgba(18, 18, 18, 0.5); /* Semi-transparent input background */
-    color: #F5F5F5; /* Off-white text */
+    background-color: rgba(18, 18, 18, 0.5);
+    color: #F5F5F5;
     font-size: 16px;
     outline: none;
     transition: all 0.3s ease;
-    max-width: 90vw; /* Prevent overflow on small screens */
+    max-width: 90vw;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
 }
 
 .search-container input[type="text"]::placeholder {
-    color: rgba(255, 255, 255, 0.6); /* More visible placeholder text */
+    color: rgba(255, 255, 255, 0.6);
 }
 
 .search-container input[type="text"]:focus {
@@ -163,22 +160,18 @@ footer {
     transform: translateY(-2px);
 }
 
-/* Media query for smaller screens */
 @media (max-width: 768px) {
     nav {
         padding: 0 5px;
     }
-    
     .nav-right {
         justify-content: flex-end;
     }
-    
     .nav-left .nav-button,
     .nav-right .nav-button {
         padding: 6px 10px;
         margin: 0 3px;
     }
-    
     .search-container input[type="text"] {
         width: 80vw;
     }
