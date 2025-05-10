@@ -3,13 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noah's Site</title>
+    <title>Noah's </title>
     <link rel="stylesheet" href="style.css">
+    <!-- Add script in head with defer attribute for better loading -->
     <script src="script.js" defer></script>
 </head>
 <body>
-    <!-- Animation container - REMOVE INLINE STYLES HERE for cleaner CSS management -->
-    <div class="background-animation">
+    <!-- Animation container with explicit inline styles -->
+    <div class="background-animation" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 2; display: block !important;">
         <!-- Canvas will be created by JavaScript -->
     </div>
     
@@ -36,5 +37,6 @@
         </div>
     </footer>
 
+    <!-- Removed script from body since it's now in head -->
 </body>
 </html>
