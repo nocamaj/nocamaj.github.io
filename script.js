@@ -1,8 +1,8 @@
 // Wrap in an IIFE
 (function() {
-    console.log('Hybrid Grid ASCII with LARGER Pixelated Native Text animation loading...');
+    console.log('Hybrid Grid ASCII with SMALLER Pixelated Native Text animation loading...');
 
-    const SimplexNoise = (() => { // ... (Simplex Noise code - remains unchanged from previous versions)
+    const SimplexNoise = (() => { // ... (Simplex Noise code - remains unchanged)
         const F2 = 0.5 * (Math.sqrt(3.0) - 1.0); const G2 = (3.0 - Math.sqrt(3.0)) / 6.0;
         const F3 = 1.0 / 3.0; const G3 = 1.0 / 6.0;
         const grad3 = new Float32Array([1,1,0,-1,1,0,1,-1,0,-1,-1,0,1,0,1,-1,0,1,1,0,-1,-1,0,-1,0,1,1,0,-1,1,0,1,-1,0,-1,-1,]);
@@ -16,7 +16,7 @@
         return{noise3D,shufflePermutations};
     })();
 
-    const phrases = [ // Same phrases as before
+    const phrases = [
         { lang: "English", text: "Hello, I'm Noah" },
         { lang: "Chinese", text: "你好，我是诺亚" }, 
         { lang: "Russian", text: "Привет, я Ноа" },  
@@ -25,7 +25,8 @@
         { lang: "Arabic", text: "مرحباً، أنا نوح" }, 
         { lang: "Spanish", text: "Hola, soy Noah" },
         { lang: "French", text: "Bonjour, je suis Noah" },
-        { lang: "German", text: "Hallo, ich bin Noah" }
+        { lang: "German", text: "Hallo, ich bin Noah" },
+        { lang: "Portuguese", text: "Olá, sou Noah" } // Added Portuguese
     ];
 
     function ready(callback) {
@@ -53,9 +54,8 @@
 
             const config = {
                 backgroundFontSize: 12, 
-                textPixelSize: 2, // Smaller pixel size for denser, potentially more detailed text
-                // Increased base font size for offscreen rendering significantly
-                nativeTextRenderFontBaseSize: 96, // Base font size in px to aim for height
+                textPixelSize: 2, 
+                nativeTextRenderFontBaseSize: 72, // Reduced base size due to smaller target area
                 nativeTextRenderFontFamily: "Arial, Noto Sans, Noto Sans JP, Noto Sans SC, Noto Sans KR, Noto Naskh Arabic, sans-serif",
                 charSet: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$*#@&?", 
                 baseColor: 'rgba(180, 200, 255, VAL)', 
@@ -63,7 +63,7 @@
                 borderColor: 'rgba(220, 220, 255, 0.8)',
                 borderChar: { corner: '+', top_bottom: '-', side: '|' },
                 textPixelOnColor: 'rgba(250, 250, 255, 0.95)',
-                textPixelOffAlpha: 0.03, // Make background even dimmer under text
+                textPixelOffAlpha: 0.03, 
                 canvasClearColor: 'rgba(10, 10, 25, 1)', 
                 noiseScale: 0.08,       
                 timeScale: 0.08,        
@@ -72,9 +72,10 @@
                 fadeSpeed: 0.1,         
                 charChangeProbability: 0.03,
                 phraseChangeInterval: 5000, 
-                textAreaWidthRatio: 0.75, // Slightly wider text area
-                textAreaHeightRatio: 0.30, // Slightly taller text area
-                textPaddingRatio: 0.08, // Padding as a ratio of the smaller dimension of text area
+                // Reduced text area ratios by 50%
+                textAreaWidthRatio: 0.375, // was 0.75
+                textAreaHeightRatio: 0.15,  // was 0.30
+                textPaddingRatio: 0.08, 
             };
             
             let currentPhraseIndex = 0;
@@ -131,7 +132,6 @@
                 const phraseObj = phrases[currentPhraseIndex];
                 const textToRender = phraseObj.text;
 
-                // Content area for text rendering (inside padding)
                 const contentRenderWidth = textDisplayArea.width - 2 * textDisplayArea.padding;
                 const contentRenderHeight = textDisplayArea.height - 2 * textDisplayArea.padding;
 
@@ -139,34 +139,30 @@
                     pixelatedTextData = { width: 0, height: 0, data: [] }; return;
                 }
 
-                // --- Determine optimal font size for offscreen rendering ---
                 let dynamicFontSize = config.nativeTextRenderFontBaseSize;
                 offCtx.font = `bold ${dynamicFontSize}px ${config.nativeTextRenderFontFamily}`;
                 let textMetrics = offCtx.measureText(textToRender);
                 let textHeight = textMetrics.actualBoundingBoxAscent + textMetrics.actualBoundingBoxDescent;
-                textHeight = (textHeight && !isNaN(textHeight) && textHeight > 0) ? textHeight : dynamicFontSize; // Fallback if metrics fail
+                textHeight = (textHeight && !isNaN(textHeight) && textHeight > 0) ? textHeight : dynamicFontSize;
 
-                // Adjust font size based on height first to fill most of the contentRenderHeight
                 if (textHeight > contentRenderHeight && contentRenderHeight > 0) {
                     dynamicFontSize = Math.floor(dynamicFontSize * (contentRenderHeight / textHeight));
-                } else if (textHeight < contentRenderHeight * 0.7 && textHeight > 0) { // If too small, try to scale up
-                     dynamicFontSize = Math.floor(dynamicFontSize * (contentRenderHeight * 0.85 / textHeight)); // Aim for 85% height
+                } else if (textHeight < contentRenderHeight * 0.7 && textHeight > 0) { 
+                     dynamicFontSize = Math.floor(dynamicFontSize * (contentRenderHeight * 0.85 / textHeight));
                 }
-                dynamicFontSize = Math.max(10, dynamicFontSize); // Minimum font size
+                dynamicFontSize = Math.max(8, dynamicFontSize); // Min font size reduced for smaller area
 
                 offCtx.font = `bold ${dynamicFontSize}px ${config.nativeTextRenderFontFamily}`;
                 textMetrics = offCtx.measureText(textToRender);
-                textHeight = textMetrics.actualBoundingBoxAscent + textMetrics.actualBoundingBoxDescent;
+                textHeight = (textMetrics.actualBoundingBoxAscent + textMetrics.actualBoundingBoxDescent);
                 textHeight = (textHeight && !isNaN(textHeight) && textHeight > 0) ? textHeight : dynamicFontSize;
                 let textWidth = textMetrics.width;
                 
-                // Adjust font size based on width if it overflows
                 if (textWidth > contentRenderWidth && contentRenderWidth > 0) {
                     dynamicFontSize = Math.floor(dynamicFontSize * (contentRenderWidth / textWidth));
                 }
-                dynamicFontSize = Math.max(10, dynamicFontSize);
+                dynamicFontSize = Math.max(8, dynamicFontSize); // Min font size
 
-                // Final font setting for offscreen rendering
                 offCtx.font = `bold ${dynamicFontSize}px ${config.nativeTextRenderFontFamily}`;
                 textMetrics = offCtx.measureText(textToRender);
                 textWidth = textMetrics.width;
@@ -176,18 +172,15 @@
                 offscreenCanvas.width = Math.max(1, Math.ceil(textWidth));
                 offscreenCanvas.height = Math.max(1, Math.ceil(textHeight));
                 
-                // Re-apply font & draw (important after canvas resize)
                 offCtx.font = `bold ${dynamicFontSize}px ${config.nativeTextRenderFontFamily}`;
-                offCtx.fillStyle = '#FFFFFF'; // Render white text on transparent for sampling alpha
-                offCtx.textAlign = 'left'; 
-                offCtx.textBaseline = 'top';
-                offCtx.clearRect(0,0, offscreenCanvas.width, offscreenCanvas.height); // Clear with transparent
+                offCtx.fillStyle = '#FFFFFF'; 
+                offCtx.textAlign = 'left'; offCtx.textBaseline = 'top';
+                offCtx.clearRect(0,0, offscreenCanvas.width, offscreenCanvas.height);
                 offCtx.fillText(textToRender, 0, 0);
 
                 const imageData = offCtx.getImageData(0, 0, offscreenCanvas.width, offscreenCanvas.height);
                 const data = imageData.data;
 
-                // Number of pixel boxes to fit into the *contentRender* area
                 const numPixelCols = Math.floor(contentRenderWidth / config.textPixelSize);
                 const numPixelRows = Math.floor(contentRenderHeight / config.textPixelSize);
                 
@@ -203,119 +196,75 @@
                     for (let c = 0; c < numPixelCols; c++) {
                         const sourceX = Math.floor(c * (offscreenCanvas.width / numPixelCols));
                         const sourceY = Math.floor(r * (offscreenCanvas.height / numPixelRows));
-                        
-                        // More robust sampling: check center of source pixel mapped from target
                         const sampleSourceX = Math.min(offscreenCanvas.width - 1, Math.floor(sourceX + (offscreenCanvas.width / numPixelCols) * 0.5));
                         const sampleSourceY = Math.min(offscreenCanvas.height - 1, Math.floor(sourceY + (offscreenCanvas.height / numPixelRows) * 0.5));
-
                         const alphaIndex = (sampleSourceY * offscreenCanvas.width + sampleSourceX) * 4 + 3;
                         const alphaVal = data[alphaIndex];
-                        pixelatedTextData.data.push(alphaVal > 128 ? 1 : 0); // Threshold for "on"
+                        pixelatedTextData.data.push(alphaVal > 128 ? 1 : 0); 
                     }
                 }
-                console.log(`Pixelated "${phraseObj.text}" (font: ${dynamicFontSize}px) to ${numPixelCols}x${numPixelRows} boxes.`);
+                 // console.log(`Pixelated "${phraseObj.text}" (font: ${dynamicFontSize}px) to ${numPixelCols}x${numPixelRows} boxes.`);
             }
 
-            function drawPixelatedText() {
+            function drawPixelatedText() { // ... (drawPixelatedText function remains unchanged)
                 if (!pixelatedTextData.data.length || pixelatedTextData.width === 0) return;
-
                 const totalPixelatedWidth = pixelatedTextData.width * config.textPixelSize;
                 const totalPixelatedHeight = pixelatedTextData.height * config.textPixelSize;
-
-                // Centering within the padded content area
                 const contentRenderWidth = textDisplayArea.width - 2 * textDisplayArea.padding;
                 const contentRenderHeight = textDisplayArea.height - 2 * textDisplayArea.padding;
-
                 const startDrawX = textDisplayArea.x + textDisplayArea.padding + Math.floor((contentRenderWidth - totalPixelatedWidth) / 2);
                 const startDrawY = textDisplayArea.y + textDisplayArea.padding + Math.floor((contentRenderHeight - totalPixelatedHeight) / 2);
-
                 ctx.fillStyle = config.textPixelOnColor;
                 for (let r = 0; r < pixelatedTextData.height; r++) {
                     for (let c = 0; c < pixelatedTextData.width; c++) {
                         if (pixelatedTextData.data[r * pixelatedTextData.width + c] === 1) {
-                            ctx.fillRect(
-                                startDrawX + c * config.textPixelSize,
-                                startDrawY + r * config.textPixelSize,
-                                config.textPixelSize,
-                                config.textPixelSize
-                            );
+                            ctx.fillRect(startDrawX+c*config.textPixelSize,startDrawY+r*config.textPixelSize,config.textPixelSize,config.textPixelSize);
                         }
                     }
                 }
             }
 
-            function setupAndRun() {
+            function setupAndRun() { // ... (setupAndRun main logic largely unchanged, but uses new config ratios)
                 if (animationFrameId) cancelAnimationFrame(animationFrameId);
-                
-                SimplexNoise.shufflePermutations();
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
-                
-                numCols = Math.floor(canvas.width / config.backgroundFontSize);
-                numRows = Math.floor(canvas.height / config.backgroundFontSize);
-                
-                textDisplayArea.width = Math.floor(canvas.width * config.textAreaWidthRatio);
-                textDisplayArea.height = Math.floor(canvas.height * config.textAreaHeightRatio);
-                textDisplayArea.x = Math.floor((canvas.width - textDisplayArea.width) / 2);
-                textDisplayArea.y = Math.floor((canvas.height - textDisplayArea.height) / 2);
+                SimplexNoise.shufflePermutations(); canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+                numCols = Math.floor(canvas.width / config.backgroundFontSize); numRows = Math.floor(canvas.height / config.backgroundFontSize);
+                textDisplayArea.width = Math.floor(canvas.width * config.textAreaWidthRatio); textDisplayArea.height = Math.floor(canvas.height * config.textAreaHeightRatio);
+                textDisplayArea.x = Math.floor((canvas.width - textDisplayArea.width) / 2); textDisplayArea.y = Math.floor((canvas.height - textDisplayArea.height) / 2);
                 textDisplayArea.padding = Math.floor(Math.min(textDisplayArea.width, textDisplayArea.height) * config.textPaddingRatio);
-
-
                 borderRectCells.startCol = Math.max(0, Math.floor(textDisplayArea.x / config.backgroundFontSize) -1);
                 borderRectCells.endCol = Math.min(numCols, Math.ceil((textDisplayArea.x + textDisplayArea.width) / config.backgroundFontSize) +1);
                 borderRectCells.startRow = Math.max(0, Math.floor(textDisplayArea.y / config.backgroundFontSize) -1);
                 borderRectCells.endRow = Math.min(numRows, Math.ceil((textDisplayArea.y + textDisplayArea.height) / config.backgroundFontSize) +1);
-
-                grid = [];
-                for (let r = 0; r < numRows; r++) {
-                    let rowCells = []; for (let c = 0; c < numCols; c++) { rowCells.push(new GridCell(c, r));}
-                    grid.push(rowCells);
-                }
-                console.log(`BG Grid: ${numCols}x${numRows}, Font: ${config.backgroundFontSize}px. Pixel Box: ${config.textPixelSize}px`);
-                console.log(`Text Area (pixels): x:${textDisplayArea.x}, y:${textDisplayArea.y}, w:${textDisplayArea.width}, h:${textDisplayArea.height}, pad:${textDisplayArea.padding}`);
-
-                renderAndPixelateCurrentPhrase(); 
-                lastPhraseChangeTime = performance.now();
-
-                ctx.font = `${config.backgroundFontSize}px monospace`;
-                ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; 
-                time = Math.random() * 1000; 
-                animate();
+                grid = []; for(let r=0;r<numRows;r++){let rowCells=[];for(let c=0;c<numCols;c++){rowCells.push(new GridCell(c,r));}grid.push(rowCells);}
+                console.log(`BG Grid: ${numCols}x${numRows}. Text Area (pixels): x:${textDisplayArea.x}, y:${textDisplayArea.y}, w:${textDisplayArea.width}, h:${textDisplayArea.height}`);
+                renderAndPixelateCurrentPhrase(); lastPhraseChangeTime = performance.now();
+                ctx.font = `${config.backgroundFontSize}px monospace`; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; 
+                time = Math.random() * 1000; animate();
             }
             
             let lastFrameTime = performance.now();
-            const targetFPS = 25; 
-            const frameInterval = 1000 / targetFPS;
+            const targetFPS = 25; const frameInterval = 1000 / targetFPS;
 
-            function animate() {
+            function animate() { // ... (animate loop remains unchanged)
                 animationFrameId = requestAnimationFrame(animate);
                 const now = performance.now(); const elapsed = now - lastFrameTime;
-
                 if (elapsed > frameInterval) {
-                    lastFrameTime = now - (elapsed % frameInterval);
-                    time += config.timeScale * 0.1; 
-
+                    lastFrameTime = now - (elapsed % frameInterval); time += config.timeScale * 0.1; 
                     if (now - lastPhraseChangeTime > config.phraseChangeInterval) {
                         currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length;
-                        renderAndPixelateCurrentPhrase();
-                        lastPhraseChangeTime = now;
+                        renderAndPixelateCurrentPhrase(); lastPhraseChangeTime = now;
                     }
                     ctx.fillStyle = config.canvasClearColor; ctx.fillRect(0, 0, canvas.width, canvas.height);
                     ctx.font = `${config.backgroundFontSize}px monospace`; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
-                    for (let r = 0; r < numRows; r++) {
-                        for (let c = 0; c < numCols; c++) {
-                            const noiseVal = (SimplexNoise.noise3D(c*config.noiseScale,r*config.noiseScale,time)+1)/2; 
-                            grid[r][c].update(noiseVal); grid[r][c].draw();
-                        }
-                    }
+                    for(let r=0;r<numRows;r++){for(let c=0;c<numCols;c++){const noiseVal=(SimplexNoise.noise3D(c*config.noiseScale,r*config.noiseScale,time)+1)/2;grid[r][c].update(noiseVal);grid[r][c].draw();}}
                     drawPixelatedText();
                 }
             }
             
             setupAndRun();
-            let resizeTimeout;
-            window.addEventListener('resize', () => {clearTimeout(resizeTimeout); resizeTimeout = setTimeout(setupAndRun, 300);});
-            console.log('Hybrid animation with larger text setup complete');
+            let resizeTimeout; window.addEventListener('resize', () => {clearTimeout(resizeTimeout); resizeTimeout = setTimeout(setupAndRun, 300);});
+            console.log('Hybrid animation with smaller text area setup complete');
+
         } catch (error) { /* ... error handling ... */
             console.error('Animation initialization failed:', error);
             const errorElement = document.createElement('div');
