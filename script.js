@@ -224,7 +224,7 @@
                 const rect = canvas.getBoundingClientRect(); 
                 mouseX = event.clientX - rect.left; 
                 mouseY = event.clientY - rect.top; 
-                // console.log(`Mouse: ${mouseX}, ${mouseY}`); // For debugging cursor
+                console.log(`Mouse: ${mouseX}, ${mouseY}`); // For debugging cursor
             });
             canvas.addEventListener('mouseleave', () => { mouseX = -10000; mouseY = -10000; });
             setupAndRun();
