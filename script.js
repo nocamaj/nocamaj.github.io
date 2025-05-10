@@ -5,64 +5,33 @@ function updateAge() {
     const ageInYears = ageInMilliseconds / (1000 * 60 * 60 * 24 * 365.25);
     const ageWithDecimal = ageInYears.toFixed(10);
 
-    document.getElementById('ageTimer').textContent = ageWithDecimal;
+    const ageTimerElement = document.getElementById('ageTimer');
+    if (ageTimerElement) {
+        ageTimerElement.textContent = ageWithDecimal;
+    }
 }
 
 // Update the timer every 10 milliseconds
 setInterval(updateAge, 10);
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Set up animated background
-    const backgroundAnimation = document.querySelector('.background-animation');
-    if (!backgroundAnimation) return;
-    
-    // Create a gradient background
-    backgroundAnimation.style.background = 'linear-gradient(300deg, #00356B, #1a1a1a, #502274)';
-    backgroundAnimation.style.backgroundSize = '300% 300%';
-    backgroundAnimation.style.animation = 'gradient-animation 15s ease infinite';
-    
-    // Add the SVG noise effect to simulate the swirling text look
-    const svgFilter = `
-    <svg style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; opacity: 0.2;" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-            <filter id="noise">
-                <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
-                <feDisplacementMap in="SourceGraphic" scale="10"/>
-            </filter>
-        </defs>
-        <rect width="100%" height="100%" filter="url(#noise)"/>
-    </svg>`;
-    
-    backgroundAnimation.innerHTML = svgFilter;
-    
-    // Add keyframes for the gradient animation if not already in the stylesheet
-    if (!document.querySelector('#gradient-animation-style')) {
-        const style = document.createElement('style');
-        style.id = 'gradient-animation-style';
-        style.textContent = `
-            @keyframes gradient-animation {
-                0% { background-position: 0% 50%; }
-                50% { background-position: 100% 50%; }
-                100% { background-position: 0% 50%; }
-            }
-        `;
-        document.head.appendChild(style);
-    }
-    
-    // Create a simple canvas animation for the swirling text effect
+    const backgroundContainer = document.querySelector('.background-animation');
+    if (!backgroundContainer) return;
+
+    // Clear any existing content
+    backgroundContainer.innerHTML = '';
+
+    // Create canvas element
     const canvas = document.createElement('canvas');
     canvas.style.position = 'absolute';
     canvas.style.top = '0';
     canvas.style.left = '0';
     canvas.style.width = '100%';
     canvas.style.height = '100%';
-    canvas.style.opacity = '0.3';
     canvas.style.pointerEvents = 'none';
-    backgroundAnimation.appendChild(canvas);
-    
-    const ctx = canvas.getContext('2d');
-    
-    // Set canvas dimensions
+    backgroundContainer.appendChild(canvas);
+
+    // Set canvas size to match window
     function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
@@ -70,50 +39,135 @@ document.addEventListener('DOMContentLoaded', () => {
     
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
+
+    const ctx = canvas.getContext('2d');
     
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789<>/?[]{}|=+-_)(*&^%$#@!~';
+    // Swirling text settings
+    const textPool = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789<>/{[]}+*_-.?:;!@#$%^&()~`"\'⋆⟡⚡☆ⓃⓄⒶⒽoNo∀H★☽☾♡♥';
+    const characters = [];
+    const totalCharacters = 150; // Adjust for desired density
+    const baseRotationSpeed = 0.2;
     
-    // Create an array of character objects
-    const textParticles = [];
-    const numParticles = 100; // Adjust based on performance
-    
-    for (let i = 0; i < numParticles; i++) {
-        textParticles.push({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            radius: 50 + Math.random() * 100,
-            angle: Math.random() * Math.PI * 2,
-            speed: 0.005 + Math.random() * 0.01,
-            character: characters.charAt(Math.floor(Math.random() * characters.length)),
-            size: 8 + Math.floor(Math.random() * 14)
-        });
+    // Custom color palette with subtle blues and purples
+    const colors = [
+        'rgba(123, 104, 238, 0.7)', // Light purple
+        'rgba(75, 0, 130, 0.7)',    // Indigo
+        'rgba(106, 90, 205, 0.7)',  // Slate blue
+        'rgba(138, 43, 226, 0.7)',  // Blue violet
+        'rgba(153, 50, 204, 0.7)',  // Dark orchid
+        'rgba(147, 112, 219, 0.7)', // Medium purple
+        'rgba(72, 61, 139, 0.7)',   // Dark slate blue
+        'rgba(25, 25, 112, 0.7)',   // Midnight blue
+        'rgba(0, 0, 139, 0.7)'      // Dark blue
+    ];
+
+    // Initialize characters
+    function createCharacters() {
+        characters.length = 0; // Clear array
+        
+        for (let i = 0; i < totalCharacters; i++) {
+            // Create spiral/swirl pattern
+            const angle = Math.random() * Math.PI * 2;
+            const radius = Math.random() * Math.min(canvas.width, canvas.height) * 0.45;
+            
+            // Calculate position
+            const x = canvas.width / 2 + Math.cos(angle) * radius;
+            const y = canvas.height / 2 + Math.sin(angle) * radius;
+            
+            // Random character from pool
+            const char = textPool[Math.floor(Math.random() * textPool.length)];
+            
+            // Random font size based on distance from center for depth effect
+            const distanceRatio = radius / (Math.min(canvas.width, canvas.height) * 0.45);
+            const minSize = 12;
+            const maxSize = 22;
+            const fontSize = Math.floor(minSize + (maxSize - minSize) * (1 - distanceRatio * 0.8));
+            
+            // Random rotation and animation parameters
+            const rotationSpeed = (0.5 + Math.random() * 0.5) * baseRotationSpeed * (Math.random() > 0.5 ? 1 : -1);
+            const orbitSpeed = (0.2 + Math.random() * 0.8) * baseRotationSpeed * (Math.random() > 0.5 ? 1 : -1);
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            
+            characters.push({
+                char: char,
+                x: x,
+                y: y,
+                fontSize: fontSize,
+                angle: angle,
+                radius: radius,
+                rotationSpeed: rotationSpeed,
+                orbitSpeed: orbitSpeed,
+                rotation: Math.random() * Math.PI * 2,
+                color: color,
+                alpha: 0.1 + Math.random() * 0.9,
+                distanceRatio: distanceRatio
+            });
+        }
     }
-    
+
+    // Animation variables
+    let time = 0;
+    let animationId;
+
     // Animation loop
     function animate() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-        ctx.font = 'bold 14px monospace';
+        // Clear canvas with semi-transparent background for trail effect
+        ctx.fillStyle = 'rgba(26, 26, 26, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        textParticles.forEach(particle => {
-            // Update position
-            particle.angle += particle.speed;
-            particle.x = canvas.width / 2 + Math.cos(particle.angle) * particle.radius;
-            particle.y = canvas.height / 2 + Math.sin(particle.angle) * particle.radius;
+        // Center point for swirling
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        
+        // Update and draw characters
+        characters.forEach(char => {
+            // Update orbit position
+            char.angle += char.orbitSpeed * 0.01;
+            char.rotation += char.rotationSpeed * 0.02;
+            
+            // Calculate new position based on orbit
+            char.x = centerX + Math.cos(char.angle) * char.radius;
+            char.y = centerY + Math.sin(char.angle) * char.radius;
             
             // Draw character
-            ctx.font = `${particle.size}px monospace`;
-            ctx.fillText(particle.character, particle.x, particle.y);
+            ctx.save();
+            ctx.translate(char.x, char.y);
+            ctx.rotate(char.rotation);
             
-            // Occasionally change character
-            if (Math.random() < 0.01) {
-                particle.character = characters.charAt(Math.floor(Math.random() * characters.length));
-            }
+            // Set font and color
+            ctx.font = `${char.fontSize}px "Courier New", monospace`;
+            ctx.fillStyle = char.color;
+            ctx.globalAlpha = char.alpha;
+            
+            // Draw text centered on its position
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(char.char, 0, 0);
+            
+            ctx.restore();
         });
         
-        requestAnimationFrame(animate);
+        time += 0.01;
+        animationId = requestAnimationFrame(animate);
     }
-    
+
+    // Initial setup
+    createCharacters();
     animate();
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+        // Cancel current animation
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+        }
+        
+        // Resize canvas and recreate characters
+        resizeCanvas();
+        createCharacters();
+        
+        // Restart animation
+        animate();
+    });
 });
 
