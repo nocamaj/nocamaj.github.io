@@ -8,50 +8,26 @@
     <script src="script.js" defer></script>
 </head>
 <body>
+    <!-- Animation container - REMOVE INLINE STYLES HERE for cleaner CSS management -->
     <div class="background-animation">
-        <canvas></canvas> <!-- Canvas directly inside for script.js to find -->
+        <!-- Canvas will be created by JavaScript -->
     </div>
     
     <header>
         <nav>
             <div class="nav-left">
-                <a href="#" class="nav-button active-nav" data-target="home-content">Home</a>
+                <a href="#" class="nav-button">Home</a>
             </div>
             <div class="nav-right">
-                <a href="#" class="nav-button" data-target="metrics-content">Metrics</a>
-                <a href="#" class="nav-button" data-target="ideas-content">Ideas</a>
-                <a href="#" class="nav-button" data-target="travel-page">Travel</a>
+                <a href="#" class="nav-button">Metrics</a>
+                <a href="#" class="nav-button">Ideas</a>
+                <a href="#" class="nav-button">Travel</a>
             </div>
         </nav>
     </header>
 
     <main>
-        <!-- Default content area, initially visible -->
-        <div id="home-content" class="page-content" style="display: block;">
-            <!-- Main content area - can remain empty or add a welcome message -->
-            <!-- The text animation will happen on the canvas background, not in this div -->
-        </div>
-
-        <!-- Placeholder for Metrics Page -->
-        <div id="metrics-content" class="page-content" style="display: none;">
-            <h2>Metrics</h2>
-            <p>Metrics page content will go here.</p>
-        </div>
-
-        <!-- Placeholder for Ideas Page -->
-        <div id="ideas-content" class="page-content" style="display: none;">
-            <h2>Ideas</h2>
-            <p>Ideas page content will go here.</p>
-        </div>
-
-        <!-- Travel Page Content -->
-        <div id="travel-page" class="page-content" style="display: none;">
-            <h2>My Travels</h2>
-            <div id="world-map-container">
-                <!-- SVG will be loaded here by JavaScript -->
-                <p>Loading map...</p> 
-            </div>
-        </div>
+        <!-- Main content area - intentionally left empty -->
     </main>
 
     <footer>
@@ -59,5 +35,6 @@
             <input type="text" placeholder="What would you like to know about Noah...">
         </div>
     </footer>
+
 </body>
 </html>
