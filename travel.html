@@ -5,31 +5,129 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Noah's Site - Travel</title>
     <link rel="stylesheet" href="style.css">
-    <!-- Note: script.js for homepage animation is NOT included here -->
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+
+    <style>
+        /* Add styles specific to the travel page map here */
+        #map { 
+            height: calc(100vh - 70px); /* Adjust 70px based on your actual header height */
+            width: 100%; 
+            background-color: #0a0a18; /* Match body if needed, or keep map distinct */
+        }
+        /* Ensure main can take up space if header is fixed */
+        main.travel-main {
+            padding-top: 70px; /* Adjust based on header height to avoid overlap */
+        }
+    </style>
 </head>
-<body>
+<body class="travel-page-background"> {/* Added class for specific background */}
     
     <header>
         <nav>
             <div class="nav-left">
-                <!-- Adjusted link to point to index.html for "Home" -->
                 <a href="index.html" class="nav-button">Home</a> 
             </div>
             <div class="nav-right">
-                <a href="#" class="nav-button">Metrics</a>
-                <a href="#" class="nav-button">Ideas</a>
-                <!-- "Travel" button could link to this page itself or be styled as active -->
+                <a href="#" class="nav-button">Metrics</a> {/* Assuming these are placeholders */}
+                <a href="#" class="nav-button">Ideas</a>   {/* Assuming these are placeholders */}
                 <a href="Travel.html" class="nav-button">Travel</a> 
             </div>
         </nav>
     </header>
 
-    <main>
-        <!-- Main content area for the Travel page - intentionally left blank -->
-        <!-- You can add your travel-specific content here later -->
+    <main class="travel-main">
+        <div id="map"></div>
     </main>
 
-    <!-- No footer on this page as per request -->
+    <!-- Leaflet JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+
+    <script>
+        // List of visited countries (use ISO A2 codes for matching with GeoJSON properties)
+        // Example: United States, Canada, Mexico, Brazil, France, Germany, Japan, Australia
+        const visitedCountriesISO_A2 = ["US", "CA", "MX", "BR", "FR", "DE", "JP", "AU", "CN", "RU", "IN", "GB", "IT", "ES", "PT", "AR", "CL", "ZA", "EG", "KE", "NG", "GH", "MA", "SE", "NO", "FI", "PL", "UA", "TR", "IR", "SA", "ID", "TH", "VN", "PH", "MY", "KR", "NZ"]; // Add your visited countries here
+
+        // Initialize the map and set its view to a general world view
+        const map = L.map('map', {
+            center: [20, 0], // Centered a bit to show more landmass
+            zoom: 2,        // Initial zoom level
+            minZoom: 2,     // Minimum zoom
+            maxZoom: 8,     // Maximum zoom
+            worldCopyJump: true, // Ensures map wraps around horizontally
+            attributionControl: false // Disable default attribution for a cleaner look if desired
+        });
+
+        // Style for all countries
+        const defaultStyle = {
+            fillColor: "#404040", // Dark grey for unvisited countries
+            weight: 1,
+            opacity: 1,
+            color: '#1a1a1a',    // Border color for countries
+            fillOpacity: 0.7
+        };
+
+        // Style for visited countries
+        const visitedStyle = {
+            fillColor: "#FFA500", // Orange for visited countries (like your example)
+            weight: 1,
+            opacity: 1,
+            color: '#1a1a1a',
+            fillOpacity: 0.8
+        };
+
+        // Load GeoJSON data for country boundaries
+        // Using a medium resolution world map GeoJSON file
+        fetch('https://geojson-maps.ash.ms/countries-110m.json') 
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok for GeoJSON');
+                }
+                return response.json();
+            })
+            .then(data => {
+                L.geoJson(data, {
+                    style: function(feature) {
+                        // Check if the country's ISO A2 code is in our visited list
+                        // The property name in GeoJSON can vary (e.g., 'iso_a2', 'ISO_A2', 'adm0_a2')
+                        // Inspect your GeoJSON to find the correct property for ISO A2 codes.
+                        // For 'https://geojson-maps.ash.ms/countries-110m.json', it's often 'iso_a2' or ' sovereignt' for name.
+                        // Let's assume we'll match by name if iso_a2 is not consistently available or for simplicity.
+                        // A more robust solution uses ISO codes. For this GeoJSON, 'iso_a2_eh' might be present or you might need to check feature.properties.name
+                        
+                        const countryISO = feature.properties.iso_a2_eh || feature.properties.iso_a2 || feature.properties.ISO_A2; // Try common ISO A2 property names
+                        if (visitedCountriesISO_A2.includes(countryISO)) {
+                            return visitedStyle;
+                        }
+                        return defaultStyle;
+                    },
+                    onEachFeature: function(feature, layer) {
+                        // You can add popups or other interactions here if needed
+                        let countryName = feature.properties.name || feature.properties.NAME || feature.properties. sovereignt;
+                        if (countryName) {
+                            layer.bindPopup(countryName);
+                        }
+                    }
+                }).addTo(map);
+            })
+            .catch(error => {
+                console.error('Error loading or parsing GeoJSON:', error);
+                // Display an error message on the map div if GeoJSON fails to load
+                const mapDiv = document.getElementById('map');
+                if (mapDiv) {
+                    mapDiv.innerHTML = '<p style="text-align:center; padding-top: 50px; color: white;">Could not load map data. Please try again later.</p>';
+                }
+            });
+
+        // Optional: Add a simple scale control
+        L.control.scale({imperial: false}).addTo(map);
+
+    </script>
 
 </body>
 </html>

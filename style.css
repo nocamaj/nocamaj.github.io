@@ -108,3 +108,7 @@ footer { /* ... rest of footer styles ... */
     .nav-left .nav-button, .nav-right .nav-button { padding: 6px 10px; margin: 0 3px; }
     .search-container input[type="text"] { width: 80vw; }
 }
+
+body.travel-page-background {
+    background-color: #0a0a18; /* Darker blue for travel page */
+}
