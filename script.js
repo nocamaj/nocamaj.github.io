@@ -1,15 +1,22 @@
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('Script loaded - animation initializing');
+
     // Clear any potential unwanted content from main
     const mainElement = document.querySelector('main');
     if (mainElement) {
         mainElement.innerHTML = '';
     }
 
+    // Get the background container
     const backgroundContainer = document.querySelector('.background-animation');
-    if (!backgroundContainer) return;
+    if (!backgroundContainer) {
+        console.error('Background container not found!');
+        return;
+    }
 
     // Clear any existing content
     backgroundContainer.innerHTML = '';
+    console.log('Background container found and cleared');
 
     // Create canvas element
     const canvas = document.createElement('canvas');
@@ -18,14 +25,17 @@ document.addEventListener('DOMContentLoaded', () => {
     canvas.style.left = '0';
     canvas.style.width = '100%';
     canvas.style.height = '100%';
-    canvas.style.zIndex = '0'; // Ensure proper z-index
+    canvas.style.zIndex = '1'; // Ensure proper z-index - make it visible!
     canvas.style.pointerEvents = 'none';
+    canvas.style.display = 'block'; // Ensure the canvas is displayed
     backgroundContainer.appendChild(canvas);
+    console.log('Canvas created and appended to container');
 
     // Set canvas size to match window
     function resizeCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
+        console.log(`Canvas resized to ${canvas.width}x${canvas.height}`);
         // Recreate grid when canvas resizes
         createGrid();
     }
@@ -34,6 +44,10 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', resizeCanvas);
 
     const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        console.error('Could not get canvas context!');
+        return;
+    }
     
     // Animation configuration
     const CHAR_WIDTH = 14; // Width of each character in pixels
@@ -45,15 +59,15 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Colors for the text - using vibrant colors that stand out against dark background
     const COLORS = [
-        'rgba(200, 150, 255, 0.9)', // Bright purple
-        'rgba(150, 100, 255, 0.9)', // Bright indigo
-        'rgba(255, 120, 220, 0.9)', // Bright pink
-        'rgba(220, 180, 255, 0.9)', // Lavender
-        'rgba(130, 255, 200, 0.9)', // Bright teal
-        'rgba(80, 200, 255, 0.9)',  // Bright blue
-        'rgba(255, 255, 130, 0.9)', // Bright yellow
-        'rgba(255, 150, 50, 0.9)',  // Bright orange
-        'rgba(255, 255, 255, 0.9)'  // White
+        'rgba(200, 150, 255, 1.0)', // Bright purple
+        'rgba(150, 100, 255, 1.0)', // Bright indigo
+        'rgba(255, 120, 220, 1.0)', // Bright pink
+        'rgba(220, 180, 255, 1.0)', // Lavender
+        'rgba(130, 255, 200, 1.0)', // Bright teal
+        'rgba(80, 200, 255, 1.0)',  // Bright blue
+        'rgba(255, 255, 130, 1.0)', // Bright yellow
+        'rgba(255, 150, 50, 1.0)',  // Bright orange
+        'rgba(255, 255, 255, 1.0)'  // White
     ];
 
     // 2D arrays for grid system
@@ -68,6 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Create a 2D grid of text and masks
     function createGrid() {
+        console.log('Creating animation grid');
         // Calculate grid dimensions based on canvas size and character dimensions
         rows = Math.ceil(canvas.height / CHAR_HEIGHT) + 2; // Add extra rows for rotation
         cols = Math.ceil(canvas.width / CHAR_WIDTH) + 2;   // Add extra columns for rotation
@@ -97,10 +112,12 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Create initial mask pattern (a star/circular shape)
         createStarMask();
+        console.log('Grid created successfully');
     }
 
     // Create a star or circular shape in the mask
     function createStarMask() {
+        console.log('Creating star mask pattern');
         // Clear existing mask
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
@@ -252,8 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Draw the grid to canvas
     function drawGrid() {
         // Clear canvas
-        ctx.fillStyle = 'rgba(18, 18, 18, 1.0)'; // Dark background
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         
         // Center the grid on canvas
         const offsetX = (canvas.width - cols * CHAR_WIDTH) / 2;
@@ -264,6 +280,9 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         
+        // Count drawn characters for debugging
+        let drawnCount = 0;
+        
         // Draw each character where mask is true
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
@@ -273,13 +292,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     // Add glow effect
                     ctx.shadowColor = colorGrid[row][col];
-                    ctx.shadowBlur = 8;
+                    ctx.shadowBlur = 10;
                     ctx.fillStyle = colorGrid[row][col];
                     
                     // Draw the character
                     ctx.fillText(textGrid[row][col], x, y);
+                    drawnCount++;
                 }
             }
+        }
+        
+        if (drawnCount === 0) {
+            console.warn('No characters drawn! Check mask generation.');
+        } else if (drawnCount < 100) {
+            console.warn(`Only ${drawnCount} characters drawn. This might be too few to be visible.`);
         }
     }
 
@@ -295,6 +321,7 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(animate);
     }
 
+    console.log('Starting animation...');
     // Initialize and start animation
     createGrid();
     animate();

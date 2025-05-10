@@ -14,7 +14,7 @@ body, html {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 0; /* Make sure it's behind content but visible */
+    z-index: 1; /* Ensure it's visible but behind content */
     overflow: hidden;
     pointer-events: none; /* Make sure it doesn't interfere with clicks */
     display: block; /* Ensure it's displayed */
