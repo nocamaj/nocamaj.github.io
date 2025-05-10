@@ -14,11 +14,22 @@ body, html {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 1; /* Ensure it's visible but behind content */
-    overflow: hidden;
+    z-index: 2; /* Ensure it's visible above background but below content */
+    overflow: visible; /* Allow content to be visible */
     pointer-events: none; /* Make sure it doesn't interfere with clicks */
-    display: block; /* Ensure it's displayed */
-    background-color: #121212; /* Match body background */
+    display: block !important; /* Force display */
+    background-color: transparent; /* Make background transparent to see animation */
+}
+
+/* Force canvas to be visible if it exists */
+.background-animation canvas {
+    display: block !important; 
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: 3 !important;
 }
 
 header {
