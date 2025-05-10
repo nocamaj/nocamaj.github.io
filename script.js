@@ -1,13 +1,8 @@
-// Wrap in an IIFE to avoid global scope pollution
+// Wrap in an IIFE
 (function() {
-    console.log('Grid-based swirling ASCII animation script loading...');
+    console.log('Grid-based swirling ASCII animation with central text loading...');
 
-    /**
-     * A standalone Simplex Noise implementation.
-     * Based on the public domain implementation by Stefan Gustavson and Peter Eastman.
-     * And further adapted from Jonas Wagner's JavaScript version.
-     */
-    const SimplexNoise = (() => {
+    const SimplexNoise = (() => { // ... (Simplex Noise code from previous response - remains unchanged)
         const F2 = 0.5 * (Math.sqrt(3.0) - 1.0);
         const G2 = (3.0 - Math.sqrt(3.0)) / 6.0;
         const F3 = 1.0 / 3.0;
@@ -121,27 +116,83 @@
         return { noise3D, shufflePermutations };
     })();
 
+    // --- Minimal 5x7 Dot Matrix Font Definition ---
+    // 1 = on, 0 = off. Each array is a row. Height 7, Width 5.
+    const dotMatrixFont = {
+        'A': [[0,1,1,1,0],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1]],
+        'B': [[1,1,1,1,0],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,0],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,0]],
+        'C': [[0,1,1,1,1],[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0],[0,1,1,1,1]],
+        'D': [[1,1,1,1,0],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,0]],
+        'E': [[1,1,1,1,1],[1,0,0,0,0],[1,0,0,0,0],[1,1,1,1,0],[1,0,0,0,0],[1,0,0,0,0],[1,1,1,1,1]],
+        'F': [[1,1,1,1,1],[1,0,0,0,0],[1,0,0,0,0],[1,1,1,1,0],[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0]],
+        'G': [[0,1,1,1,1],[1,0,0,0,0],[1,0,0,0,0],[1,0,1,1,1],[1,0,0,0,1],[1,0,0,0,1],[0,1,1,1,1]],
+        'H': [[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1]],
+        'I': [[1,1,1,1,1],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0],[1,1,1,1,1]],
+        'J': [[0,0,1,1,1],[0,0,0,1,0],[0,0,0,1,0],[0,0,0,1,0],[1,0,0,1,0],[1,0,0,1,0],[0,1,1,0,0]],
+        'K': [[1,0,0,1,0],[1,0,1,0,0],[1,1,0,0,0],[1,1,0,0,0],[1,0,1,0,0],[1,0,0,1,0],[1,0,0,1,0]], // Simplified K
+        'L': [[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,1,1,1,1]],
+        'M': [[1,0,0,0,1],[1,1,0,1,1],[1,0,1,0,1],[1,0,1,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1]],
+        'N': [[1,0,0,0,1],[1,1,0,0,1],[1,0,1,0,1],[1,0,0,1,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1]],
+        'O': [[0,1,1,1,0],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[0,1,1,1,0]],
+        'P': [[1,1,1,1,0],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,0],[1,0,0,0,0],[1,0,0,0,0],[1,0,0,0,0]],
+        'Q': [[0,1,1,1,0],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,1,0,1],[1,0,0,1,0],[0,1,1,1,0]], // Simplified Q
+        'R': [[1,1,1,1,0],[1,0,0,0,1],[1,0,0,0,1],[1,1,1,1,0],[1,0,1,0,0],[1,0,0,1,0],[1,0,0,0,1]],
+        'S': [[0,1,1,1,1],[1,0,0,0,0],[1,0,0,0,0],[0,1,1,1,0],[0,0,0,0,1],[0,0,0,0,1],[1,1,1,1,0]],
+        'T': [[1,1,1,1,1],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0]],
+        'U': [[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[0,1,1,1,0]],
+        'V': [[1,0,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[0,1,0,1,0],[0,1,0,1,0],[0,0,1,0,0],[0,0,1,0,0]],
+        'W': [[1,0,0,0,1],[1,0,0,0,1],[1,0,1,0,1],[1,0,1,0,1],[1,1,0,1,1],[1,1,0,1,1],[1,0,0,0,1]],
+        'X': [[1,0,0,0,1],[0,1,0,1,0],[0,0,1,0,0],[0,0,1,0,0],[0,1,0,1,0],[1,0,0,0,1],[0,0,0,0,0]], // Simplified X
+        'Y': [[1,0,0,0,1],[0,1,0,1,0],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0]],
+        'Z': [[1,1,1,1,1],[0,0,0,1,0],[0,0,1,0,0],[0,1,0,0,0],[1,0,0,0,0],[1,0,0,0,0],[1,1,1,1,1]],
+        '0': [[0,1,1,1,0],[1,0,0,1,1],[1,0,1,0,1],[1,1,0,0,1],[1,0,0,0,1],[1,0,0,0,1],[0,1,1,1,0]],
+        '1': [[0,0,1,0,0],[0,1,1,0,0],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0],[0,1,1,1,0]],
+        '2': [[0,1,1,1,0],[1,0,0,0,1],[0,0,0,0,1],[0,0,0,1,0],[0,0,1,0,0],[0,1,0,0,0],[1,1,1,1,1]],
+        '3': [[0,1,1,1,0],[1,0,0,0,1],[0,0,0,0,1],[0,0,1,1,0],[0,0,0,0,1],[1,0,0,0,1],[0,1,1,1,0]],
+        '4': [[0,0,0,1,0],[0,0,1,1,0],[0,1,0,1,0],[1,0,0,1,0],[1,1,1,1,1],[0,0,0,1,0],[0,0,0,1,0]],
+        '5': [[1,1,1,1,1],[1,0,0,0,0],[1,1,1,1,0],[0,0,0,0,1],[0,0,0,0,1],[1,0,0,0,1],[0,1,1,1,0]],
+        '6': [[0,1,1,1,0],[1,0,0,0,0],[1,0,0,0,0],[1,1,1,1,0],[1,0,0,0,1],[1,0,0,0,1],[0,1,1,1,0]],
+        '7': [[1,1,1,1,1],[0,0,0,0,1],[0,0,0,1,0],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0]],
+        '8': [[0,1,1,1,0],[1,0,0,0,1],[1,0,0,0,1],[0,1,1,1,0],[1,0,0,0,1],[1,0,0,0,1],[0,1,1,1,0]],
+        '9': [[0,1,1,1,0],[1,0,0,0,1],[1,0,0,0,1],[0,1,1,1,1],[0,0,0,0,1],[0,0,0,0,1],[0,1,1,1,0]],
+        ' ': [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]],
+        "'": [[0,0,1,0,0],[0,0,1,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]],
+        ',': [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,1,0,0],[0,0,1,0,0]], // Lowered comma
+        '.': [[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,1,0,0]],
+        '!': [[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0],[0,0,1,0,0],[0,0,0,0,0],[0,0,1,0,0]],
+        // Add more characters if needed
+    };
+    const FONT_CHAR_WIDTH = 5;
+    const FONT_CHAR_HEIGHT = 7;
+    const FONT_CHAR_SPACING = 1; // Cells between characters
+
+    const phrases = [
+        { lang: "English", text: "HELLO I'M NOAH" },
+        { lang: "Chinese (Pinyin)", text: "NI HAO WO SHI NOAH" },
+        { lang: "Russian (Transl.)", text: "PRIVET YA NOA" },
+        { lang: "Hindi (Transl.)", text: "NAMASTE MAIN NOA HUN" },
+        { lang: "Japanese (Romaji)", text: "KONNICHIWA NOA DESU" },
+        { lang: "Arabic (Transl.)", text: "MARHABAN ANA NUH" },
+        { lang: "Spanish", text: "HOLA SOY NOAH" },
+        { lang: "French", text: "BONJOUR JE SUIS NOAH" },
+        { lang: "German", text: "HALLO ICH BIN NOAH" }
+    ];
 
     function ready(callback) {
-        if (document.readyState !== 'loading') {
-            callback();
-        } else {
-            document.addEventListener('DOMContentLoaded', callback);
-        }
+        if (document.readyState !== 'loading') callback();
+        else document.addEventListener('DOMContentLoaded', callback);
     }
 
     function initAnimation() {
         try {
-            console.log('Grid animation initialization started');
-            
             const backgroundContainer = document.querySelector('.background-animation');
-            if (!backgroundContainer) throw new Error('Background container .background-animation not found!');
+            if (!backgroundContainer) throw new Error('.background-animation not found!');
             backgroundContainer.innerHTML = ''; 
             
             const canvas = document.createElement('canvas');
             backgroundContainer.appendChild(canvas);
             const ctx = canvas.getContext('2d');
-            if (!ctx) throw new Error('Failed to get canvas 2D context');
+            if (!ctx) throw new Error('Failed to get 2D context');
 
             let animationFrameId;
             let grid = [];
@@ -149,20 +200,33 @@
             let time = Math.random() * 1000;
 
             const config = {
-                fontSize: 12, // Reduced by ~15% from 14 (11.9 -> 12)
-                // Updated character set: letters, numbers, special symbols
+                fontSize: 10, // Further reduced by ~15% from 12
                 charSet: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789$()*&%#@!?<>[]{}|/\\-_+=^~`:;\",.'",
                 baseColor: 'rgba(180, 200, 255, VAL)', 
-                highlightColor: 'rgba(230, 240, 255, VAL)', 
+                highlightColor: 'rgba(230, 240, 255, VAL)',
+                textCellChar: '*', // Character to use for active text cells
+                textColorTemplate: 'rgba(255, 255, 255, VAL)', // Brighter for text
                 canvasClearColor: 'rgba(10, 10, 25, 1)', 
-                noiseScale: 0.06,       
+                noiseScale: 0.07, // Adjusted slightly for new font size
                 timeScale: 0.08,        
                 activationThreshold: 0.25, 
                 highlightThreshold: 0.6, 
                 fadeSpeed: 0.15,         
-                charChangeProbability: 0.02 
+                charChangeProbability: 0.02,
+                textRectHeightCells: FONT_CHAR_HEIGHT, // Height of text area based on font
+                textRectPaddingCells: 2, // Padding around text area
+                phraseChangeInterval: 5000, // 5 seconds in ms
             };
             
+            let currentPhraseIndex = 0;
+            let lastPhraseChangeTime = 0;
+            let textGridPattern = []; // 2D array [row][col] of 0 or 1 for text pixels
+
+            // Text Rectangle dimensions - will be calculated in setupGridAndRun
+            let textRectStartCol, textRectEndCol, textRectStartRow, textRectEndRow;
+            let textRectCols, textRectRows;
+
+
             class GridCell {
                 constructor(col, row) {
                     this.col = col;
@@ -171,19 +235,42 @@
                     this.currentAlpha = 0;
                     this.targetAlpha = 0;
                     this.colorTemplate = config.baseColor;
+                    this.isTextPixel = false; // Is this cell part of an active text character pixel
+                    this.isTextRectCell = false; // Is this cell within the text rectangle bounds
                 }
 
                 update(noiseValue) {
-                    if (noiseValue > config.activationThreshold) {
-                        this.targetAlpha = Math.min(1, (noiseValue - config.activationThreshold) / (1 - config.activationThreshold) * 1.5); 
-                        
-                        if (this.currentAlpha < 0.1 || Math.random() < config.charChangeProbability) {
-                            this.char = getRandomChar();
-                        }
-                        this.colorTemplate = (noiseValue > config.highlightThreshold) ? config.highlightColor : config.baseColor;
+                    this.isTextRectCell = (this.col >= textRectStartCol && this.col < textRectEndCol && 
+                                           this.row >= textRectStartRow && this.row < textRectEndRow);
+                    
+                    let relativeCol = this.col - textRectStartCol;
+                    let relativeRow = this.row - textRectStartRow;
+                    this.isTextPixel = false;
 
-                    } else {
-                        this.targetAlpha = 0;
+                    if (this.isTextRectCell && 
+                        textGridPattern[relativeRow] && 
+                        textGridPattern[relativeRow][relativeCol] === 1) {
+                        this.isTextPixel = true;
+                    }
+
+                    if (this.isTextPixel) {
+                        this.targetAlpha = 0.9 + Math.random() * 0.1; // Bright and slightly shimmering
+                        this.char = config.textCellChar; 
+                        this.colorTemplate = config.textColorTemplate;
+                    } else if (this.isTextRectCell) { // Inside text rect, but not an active pixel for text
+                        this.targetAlpha = noiseValue * 0.1; // Much dimmer background within text rect
+                        this.char = getRandomChar();
+                        this.colorTemplate = config.baseColor;
+                    } else { // Regular background cell
+                        if (noiseValue > config.activationThreshold) {
+                            this.targetAlpha = Math.min(1, (noiseValue - config.activationThreshold) / (1 - config.activationThreshold) * 1.5); 
+                            if (this.currentAlpha < 0.1 || Math.random() < config.charChangeProbability) {
+                                this.char = getRandomChar();
+                            }
+                            this.colorTemplate = (noiseValue > config.highlightThreshold) ? config.highlightColor : config.baseColor;
+                        } else {
+                            this.targetAlpha = 0;
+                        }
                     }
 
                     if (Math.abs(this.currentAlpha - this.targetAlpha) < 0.01) {
@@ -209,6 +296,59 @@
                 return config.charSet.charAt(Math.floor(Math.random() * config.charSet.length));
             }
 
+            function generateTextGrid(phraseStr) {
+                const phrase = phraseStr.toUpperCase();
+                let patternWidth = 0;
+                for (let i = 0; i < phrase.length; i++) {
+                    patternWidth += FONT_CHAR_WIDTH;
+                    if (i < phrase.length - 1) patternWidth += FONT_CHAR_SPACING;
+                }
+
+                const outputGrid = Array(FONT_CHAR_HEIGHT).fill(null).map(() => Array(patternWidth).fill(0));
+                let currentX = 0;
+
+                for (const char of phrase) {
+                    const fontChar = dotMatrixFont[char] || dotMatrixFont[' ']; // Default to space if char not found
+                    for (let r = 0; r < FONT_CHAR_HEIGHT; r++) {
+                        for (let c = 0; c < FONT_CHAR_WIDTH; c++) {
+                            if (fontChar[r] && fontChar[r][c] === 1) {
+                                if (outputGrid[r]) outputGrid[r][currentX + c] = 1;
+                            }
+                        }
+                    }
+                    currentX += FONT_CHAR_WIDTH + FONT_CHAR_SPACING;
+                }
+                return outputGrid;
+            }
+            
+            function updateActiveTextPattern() {
+                const currentFullPhrase = phrases[currentPhraseIndex];
+                const generatedPattern = generateTextGrid(currentFullPhrase.text);
+                
+                // Center the generated pattern within the textRectCols, textRectRows
+                textGridPattern = Array(textRectRows).fill(null).map(() => Array(textRectCols).fill(0));
+
+                const patternActualWidth = generatedPattern[0] ? generatedPattern[0].length : 0;
+                const patternActualHeight = generatedPattern.length;
+
+                const startXOffset = Math.floor((textRectCols - patternActualWidth) / 2);
+                const startYOffset = Math.floor((textRectRows - patternActualHeight) / 2);
+
+                for (let r = 0; r < patternActualHeight; r++) {
+                    for (let c = 0; c < patternActualWidth; c++) {
+                        if (generatedPattern[r][c] === 1) {
+                            const targetR = startYOffset + r;
+                            const targetC = startXOffset + c;
+                            if (targetR >= 0 && targetR < textRectRows && targetC >= 0 && targetC < textRectCols) {
+                                textGridPattern[targetR][targetC] = 1;
+                            }
+                        }
+                    }
+                }
+                 console.log("Updated text pattern for:", currentFullPhrase.text);
+            }
+
+
             function setupGridAndRun() {
                 if (animationFrameId) cancelAnimationFrame(animationFrameId);
                 
@@ -216,10 +356,19 @@
 
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
-                console.log(`Canvas size: ${canvas.width}x${canvas.height}`);
-
+                
                 numCols = Math.floor(canvas.width / config.fontSize);
                 numRows = Math.floor(canvas.height / config.fontSize);
+
+                // Define text rectangle based on total grid cells
+                textRectRows = config.textRectHeightCells + 2 * config.textRectPaddingCells; // e.g., 7 + 2*2 = 11 cells high
+                // Attempt to make text rect about 60-70% of screen width in cells
+                textRectCols = Math.floor(numCols * 0.7); 
+
+                textRectStartRow = Math.floor((numRows - textRectRows) / 2);
+                textRectEndRow = textRectStartRow + textRectRows;
+                textRectStartCol = Math.floor((numCols - textRectCols) / 2);
+                textRectEndCol = textRectStartCol + textRectCols;
                 
                 grid = [];
                 for (let r = 0; r < numRows; r++) {
@@ -229,11 +378,16 @@
                     }
                     grid.push(rowCells);
                 }
-                console.log(`Grid initialized: ${numCols}x${numRows} cells, font size: ${config.fontSize}px`);
+                console.log(`Grid: ${numCols}x${numRows}, Font: ${config.fontSize}px`);
+                console.log(`TextRect: cols ${textRectCols} (from ${textRectStartCol} to ${textRectEndCol-1}), rows ${textRectRows} (from ${textRectStartRow} to ${textRectEndRow-1})`);
+                
+                updateActiveTextPattern(); // Initial text pattern
+                lastPhraseChangeTime = performance.now();
+
 
                 ctx.font = `${config.fontSize}px monospace`;
                 ctx.textAlign = 'center';
-                ctx.textBaseline = 'alphabetic';
+                ctx.textBaseline = 'alphabetic'; 
 
                 time = Math.random() * 1000; 
                 animate();
@@ -252,6 +406,13 @@
                 if (elapsed > frameInterval) {
                     lastFrameTime = now - (elapsed % frameInterval);
                     time += config.timeScale * 0.1; 
+
+                    // Check for phrase change
+                    if (now - lastPhraseChangeTime > config.phraseChangeInterval) {
+                        currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length;
+                        updateActiveTextPattern();
+                        lastPhraseChangeTime = now;
+                    }
 
                     ctx.fillStyle = config.canvasClearColor;
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -274,7 +435,7 @@
                 resizeTimeout = setTimeout(setupGridAndRun, 250);
             });
             
-            console.log('Grid animation setup complete');
+            console.log('Grid animation with text setup complete');
 
         } catch (error) {
             console.error('Animation initialization failed:', error);
@@ -282,7 +443,7 @@
             Object.assign(errorElement.style, {
                 position: 'fixed', top: '10px', left: '10px', background: 'rgba(255,0,0,0.8)', 
                 color: 'white', padding: '15px', zIndex: '10000', border: '1px solid white',
-                borderRadius: '5px', maxWidth: 'calc(100% - 20px)'
+                borderRadius: '5px', maxWidth: 'calc(100% - 20px)', fontSize: '12px'
             });
             errorElement.innerHTML = `<strong>Animation Error:</strong><br>${error.message}<br><small>Check console (F12).</small>`;
             if (document.body) document.body.appendChild(errorElement);
