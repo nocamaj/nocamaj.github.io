@@ -12,95 +12,108 @@ function updateAge() {
 setInterval(updateAge, 10);
 
 document.addEventListener('DOMContentLoaded', () => {
-    const background = document.querySelector('.background-animation');
-    if (!background) return;
-
-    // Clear any existing content first
-    background.innerHTML = '';
-
-    // More varied characters for a richer look
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789<>/\\{[]}+*=_-,.?:;!@#$%^&()~`"\'';
+    // Set up animated background
+    const backgroundAnimation = document.querySelector('.background-animation');
+    if (!backgroundAnimation) return;
     
-    // Create more columns for a denser effect
-    const numColumns = Math.floor(window.innerWidth / 15); // More density
-    const streamLength = 20; // Number of characters per stream
-
-    function getRandomChar() {
-        return characters[Math.floor(Math.random() * characters.length)];
+    // Create a gradient background
+    backgroundAnimation.style.background = 'linear-gradient(300deg, #00356B, #1a1a1a, #502274)';
+    backgroundAnimation.style.backgroundSize = '300% 300%';
+    backgroundAnimation.style.animation = 'gradient-animation 15s ease infinite';
+    
+    // Add the SVG noise effect to simulate the swirling text look
+    const svgFilter = `
+    <svg style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; opacity: 0.2;" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+            <filter id="noise">
+                <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/>
+                <feDisplacementMap in="SourceGraphic" scale="10"/>
+            </filter>
+        </defs>
+        <rect width="100%" height="100%" filter="url(#noise)"/>
+    </svg>`;
+    
+    backgroundAnimation.innerHTML = svgFilter;
+    
+    // Add keyframes for the gradient animation if not already in the stylesheet
+    if (!document.querySelector('#gradient-animation-style')) {
+        const style = document.createElement('style');
+        style.id = 'gradient-animation-style';
+        style.textContent = `
+            @keyframes gradient-animation {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
+        `;
+        document.head.appendChild(style);
     }
-
-    function refreshCharacters(column) {
-        // Periodically replace characters in the stream for more dynamic effect
-        let charStream = '';
-        for (let i = 0; i < streamLength; i++) {
-            charStream += getRandomChar() + '<br>';
-        }
-        column.innerHTML = charStream;
+    
+    // Create a simple canvas animation for the swirling text effect
+    const canvas = document.createElement('canvas');
+    canvas.style.position = 'absolute';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.style.opacity = '0.3';
+    canvas.style.pointerEvents = 'none';
+    backgroundAnimation.appendChild(canvas);
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Set canvas dimensions
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
     }
-
-    function createColumn() {
-        const column = document.createElement('div');
-        column.classList.add('matrix-column');
-
-        // Initialize with random characters
-        refreshCharacters(column);
-
-        // Random horizontal position
-        column.style.left = `${Math.random() * 98}vw`; 
-        
-        // Randomize animation duration and delay
-        const duration = Math.random() * 8 + 7; // Duration between 7s and 15s
-        const delay = Math.random() * 5;        // Delay up to 5s
-        
-        // Random size variations for more organic feel
-        const fontSize = Math.floor(Math.random() * 6) + 14; // 14px to 19px
-        column.style.fontSize = `${fontSize}px`;
-
-        // Slight color variations
-        const hue = Math.random() * 30; // Subtle green variations
-        column.style.color = `hsl(${120 + hue}, 100%, 50%)`;
-
-        // Apply animation properties
-        column.style.animationDuration = `${duration}s`;
-        column.style.animationDelay = `${delay}s`;
-
-        background.appendChild(column);
-
-        // Reset animation when it ends to make it continuous
-        column.addEventListener('animationend', () => {
-            column.remove(); // Remove the old column
-            createColumn(); // Create a new one to replace it for infinite effect
+    
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789<>/?[]{}|=+-_)(*&^%$#@!~';
+    
+    // Create an array of character objects
+    const textParticles = [];
+    const numParticles = 100; // Adjust based on performance
+    
+    for (let i = 0; i < numParticles; i++) {
+        textParticles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            radius: 50 + Math.random() * 100,
+            angle: Math.random() * Math.PI * 2,
+            speed: 0.005 + Math.random() * 0.01,
+            character: characters.charAt(Math.floor(Math.random() * characters.length)),
+            size: 8 + Math.floor(Math.random() * 14)
         });
-
-        // Periodically refresh characters for more dynamism (optional)
-        if (Math.random() > 0.7) { // 30% chance to have dynamic characters
-            const refreshInterval = Math.random() * 1000 + 1000; // 1-2 seconds
-            setInterval(() => refreshCharacters(column), refreshInterval);
-        }
     }
-
-    // Create initial columns
-    for (let i = 0; i < numColumns; i++) {
-        setTimeout(() => createColumn(), Math.random() * 3000); // Stagger creation for more natural feel
-    }
-
-    // Adjust on window resize
-    window.addEventListener('resize', () => {
-        // Remove columns that are out of bounds
-        const columnsToRemove = document.querySelectorAll('.matrix-column');
-        columnsToRemove.forEach(col => {
-            if (Math.random() > 0.5) { // Only remove some to avoid flickering
-                col.remove();
+    
+    // Animation loop
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.font = 'bold 14px monospace';
+        
+        textParticles.forEach(particle => {
+            // Update position
+            particle.angle += particle.speed;
+            particle.x = canvas.width / 2 + Math.cos(particle.angle) * particle.radius;
+            particle.y = canvas.height / 2 + Math.sin(particle.angle) * particle.radius;
+            
+            // Draw character
+            ctx.font = `${particle.size}px monospace`;
+            ctx.fillText(particle.character, particle.x, particle.y);
+            
+            // Occasionally change character
+            if (Math.random() < 0.01) {
+                particle.character = characters.charAt(Math.floor(Math.random() * characters.length));
             }
         });
         
-        // Calculate new density based on window width
-        const newNumColumns = Math.floor(window.innerWidth / 15) - columnsToRemove.length;
-        if (newNumColumns > 0) {
-            for (let i = 0; i < newNumColumns; i++) {
-                createColumn();
-            }
-        }
-    });
+        requestAnimationFrame(animate);
+    }
+    
+    animate();
 });
 

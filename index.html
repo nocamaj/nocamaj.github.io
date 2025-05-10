@@ -24,7 +24,109 @@
     </header>
 
     <main>
-        <!-- Main content will go here if any is added later -->
+        <div class="content-container">
+            <h1>High-Performance Swirling Text Animation</h1>
+            <p>A smooth "swirl" text effect (like Midjourney's landing page) can be built with several web animation technologies. In principle, you generate a set of characters (often in a monospace font for easy alignment) arranged on a spiral or circular layout, then rotate or distort them each frame. Key options include <strong>CSS/SVG</strong> (native browser transforms), <strong>Canvas 2D</strong> drawing, or <strong>WebGL/Three.js</strong> with shaders. Each has trade-offs in performance: CSS/SVG is simple but limited, Canvas is flexible but CPU-bound, and WebGL (via Three.js or raw GLSL) can leverage the GPU for complex effects. We'll survey these approaches and show example code.</p>
+
+            <h2>CSS & SVG Approach</h2>
+            <p>One simple method uses HTML/CSS (or SVG) transforms. For example, wrap each letter in a <code>&lt;span&gt;</code> and absolutely position them around a center. Using CSS <code>transform: rotate(θ) translate(radius)</code> on each character (with a common <code>transform-origin</code>) creates a circle of text. Then a CSS animation (or JS tween) rotates each span around the center. Because CSS transforms are hardware-accelerated, this can run smoothly for modest numbers of elements. In practice you might use code like:</p>
+
+            <pre><code class="language-html">&lt;div class="circle-text"&gt;
+  &lt;span style="--i:0"&gt;S&lt;/span&gt;
+  &lt;span style="--i:1"&gt;W&lt;/span&gt;
+  &lt;span style="--i:2"&gt;I&lt;/span&gt;
+  &lt;span style="--i:3"&gt;R&lt;/span&gt;
+  &lt;span style="--i:4"&gt;L&lt;/span&gt;
+  &lt;span style="--i:5"&gt;!&lt;/span&gt;
+&lt;/div&gt;
+&lt;style&gt;
+.circle-text {
+  position: relative;
+  width: 200px; height: 200px;
+}
+.circle-text span {
+  position: absolute;
+  top:50%; left:50%;
+  /* origin at top center of span, at radius 80px */
+  transform-origin: 0 -80px;
+  /* initial rotation by index */
+  transform: rotate(calc(60deg * var(--i))) translateX(-50%) translateY(-50%);
+  animation: spin 4s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(calc(60deg * var(--i) + 360deg))
+           translateX(-50%) translateY(-50%); }
+}
+&lt;/style&gt;</code></pre>
+
+            <p>Here each span is placed on a circle (60° apart) and then animated to rotate a full turn. Using a monospace font and fixed letter spacing ensures the spiral stays aligned. <strong>Limitations:</strong> A large number of DOM/SVG elements can hurt performance (layout and paint costs). SVG <code>&lt;text&gt;</code> elements could be used similarly (using <code>&lt;textPath&gt;</code> or separate <code>&lt;tspan&gt;</code>), but complex SVG filters (e.g. blur, warp) tend to be slow. In fact, the Midjourney team <em>initially</em> tried SVG filters but found them too heavy and switched to Canvas/WebGL for speed. (Modern CSS can smoothly animate <code>transform</code> or <code>opacity</code> on elements, and MDN notes CSS vs JS animation speeds are often comparable.)</p>
+
+            <h2>Canvas 2D Drawing</h2>
+            <p>Using the HTML5 Canvas gives full control: you draw all characters each frame at computed positions. In JavaScript, you compute <code>(x,y)</code> for each letter (e.g. <code>x = R·cos(angle), y = R·sin(angle)</code>) and call <code>ctx.fillText()</code>. The loop runs inside a <code>requestAnimationFrame</code> callback, which is the recommended timing method for smooth 60fps animation. Canvas avoids DOM overhead, but redrawing text every frame can be CPU-intensive if many glyphs move. Example code snippet:</p>
+
+            <pre><code class="language-html">&lt;canvas id="canvas"&gt;&lt;/canvas&gt;
+&lt;script&gt;
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = 400; canvas.height = 400;
+ctx.font = "20px monospace";
+ctx.fillStyle = "white";
+
+let t = 0;
+function draw() {
+  ctx.clearRect(0, 0, 400, 400);
+  ctx.save();
+  ctx.translate(200, 200);  // center of canvas
+  const text = "HELLO";
+  const radius = 100;
+  const n = text.length;
+  for (let i = 0; i < n; i++) {
+    let angle = t + (i * 2*Math.PI / n);
+    let x = radius * Math.cos(angle);
+    let y = radius * Math.sin(angle);
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);        // optionally rotate letter too
+    ctx.fillText(text[i], 0, 0);
+    ctx.restore();
+  }
+  ctx.restore();
+  t += 0.02;
+  requestAnimationFrame(draw);
+}
+draw();
+&lt;/script&gt;</code></pre>
+
+            <p>This loop draws "HELLO" in a circle, spinning each frame. Note we use a monospace font so letters don't shift width. The key is <code>requestAnimationFrame</code>, which lets the browser optimize redraws. For performance, keep the canvas as small as needed (offscreen canvas can help) and limit per-frame work. Canvas excels when you have many moving parts, since the browser only has to composite one canvas element. It's also very portable. However, extremely complex scenes or very high resolutions might still lag on low-end devices.</p>
+
+            <h2>WebGL / Three.js (GPU Shaders)</h2>
+            <p>For maximal performance and fancy effects, WebGL is ideal. In WebGL (using Three.js or raw GL), you can either <strong>render text into a texture</strong> and then warp that texture, or create 3D text meshes. The key trick for a swirl is to use a fragment shader. One common method is: render a full-screen quad with the text texture, then in the fragment shader compute new UV coords by rotating each pixel around the center. For example, a simple GLSL snippet might do:</p>
+
+            <pre><code class="language-glsl">vec2 c = uv - vec2(0.5);
+float r = length(c);
+float theta = atan(c.y, c.x) + time * r;
+vec2 sw = vec2(cos(theta), sin(theta)) * r + vec2(0.5);
+color = texture2D(textTexture, sw);</code></pre>
+
+            <p>This rotates pixels more as they are farther from center, creating a spiral warp. As noted on StackOverflow: <em>"Render a single quad and use a fragment shader to rotate the texture-coordinate"</em> is an efficient way to swirl an image. Libraries like Three.js make this easier: you can draw text on a hidden canvas or use <code>THREE.TextGeometry</code>, then apply a custom <code>THREE.ShaderMaterial</code> or post-processing pass to do the swirl. Additional effects (Midjourney uses chromatic aberration, i.e. splitting RGB channels slightly) can also be done in the shader by sampling the texture with slight offsets per color channel. Because the GPU handles all the math, even thousands of pixels can be distorted smoothly. The trade-off is code complexity and initial setup (Three.js adds library weight, and writing shaders requires some graphics expertise).</p>
+
+            <h2>Performance Tips</h2>
+            <ul>
+                <li><strong>Use <code>requestAnimationFrame</code></strong>: Always drive your animation loop with <code>requestAnimationFrame</code> rather than <code>setTimeout</code>/<code>setInterval</code>. This lets the browser batch and pause animations in inactive tabs.</li>
+                <li><strong>Limit redraw area</strong>: With Canvas or WebGL, only redraw what changes. If the background is static, draw the text layer over a static background texture or CSS background.</li>
+                <li><strong>Use GPU-friendly properties</strong>: On DOM elements, animate <code>transform</code> and <code>opacity</code> only. Avoid layout-heavy properties. (Transform animations are GPU-accelerated on modern browsers.)</li>
+                <li><strong>Batch objects</strong>: If using WebGL, draw one quad or mesh with a texture instead of many individual characters. Fewer draw calls means higher FPS.</li>
+                <li><strong>Optimize text rendering</strong>: For Canvas, consider drawing static text to an offscreen canvas and reusing it as a sprite/texture. This avoids rasterizing fonts each frame.</li>
+                <li><strong>Profile and adjust</strong>: Use browser devtools (Performance tab) to see if frames are dropping. Adjust text count or animation complexity if needed. As MDN notes, well-optimized JavaScript animation can match CSS animation performance.</li>
+            </ul>
+
+            <h2>Conclusion</h2>
+            <p>In summary, the fastest and smoothest solution for a Midjourney-like swirling text is typically a <strong>WebGL shader approach</strong> (possibly via Three.js). This leverages GPU power to warp a pre-rendered text texture each frame, and handles extra effects like color-splitting with ease. If your scene is simpler or you want an easy setup, <strong>Canvas 2D</strong> is a good compromise: use <code>requestAnimationFrame</code>, compute positions with trigonometry, and redraw the letters. Pure <strong>CSS/SVG</strong> can work for small amounts of text (using <code>transform: rotate()</code> and <code>keyframes</code>), but it scales poorly to very complex distortions. Whichever method you choose, focus on drawing only what's necessary and animating with transforms or shaders to keep 60fps. Implementing the animation in raw code (as Midjourney's team notes) is a generative process, but with practice and these techniques you can recreate a similar swirling text effect that runs smoothly in browsers.</p>
+
+            <p><strong>Example Code (Canvas 2D):</strong> The above Canvas snippet demonstrates rotating text around the center each frame. You can adapt it by changing the spiral formula (e.g. make the radius vary or animate the letter spacing) to achieve different swirl patterns.</p>
+
+            <p><strong>Sources:</strong> The approach of animating on each frame is confirmed by reverse-engineering Midjourney's code, which repeatedly calls <code>requestAnimationFrame()</code> to update the SVG text positions. Browser performance docs recommend this pattern for efficient animation. And graphics experts suggest using a single quad with a fragment shader for the swirl transform, which aligns with how high-performance web animations are typically built.</p>
+        </div>
     </main>
 
     <footer>
