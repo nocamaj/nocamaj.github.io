@@ -35,8 +35,9 @@ header {
     left: 0;
     width: 100%;
     background-color: rgba(18, 18, 18, 0.00); 
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    /* Reduced blur from 12px to 10px */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     padding: 15px 20px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     z-index: 10; 
@@ -79,7 +80,9 @@ main { /* ... rest of main styles ... */
 footer { /* ... rest of footer styles ... */
     position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px 0;
     background-color: rgba(18, 18, 18, 0.00);
-    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    /* Reduced blur from 12px to 10px */
+    backdrop-filter: blur(10px); 
+    -webkit-backdrop-filter: blur(10px);
     display: flex; justify-content: center; align-items: center;
     z-index: 10; box-sizing: border-box;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
