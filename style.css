@@ -14,8 +14,8 @@ body, html {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 2; /* Ensure it's visible above background but below content */
-    overflow: visible; /* Allow content to be visible */
+    z-index: 1; /* Ensures it's behind main content (z-index 5) but above default body */
+    overflow: hidden; 
     pointer-events: none; /* Make sure it doesn't interfere with clicks */
     display: block !important; /* Force display */
     background-color: transparent; /* Make background transparent to see animation */
@@ -29,7 +29,7 @@ body, html {
     left: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    z-index: 3 !important;
+    /* z-index removed; will be within the stacking context of .background-animation */
 }
 
 header {
@@ -42,7 +42,7 @@ header {
     -webkit-backdrop-filter: blur(12px); /* For Safari */
     padding: 15px 20px; /* Reduced horizontal padding */
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    z-index: 10; /* Higher than background animation */
+    z-index: 10; /* Higher than background animation and main content */
     box-sizing: border-box; /* Include padding in width calculation */
     border-bottom: 1px solid rgba(255, 255, 255, 0.08); /* Subtle border for glass effect */
 }
@@ -130,7 +130,7 @@ footer {
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 10; /* Higher than background animation */
+    z-index: 10; /* Higher than background animation and main content */
     box-sizing: border-box; /* Include padding in width calculation */
     border-top: 1px solid rgba(255, 255, 255, 0.08); /* Subtle border for glass effect */
     box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2); /* Shadow for glass effect */
@@ -182,4 +182,4 @@ footer {
     .search-container input[type="text"] {
         width: 80vw;
     }
-} 
+}
