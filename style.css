@@ -174,7 +174,7 @@ main.travel-main {
     flex-grow: 1; /* Map takes remaining space */
     height: 100%; 
     width: 100%; /* Will be less than 100% of map-outer-container due to legend */
-    background-color: #121f3a; /* Lighter blue ocean color (was #0a0a18) */
+    background-color: #0c172e; /* Lighter blue ocean color (was #0a0a18) */
     border-radius: 15px; 
     overflow: hidden; 
 }
