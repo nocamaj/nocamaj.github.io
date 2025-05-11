@@ -51,7 +51,7 @@
     <script>
         // List of visited countries (use ISO A2 codes for matching with GeoJSON properties)
         // Example: United States, Canada, Mexico, Brazil, France, Germany, Japan, Australia
-        const visitedCountriesISO_A2 = ["US", "CA", "MX", "BR", "FR", "DE", "JP", "AU", "CN", "RU", "IN", "GB", "IT", "ES", "PT", "AR", "CL", "ZA", "EG", "KE", "NG", "GH", "MA", "SE", "NO", "FI", "PL", "UA", "TR", "IR", "SA", "ID", "TH", "VN", "PH", "MY", "KR", "NZ"]; // Add your visited countries here
+        const visitedCountriesISO_A2 = ["AT", "BZ", "BA", "CA", "CN", "HR", "FR", "GR", "HU", "IT", "XK", "MK", "MX", "ME", "NL", "PE", "PL", "LC", "VC", "RS", "SK", "ES", "CH", "TR", "AE", "GB"]; // Add your visited countries here
 
         // Initialize the map and set its view to a general world view
         const map = L.map('map', {
@@ -83,7 +83,7 @@
 
         // Load GeoJSON data for country boundaries
         // Using a medium resolution world map GeoJSON file
-        fetch('https://geojson-maps.ash.ms/countries-110m.json') 
+        fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok for GeoJSON');
