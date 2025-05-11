@@ -3,22 +3,18 @@ body, html {
     padding: 0;
     height: 100%;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    /* Unified background for all pages unless overridden by a more specific class */
-    background-color: #0a0a18; 
+    background-color: #0a0a18; /* Unified background for all pages */
     color: #F5F5F5; 
     overflow: hidden; 
 }
 
-/* body.travel-page-background class is still useful if you ever want 
-   travel page to diverge, but for now, #0a0a18 is the default for all */
-
-.background-animation { /* For index.html */
+.background-animation { /* For index.html and travel.html */
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 1; 
+    z-index: 1; /* BEHIND everything else */
     overflow: hidden; 
     pointer-events: none; 
     background-color: transparent; 
@@ -43,12 +39,12 @@ header {
     -webkit-backdrop-filter: blur(8.5px);
     padding: 15px 20px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    z-index: 10; 
+    z-index: 10; /* High z-index, above map and animation */
     box-sizing: border-box;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-nav { /* ... nav styles ... */
+nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -74,23 +70,26 @@ nav { /* ... nav styles ... */
 }
 .nav-left .nav-button:hover::before, .nav-right .nav-button:hover::before { transform: translateY(0); }
 
-
+/* Styles for main content area on index.html */
 main:not(.travel-main) { 
     position: relative; padding-top: 80px; padding-bottom: 80px;
-    min-height: calc(100vh - 160px); z-index: 5; 
+    min-height: calc(100vh - 160px); 
+    z-index: 5; /* Above background animation, below header/footer */
 }
 
-footer { /* ... footer styles ... */
+footer { /* Only for index.html */
     position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px 0;
     background-color: rgba(18, 18, 18, 0.00);
-    backdrop-filter: blur(8.5px); -webkit-backdrop-filter: blur(8.5px);
+    backdrop-filter: blur(8.5px); 
+    -webkit-backdrop-filter: blur(8.5px);
     display: flex; justify-content: center; align-items: center;
-    z-index: 10; box-sizing: border-box;
+    z-index: 10; /* Same as header */
+    box-sizing: border-box;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.search-container input[type="text"] { /* ... search styles ... */
+.search-container input[type="text"] { 
     width: 400px; padding: 12px 20px; border: 1px solid rgba(255,255,255,0.1);
     border-radius: 25px; background-color: rgba(18,18,18,0.5); color: #F5F5F5;
     font-size: 16px; outline: none; transition: all 0.3s ease; max-width: 90vw;
@@ -103,7 +102,7 @@ footer { /* ... footer styles ... */
     background-color: rgba(26,26,26,0.7); transform: translateY(-2px);
 }
 
-@media (max-width: 768px) { /* ... media query styles ... */
+@media (max-width: 768px) { 
     nav { padding: 0 5px; }
     .nav-right { justify-content: flex-end; }
     .nav-left .nav-button, .nav-right .nav-button { padding: 6px 10px; margin: 0 3px; }
@@ -112,13 +111,12 @@ footer { /* ... footer styles ... */
 
 /* === Travel Page Specific Styles === */
 body.travel-page-background {
-    /* This class still exists but now the default body also has #0a0a18 */
-    /* background-color: #0a0a18;  */
+    /* background-color: #0a0a18; /* Already default body background */
     overflow: hidden; 
     margin: 0; 
     padding: 0; 
     height: 100vh; 
-    position: relative; 
+    /* position: relative; /* Not needed if children are positioned relative to viewport or static */
 }
 
 main.travel-main {
@@ -130,31 +128,37 @@ main.travel-main {
     display: flex;
     align-items: center;
     justify-content: center;
+    z-index: 2; /* Above background-animation */
 }
 
 .map-outer-container {
     width: calc(100% - 80px);  
-    height: calc(100vh - 60px - 80px); /* Account for header (60px) and top/bottom margins (40px each) */
+    height: calc(100vh - 60px - 80px); 
     padding: 15px; 
     border: 2px solid rgba(150, 150, 180, 0.5); 
     border-radius: 25px; 
-    background-color: rgba(10, 10, 24, 0.3); 
+    background-color: rgba(10, 10, 24, 0.3); /* Semi-transparent to let ASCII show through padding */
     box-shadow: 0 0 15px rgba(0,0,0,0.3); 
     box-sizing: border-box;
-    display: flex; /* Changed to flex for legend + map layout */
-    margin-top: 60px; 
+    display: flex; 
+    margin-top: 60px; /* To push it below the fixed header */
+    position: relative; /* Ensure z-index context if needed, though not strictly necessary here */
+    z-index: 3; /* Above main.travel-main's potential default content, if any, and above animation */
 }
 
-/* Legend styles */
 .map-legend {
-    flex: 0 0 180px; /* Fixed width for the legend column, adjust as needed */
-    padding-right: 15px; /* Space between legend and map */
+    flex: 0 0 180px; 
+    padding-right: 15px; 
     box-sizing: border-box;
     color: #F5F5F5;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* Align items to the top */
-    padding-top: 10px; /* Some padding at the top of the legend */
+    justify-content: flex-start; 
+    padding-top: 10px; 
+    position: relative; /* To ensure it's part of the stacking context */
+    z-index: 4; /* Above map-outer-container's background, below map popups potentially */
+    /* background-color: rgba(18, 18, 30, 0.2); /* Optional: very subtle backing for legend text */
+    /* backdrop-filter: blur(2px); */
 }
 
 .legend-item {
@@ -167,14 +171,16 @@ main.travel-main {
     width: 20px;
     height: 20px;
     margin-right: 10px;
-    border: 1px solid #555; /* Slight border for the color boxes */
+    border: 1px solid #555; 
 }
 
 #map { 
-    flex-grow: 1; /* Map takes remaining space */
+    flex-grow: 1; 
     height: 100%; 
-    width: 100%; /* Will be less than 100% of map-outer-container due to legend */
-    background-color: #0c172e; /* Lighter blue ocean color (was #0a0a18) */
+    width: 100%; 
+    background-color: #121f3a; /* Opaque Ocean color - hides ASCII behind map tiles */
     border-radius: 15px; 
     overflow: hidden; 
+    position: relative; /* For Leaflet popups etc. */
+    z-index: 3; /* Ensures map tiles are above map-outer-container background */
 }

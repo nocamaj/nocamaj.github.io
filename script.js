@@ -1,6 +1,14 @@
 // Wrap in an IIFE
 (function() {
-    console.log('Hybrid Grid ASCII with Cursor Fix & Updated Text Transitions loading...');
+    // Determine if we are on the homepage (e.g., by presence of footer search or specific ID)
+    // Using the presence of the footer as an indicator for the homepage.
+    const isHomepage = !!document.querySelector('footer .search-container');
+    
+    if (isHomepage) {
+        console.log('Homepage detected: Initializing ASCII animation WITH central text.');
+    } else {
+        console.log('Not homepage: Initializing ASCII animation WITHOUT central text (background only).');
+    }
 
     const SimplexNoise = (() => { // ... (Simplex Noise code - remains unchanged)
         const F2=0.5*(Math.sqrt(3.0)-1.0);const G2=(3.0-Math.sqrt(3.0))/6.0;const F3=1.0/3.0;const G3=1.0/6.0;
@@ -24,15 +32,20 @@
     function initAnimation() {
         try {
             const backgroundContainer = document.querySelector('.background-animation');
-            if (!backgroundContainer) throw new Error('.background-animation not found!');
+            if (!backgroundContainer) { 
+                console.warn('.background-animation container not found for this page.');
+                return; // Don't proceed if the container isn't on the page
+            }
             backgroundContainer.innerHTML = ''; 
             
             const canvas = document.createElement('canvas');
-            const offscreenCanvas = document.createElement('canvas');
+            const offscreenCanvas = document.createElement('canvas'); // Only used if isHomepage
             backgroundContainer.appendChild(canvas);
             const ctx = canvas.getContext('2d', { willReadFrequently: false }); 
-            const offCtx = offscreenCanvas.getContext('2d', { willReadFrequently: true });
-            if (!ctx || !offCtx) throw new Error('Failed to get 2D context');
+            const offCtx = isHomepage ? offscreenCanvas.getContext('2d', { willReadFrequently: true }) : null;
+            if (!ctx) throw new Error('Failed to get 2D context for main canvas');
+            if (isHomepage && !offCtx) throw new Error('Failed to get 2D context for offscreen canvas on homepage');
+
 
             let animationFrameId; let grid = []; let numCols, numRows; let time = Math.random() * 1000;
             let mouseX = -10000, mouseY = -10000; 
@@ -46,89 +59,87 @@
                 borderColor: 'rgba(220, 220, 255, 0.8)',
                 borderChar: { corner:'+', top_bottom:'-', side:'|' },
                 textPixelOnColor: 'rgba(250, 250, 255, 1)',
-                canvasClearColor: 'rgba(10, 10, 25, 1)', 
+                canvasClearColor: 'rgba(10, 10, 25, 0)', // Make ASCII canvas clear for page bg to show
                 noiseScale: 0.08, timeScale: 0.08, activationThreshold: 0.3, highlightThreshold: 0.65, 
                 fadeSpeed: 0.15, charChangeProbability: 0.03,
-                phraseStableDisplayDuration: 5000, // Increased to 5 seconds
-                textTransitionDuration: 300,    // Faster transition (was 600ms)
+                phraseStableDisplayDuration: 7000, textTransitionDuration: 300,    
                 textAreaWidthRatio: 0.375, textAreaHeightRatio: 0.15, textPaddingRatio: 0.1,
-                cursorInteractionRadius: 70, 
-                cursorVanishStrength: 1.0, 
-                cursorVanishFalloff: 1.5,  
+                cursorInteractionRadius: 70, cursorVanishStrength: 1.0, cursorVanishFalloff: 1.5,  
             };
             
+            // Homepage-specific variables (only initialized if isHomepage)
             let currentPhraseIndex = 0; let lastPhraseChangeTime = 0;
             let currentPixelatedTextData = { width:0,height:0,data:[] }; 
             let outgoingPixelatedTextData = null; 
             let transitionDisplayPixelData = { width:0,height:0,data:[] };
             let isTextTransitioning = false; let textTransitionProgress = 0;
-
             let textDisplayArea = { x:0,y:0,width:0,height:0,padding:0 };
-            let borderRectCells = { startCol:0,endCol:0,startRow:0,endRow:0 };
+            let borderRectCells = { startCol:0,endCol:0,startRow:0,endRow:0 }; // For homepage text box
 
             class GridCell {
-                constructor(col, row) { /* ... constructor unchanged ... */
+                constructor(col, row) {
                     this.col=col; this.row=row; this.char=getRandomChar(); this.currentAlpha=0; this.targetAlpha=0;
-                    this.colorTemplate=config.baseColor; this.isBorder=false; this.borderRole=null; this.isWithinTextDisplayInterior=false;
+                    this.colorTemplate=config.baseColor; this.isBorderTextRect=false; this.isWithinTextDisplayInterior=false;
                 }
                 update(noiseValue) {
-                    const isTopB=this.row===borderRectCells.startRow;const isBottomB=this.row===borderRectCells.endRow-1;
-                    const isLeftB=this.col===borderRectCells.startCol;const isRightB=this.col===borderRectCells.endCol-1;
-                    this.isBorder=(isLeftB||isRightB)&&(this.row>=borderRectCells.startRow&&this.row<borderRectCells.endRow)||(isTopB||isBottomB)&&(this.col>=borderRectCells.startCol&&this.col<borderRectCells.endCol);
-                    this.isWithinTextDisplayInterior=this.col>borderRectCells.startCol&&this.col<borderRectCells.endCol-1&&this.row>borderRectCells.startRow&&this.row<borderRectCells.endRow-1;
-                    
-                    let noiseDrivenTargetAlpha = 0;
-                    if (noiseValue > config.activationThreshold) {
-                        noiseDrivenTargetAlpha = Math.min(1, (noiseValue - config.activationThreshold) / (1 - config.activationThreshold) * 1.2);
-                    }
+                    let finalTargetAlpha = 0; // Default to invisible
 
-                    if (this.isBorder) { /* ... border logic unchanged ... */
-                        this.targetAlpha = 0.7 + (Math.sin(time * 2.5 + this.col * 0.2 + this.row * 0.3) + 1) * 0.15; 
-                        this.colorTemplate = config.borderColor.replace('VAL', this.targetAlpha.toFixed(2));
+                    if (isHomepage) { // Logic for homepage text box border and interior
+                        const isTopB=this.row===borderRectCells.startRow;const isBottomB=this.row===borderRectCells.endRow-1;
+                        const isLeftB=this.col===borderRectCells.startCol;const isRightB=this.col===borderRectCells.endCol-1;
+                        this.isBorderTextRect=(isLeftB||isRightB)&&(this.row>=borderRectCells.startRow&&this.row<borderRectCells.endRow)||(isTopB||isBottomB)&&(this.col>=borderRectCells.startCol&&this.col<borderRectCells.endCol);
+                        this.isWithinTextDisplayInterior=this.col>borderRectCells.startCol&&this.col<borderRectCells.endCol-1&&this.row>borderRectCells.startRow&&this.row<borderRectCells.endRow-1;
+                    } else { // Not homepage, so no text box border or interior logic
+                        this.isBorderTextRect = false;
+                        this.isWithinTextDisplayInterior = false;
+                    }
+                    
+                    if (this.isBorderTextRect && isHomepage) { 
+                        finalTargetAlpha = 0.7 + (Math.sin(time * 2.5 + this.col * 0.2 + this.row * 0.3) + 1) * 0.15; 
+                        this.colorTemplate = config.borderColor.replace('VAL', finalTargetAlpha.toFixed(2));
+                        const isTopB=this.row===borderRectCells.startRow;const isBottomB=this.row===borderRectCells.endRow-1; // Re-check for char assignment
+                        const isLeftB=this.col===borderRectCells.startCol;const isRightB=this.col===borderRectCells.endCol-1;
                         if((isTopB&&isLeftB)||(isTopB&&isRightB)||(isBottomB&&isLeftB)||(isBottomB&&isRightB)){this.char=config.borderChar.corner;}
                         else if(isTopB||isBottomB){this.char=config.borderChar.top_bottom;} else if(isLeftB||isRightB){this.char=config.borderChar.side;}
-                    } else if (this.isWithinTextDisplayInterior) {
-                        this.targetAlpha = 0; this.char = ''; 
-                    } else { 
-                        let finalTargetAlpha = noiseDrivenTargetAlpha; // Start with noise-driven alpha
+                    } else if (this.isWithinTextDisplayInterior && isHomepage) {
+                        finalTargetAlpha = 0; this.char = ''; 
+                    } else { // Regular background cell (applies to all cells on non-homepage, and outside text box on homepage)
+                        if (noiseValue > config.activationThreshold) {
+                            finalTargetAlpha = Math.min(1, (noiseValue - config.activationThreshold) / (1 - config.activationThreshold) * 1.2);
+                        }
                         this.colorTemplate = (noiseValue > config.highlightThreshold && finalTargetAlpha > 0.5) ? config.highlightColor : config.baseColor;
                         if (finalTargetAlpha > 0.01 && (this.currentAlpha < 0.1 || Math.random() < config.charChangeProbability)) { 
                             this.char = getRandomChar(); 
                         } else if (finalTargetAlpha < 0.01) {
-                            this.char = ''; // Clear char if it's going to be invisible
+                            this.char = '';
                         }
 
-
-                        // Cursor Interaction - applied to the noise-driven targetAlpha
-                        const cellX = (this.col + 0.5) * config.backgroundFontSize;
-                        const cellY = (this.row + 0.5) * config.backgroundFontSize;
-                        const distToCursor = Math.sqrt(Math.pow(cellX - mouseX, 2) + Math.pow(cellY - mouseY, 2));
-                        
+                        const cellX=(this.col+0.5)*config.backgroundFontSize; const cellY=(this.row+0.5)*config.backgroundFontSize;
+                        const distToCursor=Math.sqrt(Math.pow(cellX-mouseX,2)+Math.pow(cellY-mouseY,2));
                         let cursorVanishMultiplier = 1.0;
-                        if (distToCursor < config.cursorInteractionRadius) {
-                            const proximityFactor = Math.max(0, 1 - (distToCursor / config.cursorInteractionRadius));
-                            const vanishAmount = Math.pow(proximityFactor, config.cursorVanishFalloff) * config.cursorVanishStrength;
+                        if(distToCursor < config.cursorInteractionRadius){
+                            const proximityFactor=Math.max(0,1-(distToCursor/config.cursorInteractionRadius));
+                            const vanishAmount=Math.pow(proximityFactor,config.cursorVanishFalloff)*config.cursorVanishStrength;
                             cursorVanishMultiplier = (1 - vanishAmount);
                         }
-                        finalTargetAlpha *= cursorVanishMultiplier; // Apply cursor effect
-                        this.targetAlpha = finalTargetAlpha;
+                        finalTargetAlpha *= cursorVanishMultiplier;
                     }
-                    this.currentAlpha += (this.targetAlpha - this.currentAlpha) * config.fadeSpeed;
+                    this.targetAlpha = finalTargetAlpha;
+                    this.currentAlpha+=(this.targetAlpha-this.currentAlpha)*config.fadeSpeed;
                     if(Math.abs(this.currentAlpha-this.targetAlpha)<0.01)this.currentAlpha=this.targetAlpha;
                 }
-                draw() { /* ... draw logic unchanged ... */
+                draw() {
                     if (this.currentAlpha > 0.001) { 
-                         if(this.isBorder) { ctx.fillStyle = this.colorTemplate; } 
+                         if(this.isBorderTextRect && isHomepage) { ctx.fillStyle = this.colorTemplate; } 
                          else { ctx.fillStyle = this.colorTemplate.replace('VAL', this.currentAlpha.toFixed(2)); }
                         ctx.fillText(this.char, this.col*config.backgroundFontSize + config.backgroundFontSize*0.5, this.row*config.backgroundFontSize + config.backgroundFontSize*0.7);
                     }
                 }
             }
 
-            function getRandomChar() { return config.charSet.charAt(Math.floor(Math.random()*config.charSet.length)); }
-            function clonePixelatedData(dataToClone) { /* ... unchanged ... */ if(!dataToClone||!dataToClone.data)return{width:0,height:0,data:[]}; return{width:dataToClone.width,height:dataToClone.height,data:dataToClone.data.slice()};}
-            function renderAndPixelateCurrentPhrase(targetDataStore) { /* ... unchanged (text sizing and centering) ... */
-                const phraseObj=phrases[currentPhraseIndex];const textToRender=phraseObj.text;
+            // --- Homepage Specific Functions (only called if isHomepage is true) ---
+            function renderAndPixelateCurrentPhrase(targetDataStore) { /* ... unchanged ... */
+                if(!isHomepage) return; const phraseObj=phrases[currentPhraseIndex];const textToRender=phraseObj.text;
                 const contentRenderWidth=textDisplayArea.width-2*textDisplayArea.padding;const contentRenderHeight=textDisplayArea.height-2*textDisplayArea.padding;
                 if(contentRenderWidth<=0||contentRenderHeight<=0){targetDataStore.width=0;targetDataStore.height=0;targetDataStore.data=[];return;}
                 let dynamicFontSize=config.minNativeRenderFontSize;let textHeight=0;
@@ -145,9 +156,8 @@
                 targetDataStore.width=nPC;targetDataStore.height=nPR;targetDataStore.data=[];
                 for(let r=0;r<nPR;r++){for(let c=0;c<nPC;c++){const sX=Math.floor(c*(offscreenCanvas.width/nPC));const sY=Math.floor(r*(offscreenCanvas.height/nPR));const sSX=Math.min(offscreenCanvas.width-1,Math.floor(sX+(offscreenCanvas.width/nPC)*0.5));const sSY=Math.min(offscreenCanvas.height-1,Math.floor(sY+(offscreenCanvas.height/nPR)*0.5));const aI=(sSY*offscreenCanvas.width+sSX)*4+3;const aV=d[aI];targetDataStore.data.push(aV>128?1:0);}}
             }
-
             function drawPixelatedTextScramble() { /* ... unchanged ... */ 
-                if (!transitionDisplayPixelData.data.length || transitionDisplayPixelData.width === 0) return;
+                if(!isHomepage || !transitionDisplayPixelData.data.length || transitionDisplayPixelData.width === 0) return;
                 const totalPixelatedWidth = transitionDisplayPixelData.width * config.textPixelSize;
                 const totalPixelatedHeight = transitionDisplayPixelData.height * config.textPixelSize;
                 const contentRenderWidth = textDisplayArea.width - 2 * textDisplayArea.padding;
@@ -155,82 +165,89 @@
                 const startDrawX = textDisplayArea.x + textDisplayArea.padding + Math.floor((contentRenderWidth - totalPixelatedWidth) / 2);
                 const startDrawY = textDisplayArea.y + textDisplayArea.padding + Math.floor((contentRenderHeight - totalPixelatedHeight) / 2);
                 ctx.fillStyle = config.textPixelOnColor;
-                for (let r = 0; r < transitionDisplayPixelData.height; r++) {
-                    for (let c = 0; c < transitionDisplayPixelData.width; c++) {
-                        if (transitionDisplayPixelData.data[r * transitionDisplayPixelData.width + c] === 1) {
-                            ctx.fillRect(startDrawX + c * config.textPixelSize, startDrawY + r * config.textPixelSize, config.textPixelSize, config.textPixelSize);
-                        }
-                    }
-                }
+                for(let r=0;r<transitionDisplayPixelData.height;r++){for(let c=0;c<transitionDisplayPixelData.width;c++){if(transitionDisplayPixelData.data[r*transitionDisplayPixelData.width+c]===1){ctx.fillRect(startDrawX+c*config.textPixelSize,startDrawY+r*config.textPixelSize,config.textPixelSize,config.textPixelSize);}}}
             }
-            
             function computeTransitionFrame() { /* ... unchanged ... */ 
-                if (!currentPixelatedTextData.data.length || !outgoingPixelatedTextData || !outgoingPixelatedTextData.data.length) {
-                    transitionDisplayPixelData = clonePixelatedData(currentPixelatedTextData); return;
-                }
-                if (transitionDisplayPixelData.width !== currentPixelatedTextData.width || transitionDisplayPixelData.height !== currentPixelatedTextData.height) {
-                    transitionDisplayPixelData.width = currentPixelatedTextData.width; transitionDisplayPixelData.height = currentPixelatedTextData.height;
-                    transitionDisplayPixelData.data = new Array(currentPixelatedTextData.width * currentPixelatedTextData.height).fill(0);
-                }
-                const totalPixels = transitionDisplayPixelData.width * transitionDisplayPixelData.height;
-                for (let i = 0; i < totalPixels; i++) {
-                    const oldOn = outgoingPixelatedTextData.data[i] === 1; const newOn = currentPixelatedTextData.data[i] === 1;
-                    let shouldBeOn = 0;
-                    if (oldOn && !newOn) { shouldBeOn = (Math.random() > textTransitionProgress) ? 1 : 0; }
-                    else if (!oldOn && newOn) { shouldBeOn = (Math.random() < textTransitionProgress) ? 1 : 0; }
-                    else if (newOn) { shouldBeOn = 1; } else { shouldBeOn = 0; }
-                    transitionDisplayPixelData.data[i] = shouldBeOn;
-                }
+                if(!isHomepage || !currentPixelatedTextData.data.length || !outgoingPixelatedTextData || !outgoingPixelatedTextData.data.length){transitionDisplayPixelData=clonePixelatedData(currentPixelatedTextData);return;}
+                if(transitionDisplayPixelData.width!==currentPixelatedTextData.width||transitionDisplayPixelData.height!==currentPixelatedTextData.height){transitionDisplayPixelData.width=currentPixelatedTextData.width;transitionDisplayPixelData.height=currentPixelatedTextData.height;transitionDisplayPixelData.data=new Array(currentPixelatedTextData.width*currentPixelatedTextData.height).fill(0);}
+                const totalPixels=transitionDisplayPixelData.width*transitionDisplayPixelData.height;
+                for(let i=0;i<totalPixels;i++){const oldOn=outgoingPixelatedTextData.data[i]===1;const newOn=currentPixelatedTextData.data[i]===1;let shouldBeOn=0;
+                if(oldOn&&!newOn){shouldBeOn=(Math.random()>textTransitionProgress)?1:0;}else if(!oldOn&&newOn){shouldBeOn=(Math.random()<textTransitionProgress)?1:0;}else if(newOn){shouldBeOn=1;}else{shouldBeOn=0;}transitionDisplayPixelData.data[i]=shouldBeOn;}
             }
+            // --- End Homepage Specific Functions ---
 
-            function setupAndRun() { /* ... setupAndRun largely unchanged ... */
+            function getRandomChar() { return config.charSet.charAt(Math.floor(Math.random()*config.charSet.length)); }
+            function clonePixelatedData(dataToClone) { if(!dataToClone||!dataToClone.data)return{width:0,height:0,data:[]}; return{width:dataToClone.width,height:dataToClone.height,data:dataToClone.data.slice()};}
+
+            function setupAndRun() {
                 if(animationFrameId)cancelAnimationFrame(animationFrameId);SimplexNoise.shufflePermutations();canvas.width=window.innerWidth;canvas.height=window.innerHeight;
                 numCols=Math.floor(canvas.width/config.backgroundFontSize);numRows=Math.floor(canvas.height/config.backgroundFontSize);
-                textDisplayArea.width=Math.floor(canvas.width*config.textAreaWidthRatio);textDisplayArea.height=Math.floor(canvas.height*config.textAreaHeightRatio);
-                textDisplayArea.x=Math.floor((canvas.width-textDisplayArea.width)/2);textDisplayArea.y=Math.floor((canvas.height-textDisplayArea.height)/2);
-                textDisplayArea.padding=Math.floor(Math.min(textDisplayArea.width,textDisplayArea.height)*config.textPaddingRatio);
-                borderRectCells.startCol=Math.max(0,Math.floor(textDisplayArea.x/config.backgroundFontSize)-1);borderRectCells.endCol=Math.min(numCols,Math.ceil((textDisplayArea.x+textDisplayArea.width)/config.backgroundFontSize)+1);
-                borderRectCells.startRow=Math.max(0,Math.floor(textDisplayArea.y/config.backgroundFontSize)-1);borderRectCells.endRow=Math.min(numRows,Math.ceil((textDisplayArea.y+textDisplayArea.height)/config.backgroundFontSize)+1);
+                
+                if (isHomepage) { // Setup for homepage text box
+                    textDisplayArea.width=Math.floor(canvas.width*config.textAreaWidthRatio);textDisplayArea.height=Math.floor(canvas.height*config.textAreaHeightRatio);
+                    textDisplayArea.x=Math.floor((canvas.width-textDisplayArea.width)/2);textDisplayArea.y=Math.floor((canvas.height-textDisplayArea.height)/2);
+                    textDisplayArea.padding=Math.floor(Math.min(textDisplayArea.width,textDisplayArea.height)*config.textPaddingRatio);
+                    borderRectCells.startCol=Math.max(0,Math.floor(textDisplayArea.x/config.backgroundFontSize)-1);borderRectCells.endCol=Math.min(numCols,Math.ceil((textDisplayArea.x+textDisplayArea.width)/config.backgroundFontSize)+1);
+                    borderRectCells.startRow=Math.max(0,Math.floor(textDisplayArea.y/config.backgroundFontSize)-1);borderRectCells.endRow=Math.min(numRows,Math.ceil((textDisplayArea.y+textDisplayArea.height)/config.backgroundFontSize)+1);
+                    renderAndPixelateCurrentPhrase(currentPixelatedTextData); 
+                    transitionDisplayPixelData = clonePixelatedData(currentPixelatedTextData);
+                    lastPhraseChangeTime=performance.now(); isTextTransitioning=false; textTransitionProgress=0; outgoingPixelatedTextData=null;
+                }
+                
                 grid=[];for(let r=0;r<numRows;r++){let rowCells=[];for(let c=0;c<numCols;c++){rowCells.push(new GridCell(c,r));}grid.push(rowCells);}
-                renderAndPixelateCurrentPhrase(currentPixelatedTextData); 
-                transitionDisplayPixelData = clonePixelatedData(currentPixelatedTextData);
-                lastPhraseChangeTime=performance.now(); isTextTransitioning=false; textTransitionProgress=0; outgoingPixelatedTextData=null;
                 ctx.font=`${config.backgroundFontSize}px monospace`;ctx.textAlign='center';ctx.textBaseline='alphabetic';time=Math.random()*1000;animate();
             }
             
             let lastFrameDrawnTime = performance.now(); 
             const targetFPS = 30; const frameInterval = 1000 / targetFPS;
 
-            function animate() { /* ... animate loop with transition logic largely unchanged ... */
+            function animate() {
                 animationFrameId = requestAnimationFrame(animate);
                 const now = performance.now(); const elapsed = now - lastFrameDrawnTime;
+
                 if (elapsed >= frameInterval) {
                     lastFrameDrawnTime = now - (elapsed % frameInterval); time += config.timeScale * 0.1 * (elapsed / frameInterval);
-                    if (isTextTransitioning) {
-                        textTransitionProgress += (elapsed / config.textTransitionDuration); computeTransitionFrame();
-                        if (textTransitionProgress >= 1) { isTextTransitioning = false; textTransitionProgress = 0; outgoingPixelatedTextData = null; transitionDisplayPixelData = clonePixelatedData(currentPixelatedTextData); lastPhraseChangeTime = now; }
-                    } else if (now - lastPhraseChangeTime > config.phraseStableDisplayDuration) {
-                        isTextTransitioning = true; textTransitionProgress = 0; outgoingPixelatedTextData = clonePixelatedData(currentPixelatedTextData);
-                        currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length; renderAndPixelateCurrentPhrase(currentPixelatedTextData);
+
+                    if (isHomepage) { // Homepage text transition logic
+                        if (isTextTransitioning) {
+                            textTransitionProgress += (elapsed / config.textTransitionDuration); computeTransitionFrame();
+                            if (textTransitionProgress >= 1) { isTextTransitioning = false; textTransitionProgress = 0; outgoingPixelatedTextData = null; transitionDisplayPixelData = clonePixelatedData(currentPixelatedTextData); lastPhraseChangeTime = now; }
+                        } else if (now - lastPhraseChangeTime > config.phraseStableDisplayDuration) {
+                            isTextTransitioning = true; textTransitionProgress = 0; outgoingPixelatedTextData = clonePixelatedData(currentPixelatedTextData);
+                            currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length; renderAndPixelateCurrentPhrase(currentPixelatedTextData);
+                        }
                     }
-                    ctx.fillStyle = config.canvasClearColor; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    // Clear with transparency so page background shows through
+                    ctx.clearRect(0, 0, canvas.width, canvas.height); 
+                    // Or, if you want the ASCII background to have its own base color different from page bg:
+                    // ctx.fillStyle = config.canvasClearColor; ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+
                     ctx.font = `${config.backgroundFontSize}px monospace`; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
                     for(let r=0;r<numRows;r++){for(let c=0;c<numCols;c++){const noiseVal=(SimplexNoise.noise3D(c*config.noiseScale,r*config.noiseScale,time)+1)/2;grid[r][c].update(noiseVal);grid[r][c].draw();}}
-                    drawPixelatedTextScramble();
+                    
+                    if (isHomepage) {
+                        drawPixelatedTextScramble();
+                    }
                 }
             }
             
-            canvas.addEventListener('mousemove', (event) => { 
-                const rect = canvas.getBoundingClientRect(); 
-                mouseX = event.clientX - rect.left; 
-                mouseY = event.clientY - rect.top; 
-                console.log(`Mouse: ${mouseX}, ${mouseY}`); // For debugging cursor
-            });
+            canvas.addEventListener('mousemove', (event) => { const rect = canvas.getBoundingClientRect(); mouseX = event.clientX - rect.left; mouseY = event.clientY - rect.top; });
             canvas.addEventListener('mouseleave', () => { mouseX = -10000; mouseY = -10000; });
-            setupAndRun();
-            let resizeTimeout; window.addEventListener('resize', () => {clearTimeout(resizeTimeout); resizeTimeout = setTimeout(setupAndRun, 300);});
-            console.log('Hybrid animation with cursor fix & faster scramble text setup complete');
-        } catch (error) { /* ... error handling ... */ 
+            
+            // Only proceed with animation if the container div exists on the current page
+            if (backgroundContainer) {
+                setupAndRun();
+            }
+
+            let resizeTimeout; window.addEventListener('resize', () => {
+                if (backgroundContainer) { // Only resize if animation is active
+                    clearTimeout(resizeTimeout); resizeTimeout = setTimeout(setupAndRun, 300);
+                }
+            });
+            console.log('ASCII animation script setup complete. Homepage features active: ' + isHomepage);
+        } catch (error) { 
             console.error('Animation initialization failed:', error);
             const errorElement = document.createElement('div');
             Object.assign(errorElement.style, {position:'fixed',top:'10px',left:'10px',background:'rgba(255,0,0,0.8)',color:'white',padding:'15px',zIndex:'10000',border:'1px solid white',borderRadius:'5px',maxWidth:'calc(100% - 20px)',fontSize:'12px'});
@@ -239,5 +256,11 @@
         }
     }
     ready(initAnimation);
-    window.addEventListener('load', () => { const bgC=document.querySelector('.background-animation');if(bgC&&!bgC.querySelector('canvas')){initAnimation();}});
+    window.addEventListener('load', () => { 
+        const bgC=document.querySelector('.background-animation');
+        if(bgC&&!bgC.querySelector('canvas')){ 
+            console.log("Canvas not found on window.load, attempting initAnimation again if container exists.");
+            initAnimation(); // initAnimation itself checks for backgroundContainer
+        }
+    });
 })();
