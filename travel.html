@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>noahcamaj.com</title>
+    <title>Noah's Site - Travel</title>
     <link rel="stylesheet" href="style.css">
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -27,13 +27,13 @@
 
     <main class="travel-main">
         <div class="map-outer-container">
-
             <div class="map-legend">
                 <div class="legend-item">
                     <span class="legend-color-box" style="background-color: #FFC04D;"></span> - Visited
                 </div>
                 <div class="legend-item">
-                    <span class="legend-color-box" style="background-color: #74d774;"></span> - Lived 
+                    {/* Replace with your actual chosen green color */}
+                    <span class="legend-color-box" style="background-color: #8FBC8F;"></span> - Lived In 
                 </div>
             </div>
             <div id="map"></div>
@@ -45,13 +45,28 @@
      crossorigin=""></script>
 
     <script>
+        // Primary list for matching by ISO A2 codes
         const visitedCountriesISO_A2 = [
-            "AT", "BZ", "BA", "CA", "CN", "HR", "FR", "GR", "HU", "IT", "KV", "MK", 
+            "AT", "BZ", "BA", "CA", "CN", "HR", /* "FR" removed, will match by name */ "GR", "HU", "IT", /* "XK" removed */ "MK", 
             "MX", "ME", "NL", "PE", "PL", "LC", "VC", "RS", "SK", "ES", "CH", 
             "TR", "AE", "GB"
         ]; 
 
-        const livedInCountriesISO_A2 = ["US", "AL"]; // New list
+        // Fallback list for matching by name (for countries with problematic ISO codes like -99)
+        // Ensure these names EXACTLY match how they appear in feature.properties.name or feature.properties.ADMIN
+        // Make them uppercase for case-insensitive comparison.
+        const visitedCountriesByName = [
+            "FRANCE", 
+            "KOSOVO" 
+            // Add other names here if you find more -99 ISO codes
+        ];
+
+        const livedInCountriesISO_A2 = ["US", "AL"]; 
+        const livedInCountriesByName = [ 
+            // Add names here if US or AL have -99 ISO codes in some datasets, though unlikely for US.
+            // For AL (Albania), it should typically have a proper ISO code.
+        ];
+
 
         const map = L.map('map', {
             center: [20, 0], 
@@ -77,16 +92,16 @@
             color: '#000000',    
             fillOpacity: 0.9     
         };
-
-        const livedInStyle = {      // New style for "Lived In"
-            fillColor: "#74d774", // LightGreen - similar brightness to the orange
+ 
+        const livedInStyle = {      
+            fillColor: "#8FBC8F", // Replace with your actual chosen green
             weight: 0.7,          
             opacity: 1,
             color: '#000000',    
-            fillOpacity: 0.95    // Slightly more opaque to stand out
+            fillOpacity: 0.95    
         };
 
-        let featureCounter = 0; 
+        // let featureCounter = 0; // Keep for debugging if needed
 
         fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson') 
             .then(response => {
@@ -98,22 +113,46 @@
             .then(data => {
                 L.geoJson(data, {
                     style: function(feature) {
-                        // if (featureCounter < 5) { // Keep for debugging if needed
+                        // if (featureCounter < 20) { // Log more features to find names if needed
                         //     console.log("Feature properties:", feature.properties);
                         //     featureCounter++;
                         // }
 
-                        const countryISO = feature.properties["ISO3166-1-Alpha-2"]; 
+                        const countryISO_GeoJSON = feature.properties["ISO3166-1-Alpha-2"];
+                        // Use 'name' first as it seems more consistent in your screenshot, then fallback to 'ADMIN'
+                        const countryName_GeoJSON = (feature.properties.name || feature.properties.ADMIN || "").toUpperCase(); 
+
+                        let isLivedIn = false;
+                        let isVisited = false;
+
+                        // Check Lived In first (priority)
+                        if (countryISO_GeoJSON && countryISO_GeoJSON !== "-99" && livedInCountriesISO_A2.includes(countryISO_GeoJSON.toUpperCase())) {
+                            isLivedIn = true;
+                        } else if (livedInCountriesByName.includes(countryName_GeoJSON)) {
+                            isLivedIn = true;
+                        }
+
+                        // If not lived in, check Visited
+                        if (!isLivedIn) {
+                            if (countryISO_GeoJSON && countryISO_GeoJSON !== "-99" && visitedCountriesISO_A2.includes(countryISO_GeoJSON.toUpperCase())) {
+                                isVisited = true;
+                            } else if (visitedCountriesByName.includes(countryName_GeoJSON)) {
+                                isVisited = true;
+                            }
+                        }
                         
-                        if (countryISO && livedInCountriesISO_A2.includes(countryISO.toUpperCase())) {
-                            return livedInStyle; // Lived in takes precedence
-                        } else if (countryISO && visitedCountriesISO_A2.includes(countryISO.toUpperCase())) { 
+                        // Apply styles
+                        if (isLivedIn) {
+                            // console.log("Highlighting Lived In:", countryName_GeoJSON, countryISO_GeoJSON);
+                            return livedInStyle;
+                        } else if (isVisited) {
+                            // console.log("Highlighting Visited:", countryName_GeoJSON, countryISO_GeoJSON);
                             return visitedStyle;
                         }
                         return defaultStyle;
                     },
                     onEachFeature: function(feature, layer) {
-                        let countryName = feature.properties.name; 
+                        let countryName = feature.properties.name || feature.properties.ADMIN; 
                         if (countryName) {
                             layer.bindPopup(countryName);
                         }
