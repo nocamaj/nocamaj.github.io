@@ -40,10 +40,7 @@
         // Test with a very small, known-good list first if highlighting fails.
         // e.g., const visitedCountriesISO_A2 = ["US", "CA", "FR"];
         const visitedCountriesISO_A2 = [
-            "US", "CA", "MX", "FR", "DE", "IT", "ES", "GB", "JP", "AU", 
-            "CN", "RU", "IN", "BR", "PT", "AR", "CL", "ZA", "EG", "KE", 
-            "NG", "GH", "MA", "SE", "NO", "FI", "PL", "UA", "TR", "IR", 
-            "SA", "ID", "TH", "VN", "PH", "MY", "KR", "NZ" 
+            "US", "CA",
             // Add or remove countries as needed using their 2-letter ISO A2 codes
         ]; 
 
@@ -57,7 +54,7 @@
         });
 
         const defaultStyle = {
-            fillColor: "#585858", // Made 25% lighter (was #383838)
+            fillColor: "#afafaf", // Made 25% lighter (was #383838)
             weight: 0.5,          
             opacity: 1,
             color: '#101010',    
@@ -84,7 +81,7 @@
                     style: function(feature) {
                         const countryISO = feature.properties.ISO_A2; // This is correct for this GeoJSON
                         if (visitedCountriesISO_A2.includes(countryISO)) {
-                            // console.log("Visited:", countryISO, feature.properties.ADMIN); // For debugging
+                            console.log("Visited:", countryISO, feature.properties.ADMIN); // For debugging
                             return visitedStyle;
                         }
                         return defaultStyle;
