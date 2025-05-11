@@ -28,7 +28,7 @@
     </header>
 
     <main class="travel-main">
-        <div class="map-outer-container"> {/* New wrapper for border and padding */}
+        <div class="map-outer-container">
             <div id="map"></div>
         </div>
     </main>
@@ -43,9 +43,7 @@
             "US", "CA", "MX", "FR", "DE", "IT", "ES", "GB", "JP", "AU", 
             "CN", "RU", "IN", "BR", "PT", "AR", "CL", "ZA", "EG", "KE", 
             "NG", "GH", "MA", "SE", "NO", "FI", "PL", "UA", "TR", "IR", 
-            "SA", "ID", "TH", "VN", "PH", "MY", "KR", "NZ" 
-            // Add or remove countries as needed using their 2-letter ISO A2 codes
-        ]; 
+            "SA", "ID", "TH", "VN", "PH", "MY", "KR", "NZ"]; 
 
         const map = L.map('map', {
             center: [20, 0], 
@@ -55,8 +53,8 @@
             worldCopyJump: true,
             attributionControl: false,
             // Optional: to make the map feel more like your reference image, you could set a maxBounds
-            // maxBounds: [[-90, -180], [90, 180]], // Prevents panning beyond world edges
-            // maxBoundsViscosity: 1.0 // Makes the bounds hard
+            maxBounds: [[-90, -180], [90, 180]], // Prevents panning beyond world edges
+            maxBoundsViscosity: 1.0 // Makes the bounds hard
         });
 
         const defaultStyle = {
