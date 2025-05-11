@@ -3,21 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noah's Site - Travel</title> {/* Changed title from noahcamaj.com for page specificity */}
+    <title>noahcamaj.com</title> {/* Changed title */}
     <link rel="stylesheet" href="style.css">
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
      crossorigin=""/>
     
-    {/* Script for ASCII animation, will be conditional based on logic within script.js */}
     <script src="script.js" defer></script> 
 </head>
 <body class="travel-page-background"> 
 
-    {/* Background Animation Div (same as index.html) */}
     <div class="background-animation">
-        {/* Canvas will be created by JavaScript (script.js) */}
+        {/* Canvas will be created by script.js */}
     </div>
     
     <header>
@@ -28,8 +26,7 @@
             <div class="nav-right">
                 <a href="#" class="nav-button">Metrics</a> 
                 <a href="#" class="nav-button">Ideas</a>   
-                {/* Corrected link case to match typical file naming */}
-                <a href="Travel.html" class="nav-button">Travel</a> 
+                <a href="travel.html" class="nav-button">Travel</a> {/* Lowercase 't' */}
             </div>
         </nav>
     </header>
@@ -41,8 +38,7 @@
                     <span class="legend-color-box" style="background-color: #FFC04D;"></span> - Visited
                 </div>
                 <div class="legend-item">
-                    {/* Using your provided green color */}
-                    <span class="legend-color-box" style="background-color: #8FBC8F;"></span> - Lived In 
+                    <span class="legend-color-box" style="background-color: #8FBC8F;"></span> - Lived {/* Changed from Lived In */}
                 </div>
             </div>
             <div id="map"></div>
@@ -54,15 +50,15 @@
      crossorigin=""></script>
 
     <script>
-        // Map JavaScript (Leaflet) - This logic remains specific to the travel page
         const visitedCountriesISO_A2 = [
-            "AT", "BZ", "BA", "CA", "CN", "HR", /* "FR" removed */ "GR", "HU", "IT", /* "XK" removed */ "MK", 
+            "AT", "BZ", "BA", "CA", "CN", "HR", "GR", "HU", "IT", "MK", 
             "MX", "ME", "NL", "PE", "PL", "LC", "VC", "RS", "SK", "ES", "CH", 
             "TR", "AE", "GB"
         ]; 
         const visitedCountriesByName = ["FRANCE", "KOSOVO"];
-        const livedInCountriesISO_A2 = ["US", "AL"]; 
-        const livedInCountriesByName = [];
+
+        const livedCountriesISO_A2 = ["US", "AL"]; // Renamed from livedInCountriesISO_A2
+        const livedCountriesByName = []; 
 
         const map = L.map('map', {
             center: [20, 0], 
@@ -87,8 +83,9 @@
             color: '#000000',    
             fillOpacity: 0.9     
         };
-        const livedInStyle = {      
-            fillColor: "#8FBC8F", // Your green color
+ 
+        const livedStyle = {      // Renamed from livedInStyle
+            fillColor: "#8FBC8F", 
             weight: 0.7,          
             opacity: 1,
             color: '#000000',    
@@ -105,13 +102,30 @@
             .then(data => {
                 L.geoJson(data, {
                     style: function(feature) {
-                        const countryISO = feature.properties["ISO3166-1-Alpha-2"];
-                        const countryName = (feature.properties.name || feature.properties.ADMIN || "").toUpperCase(); 
+                        const countryISO_GeoJSON = feature.properties["ISO3166-1-Alpha-2"];
+                        const countryName_GeoJSON = (feature.properties.name || feature.properties.ADMIN || "").toUpperCase(); 
+
+                        let isLived = false; // Renamed
+                        let isVisited = false;
+
+                        // Check Lived first (priority)
+                        if (countryISO_GeoJSON && countryISO_GeoJSON !== "-99" && livedCountriesISO_A2.includes(countryISO_GeoJSON.toUpperCase())) {
+                            isLived = true;
+                        } else if (livedCountriesByName.includes(countryName_GeoJSON)) {
+                            isLived = true;
+                        }
+
+                        // If not lived, check Visited
+                        if (!isLived) {
+                            if (countryISO_GeoJSON && countryISO_GeoJSON !== "-99" && visitedCountriesISO_A2.includes(countryISO_GeoJSON.toUpperCase())) {
+                                isVisited = true;
+                            } else if (visitedCountriesByName.includes(countryName_GeoJSON)) {
+                                isVisited = true;
+                            }
+                        }
                         
-                        if (countryISO && countryISO !== "-99" && livedInCountriesISO_A2.includes(countryISO.toUpperCase())) { return livedInStyle; } 
-                        else if (livedInCountriesByName.includes(countryName)) { return livedInStyle; }
-                        else if (countryISO && countryISO !== "-99" && visitedCountriesISO_A2.includes(countryISO.toUpperCase())) { return visitedStyle; } 
-                        else if (visitedCountriesByName.includes(countryName)) { return visitedStyle; }
+                        if (isLived) { return livedStyle; } 
+                        else if (isVisited) { return visitedStyle; }
                         return defaultStyle;
                     },
                     onEachFeature: function(feature, layer) {
