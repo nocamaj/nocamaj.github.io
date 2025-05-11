@@ -109,6 +109,41 @@ footer { /* ... rest of footer styles ... */
     .search-container input[type="text"] { width: 80vw; }
 }
 
+/* Styles for the Travel Page Map Container */
 body.travel-page-background {
-    background-color: #0a0a18; /* Darker blue for travel page */
+    background-color: #0a0a18; /* Ensure this is the desired page background */
+    overflow: hidden; /* Prevent scrollbars from main content if it slightly over-extends */
+}
+
+main.travel-main {
+    display: flex; /* Use flexbox to center the map container easily if needed */
+    justify-content: center;
+    align-items: center;
+    padding-top: calc(60px + 20px); /* Header height (approx 60px) + top margin for map-outer-container */
+    padding-bottom: 20px; /* Bottom margin for map-outer-container */
+    box-sizing: border-box;
+    height: 100vh; /* Full viewport height */
+    width: 100vw;  /* Full viewport width */
+}
+
+.map-outer-container {
+    width: calc(100% - 40px); /* Near the edge, 20px margin on each side */
+    height: calc(100% - 40px); /* Near the edge, 20px margin from top (after header) and bottom */
+    max-width: 1800px; /* Optional: max width for very large screens */
+    padding: 15px; /* Padding between the border and the map itself */
+    border: 2px solid rgba(150, 150, 180, 0.5); /* A subtle border color, adjust as you like */
+    border-radius: 25px; /* Rounded edges for the outer container */
+    background-color: rgba(10, 10, 24, 0.3); /* Optional: slight background for the padded area */
+    box-shadow: 0 0 15px rgba(0,0,0,0.3); /* Optional: a subtle shadow */
+    box-sizing: border-box;
+    display: flex; /* To make #map fill this container */
+}
+
+#map { 
+    flex-grow: 1; /* Allow map to fill the .map-outer-container */
+    height: 100%; 
+    width: 100%; 
+    background-color: #0a0a18; /* This will be the "ocean" color of the map */
+    border-radius: 15px; /* Rounded corners for the map div itself, inside the padded border */
+    overflow: hidden; /* Ensures Leaflet controls don't poke out of rounded corners */
 }
