@@ -35,9 +35,9 @@
      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
      crossorigin=""></script>
 
-    <script>
+     <script>
         // TEST WITH A VERY SMALL LIST FIRST!
-        const visitedCountriesISO_A2 = ["CL", "PE", "FR", "DE", "JP"]; // Uppercase ISO A2 codes
+        const visitedCountriesISO_A2 = ["US", "CA", "FR", "DE", "JP", "ID", "MY", "CL", "BO", "PE"]; // Added codes from your screenshot for testing
 
         const map = L.map('map', {
             center: [20, 0], 
@@ -49,7 +49,7 @@
         });
 
         const defaultStyle = {
-            fillColor: "#585858", // Lighter grey for unvisited countries
+            fillColor: "#585858", 
             weight: 0.5,          
             opacity: 1,
             color: '#101010',    
@@ -64,7 +64,7 @@
             fillOpacity: 0.9     
         };
 
-        let featureCounter = 0; // For limiting console.log
+        let featureCounter = 0; 
 
         fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson') 
             .then(response => {
@@ -76,31 +76,32 @@
             .then(data => {
                 L.geoJson(data, {
                     style: function(feature) {
-                        // Log properties for the first few features to help debug
-                        if (featureCounter < 5) {
+                        if (featureCounter < 10) { // Log a few more to be sure
                             console.log("Feature properties:", feature.properties);
                             featureCounter++;
                         }
 
-                        const countryISO = feature.properties.ISO_A2; 
-                        if (countryISO && visitedCountriesISO_A2.includes(countryISO.toUpperCase())) { // Ensure comparison is robust
-                            // console.log("Highlighting Visited:", countryISO, feature.properties.ADMIN); 
+                        // CORRECTED PROPERTY NAME HERE:
+                        const countryISO = feature.properties["ISO3166-1-Alpha-2"]; 
+                        
+                        if (countryISO && visitedCountriesISO_A2.includes(countryISO.toUpperCase())) { 
+                            console.log("Highlighting Visited:", countryISO, feature.properties.name); // Changed from ADMIN to name based on your screenshot
                             return visitedStyle;
                         }
                         return defaultStyle;
                     },
                     onEachFeature: function(feature, layer) {
-                        let countryName = feature.properties.ADMIN; 
+                        // Use 'name' for the popup, as seen in your screenshot
+                        let countryName = feature.properties.name; 
                         if (countryName) {
                             layer.bindPopup(countryName);
                         }
                     }
                 }).addTo(map);
 
-                // After data is added, ensure map size is correct, especially if container was resized by CSS
                 setTimeout(() => {
                     map.invalidateSize();
-                }, 100); // Small delay to ensure DOM is fully updated
+                }, 100); 
 
             })
             .catch(error => {
