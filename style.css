@@ -145,5 +145,5 @@ main.travel-main {
     width: 100%; 
     background-color: #0a0a18; /* This will be the "ocean" color of the map */
     border-radius: 15px; /* Rounded corners for the map div itself, inside the padded border */
-    overflow: hidden; /* Ensures Leaflet controls don't poke out of rounded corners */
+    overflow: hidden; /* Enures Leaflet controls don't poke out of rounded corners */
 }
