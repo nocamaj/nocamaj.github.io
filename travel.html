@@ -3,22 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Noah's Site - Travel</title>
+    <title>noahcamaj.com</title>
     <link rel="stylesheet" href="style.css">
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
      crossorigin=""/>
-    
-    {/* The script for the background animation is now included */}
-    <script src="script.js" defer></script>
 </head>
 <body class="travel-page-background"> 
-
-    {/* Animation container from index.html, ensure z-index is handled by CSS correctly */}
-    <div class="background-animation">
-        {/* Canvas will be created by JavaScript from script.js */}
-    </div>
     
     <header>
         <nav>
@@ -28,7 +20,7 @@
             <div class="nav-right">
                 <a href="#" class="nav-button">Metrics</a> 
                 <a href="#" class="nav-button">Ideas</a>   
-                <a href="Travel.html" class="nav-button">Travel</a> 
+                <a href="travel.html" class="nav-button">Travel</a> 
             </div>
         </nav>
     </header>
@@ -40,7 +32,6 @@
                     <span class="legend-color-box" style="background-color: #FFC04D;"></span> - Visited
                 </div>
                 <div class="legend-item">
-                    {/* Replace with your actual chosen green color */}
                     <span class="legend-color-box" style="background-color: #8FBC8F;"></span> - Lived In 
                 </div>
             </div>
@@ -53,59 +44,133 @@
      crossorigin=""></script>
 
     <script>
-        // Leaflet map initialization and country highlighting logic
-        // (This entire <script> block for the map remains THE SAME as your last working version)
-
+        // Primary list for matching by ISO A2 codes
         const visitedCountriesISO_A2 = [
-            "AT", "BZ", "BA", "CA", "CN", "HR", "GR", "HU", "IT", "MK", 
+            "AT", "BZ", "BA", "CA", "CN", "HR", /* "FR" removed, will match by name */ "GR", "HU", "IT", /* "XK" removed */ "MK", 
             "MX", "ME", "NL", "PE", "PL", "LC", "VC", "RS", "SK", "ES", "CH", 
             "TR", "AE", "GB"
         ]; 
-        const visitedCountriesByName = ["FRANCE", "KOSOVO"];
+
+        // Fallback list for matching by name (for countries with problematic ISO codes like -99)
+        // Ensure these names EXACTLY match how they appear in feature.properties.name or feature.properties.ADMIN
+        // Make them uppercase for case-insensitive comparison.
+        const visitedCountriesByName = [
+            "FRANCE", 
+            "KOSOVO" 
+            // Add other names here if you find more -99 ISO codes
+        ];
+
         const livedInCountriesISO_A2 = ["US", "AL"]; 
-        const livedInCountriesByName = [];
+        const livedInCountriesByName = [ 
+            // Add names here if US or AL have -99 ISO codes in some datasets, though unlikely for US.
+            // For AL (Albania), it should typically have a proper ISO code.
+        ];
+
 
         const map = L.map('map', {
-            center: [20, 0], zoom: 2, minZoom: 2, maxZoom: 8, worldCopyJump: true, attributionControl: false,
+            center: [20, 0], 
+            zoom: 2,
+            minZoom: 2,     
+            maxZoom: 8,     
+            worldCopyJump: true,
+            attributionControl: false,
         });
 
-        const defaultStyle = { fillColor: "#585858", weight: 0.5, opacity: 1, color: '#101010', fillOpacity: 0.7 };
-        const visitedStyle = { fillColor: "#FFC04D", weight: 0.7, opacity: 1, color: '#000000', fillOpacity: 0.9 };
-        const livedInStyle = { fillColor: "#8FBC8F", weight: 0.7, opacity: 1, color: '#000000', fillOpacity: 0.95 };
+        const defaultStyle = {
+            fillColor: "#585858", 
+            weight: 0.5,          
+            opacity: 1,
+            color: '#101010',    
+            fillOpacity: 0.7
+        };
+
+        const visitedStyle = {
+            fillColor: "#FFC04D", // Light orange
+            weight: 0.7,          
+            opacity: 1,
+            color: '#000000',    
+            fillOpacity: 0.9     
+        };
+ 
+        const livedInStyle = {      
+            fillColor: "#8FBC8F",
+            weight: 0.7,          
+            opacity: 1,
+            color: '#000000',    
+            fillOpacity: 0.95    
+        };
+
+        // let featureCounter = 0; // Keep for debugging if needed
 
         fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson') 
             .then(response => {
-                if (!response.ok) { throw new Error('Network response was not ok for GeoJSON: ' + response.statusText); }
+                if (!response.ok) {
+                    throw new Error('Network response was not ok for GeoJSON: ' + response.statusText);
+                }
                 return response.json();
             })
             .then(data => {
                 L.geoJson(data, {
                     style: function(feature) {
+                        // if (featureCounter < 20) { // Log more features to find names if needed
+                        //     console.log("Feature properties:", feature.properties);
+                        //     featureCounter++;
+                        // }
+
                         const countryISO_GeoJSON = feature.properties["ISO3166-1-Alpha-2"];
+                        // Use 'name' first as it seems more consistent in your screenshot, then fallback to 'ADMIN'
                         const countryName_GeoJSON = (feature.properties.name || feature.properties.ADMIN || "").toUpperCase(); 
-                        let isLivedIn = false; let isVisited = false;
-                        if (countryISO_GeoJSON && countryISO_GeoJSON !== "-99" && livedInCountriesISO_A2.includes(countryISO_GeoJSON.toUpperCase())) { isLivedIn = true; } 
-                        else if (livedInCountriesByName.includes(countryName_GeoJSON)) { isLivedIn = true; }
-                        if (!isLivedIn) {
-                            if (countryISO_GeoJSON && countryISO_GeoJSON !== "-99" && visitedCountriesISO_A2.includes(countryISO_GeoJSON.toUpperCase())) { isVisited = true; } 
-                            else if (visitedCountriesByName.includes(countryName_GeoJSON)) { isVisited = true; }
+
+                        let isLivedIn = false;
+                        let isVisited = false;
+
+                        // Check Lived In first (priority)
+                        if (countryISO_GeoJSON && countryISO_GeoJSON !== "-99" && livedInCountriesISO_A2.includes(countryISO_GeoJSON.toUpperCase())) {
+                            isLivedIn = true;
+                        } else if (livedInCountriesByName.includes(countryName_GeoJSON)) {
+                            isLivedIn = true;
                         }
-                        if (isLivedIn) { return livedInStyle; } 
-                        else if (isVisited) { return visitedStyle; }
+
+                        // If not lived in, check Visited.
+                        if (!isLivedIn) {
+                            if (countryISO_GeoJSON && countryISO_GeoJSON !== "-99" && visitedCountriesISO_A2.includes(countryISO_GeoJSON.toUpperCase())) {
+                                isVisited = true;
+                            } else if (visitedCountriesByName.includes(countryName_GeoJSON)) {
+                                isVisited = true;
+                            }
+                        }
+                        
+                        // Apply styles
+                        if (isLivedIn) {
+                            // console.log("Highlighting Lived In:", countryName_GeoJSON, countryISO_GeoJSON);
+                            return livedInStyle;
+                        } else if (isVisited) {
+                            // console.log("Highlighting Visited:", countryName_GeoJSON, countryISO_GeoJSON);
+                            return visitedStyle;
+                        }
                         return defaultStyle;
                     },
                     onEachFeature: function(feature, layer) {
                         let countryName = feature.properties.name || feature.properties.ADMIN; 
-                        if (countryName) { layer.bindPopup(countryName); }
+                        if (countryName) {
+                            layer.bindPopup(countryName);
+                        }
                     }
                 }).addTo(map);
-                setTimeout(() => { map.invalidateSize(); }, 100); 
+
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 100); 
+
             })
             .catch(error => {
                 console.error('Error loading or parsing GeoJSON:', error);
                 const mapDiv = document.getElementById('map');
-                if (mapDiv) { mapDiv.innerHTML = `<p style="text-align:center; padding-top: 50px; color: white;">Could not load map data. Error: ${error.message}</p>`;}
+                if (mapDiv) {
+                    mapDiv.innerHTML = `<p style="text-align:center; padding-top: 50px; color: white;">Could not load map data. Error: ${error.message}</p>`;
+                }
             });
     </script>
+
 </body>
 </html>
