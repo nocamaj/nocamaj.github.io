@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>noahcamaj.com</title>
+    <title>Noah's Site - Travel</title>
     <link rel="stylesheet" href="style.css">
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -27,6 +27,15 @@
 
     <main class="travel-main">
         <div class="map-outer-container">
+            {/* Legend Column Added Here */}
+            <div class="map-legend">
+                <div class="legend-item">
+                    <span class="legend-color-box" style="background-color: #FFC04D;"></span> - Visited
+                </div>
+                <div class="legend-item">
+                    <span class="legend-color-box" style="background-color: #90EE90;"></span> - Lived In 
+                </div>
+            </div>
             <div id="map"></div>
         </div>
     </main>
@@ -35,9 +44,14 @@
      integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
      crossorigin=""></script>
 
-     <script>
-        // TEST WITH A VERY SMALL LIST FIRST!
-        const visitedCountriesISO_A2 = ["US", "CA", "FR", "DE", "JP", "ID", "MY", "CL", "BO", "PE"]; // Added codes from your screenshot for testing
+    <script>
+        const visitedCountriesISO_A2 = [
+            "AT", "BZ", "BA", "CA", "CN", "HR", "FR", "GR", "HU", "IT", "XK", "MK", 
+            "MX", "ME", "NL", "PE", "PL", "LC", "VC", "RS", "SK", "ES", "CH", 
+            "TR", "AE", "GB"
+        ]; 
+
+        const livedInCountriesISO_A2 = ["US", "AL"]; // New list
 
         const map = L.map('map', {
             center: [20, 0], 
@@ -57,11 +71,19 @@
         };
 
         const visitedStyle = {
-            fillColor: "#FFC04D", // Light orange for visited countries
+            fillColor: "#FFC04D", // Light orange
             weight: 0.7,          
             opacity: 1,
             color: '#000000',    
             fillOpacity: 0.9     
+        };
+
+        const livedInStyle = {      // New style for "Lived In"
+            fillColor: "#90EE90", // LightGreen - similar brightness to the orange
+            weight: 0.7,          
+            opacity: 1,
+            color: '#000000',    
+            fillOpacity: 0.95    // Slightly more opaque to stand out
         };
 
         let featureCounter = 0; 
@@ -76,22 +98,21 @@
             .then(data => {
                 L.geoJson(data, {
                     style: function(feature) {
-                        if (featureCounter < 10) { // Log a few more to be sure
-                            console.log("Feature properties:", feature.properties);
-                            featureCounter++;
-                        }
+                        // if (featureCounter < 5) { // Keep for debugging if needed
+                        //     console.log("Feature properties:", feature.properties);
+                        //     featureCounter++;
+                        // }
 
-                        // CORRECTED PROPERTY NAME HERE:
                         const countryISO = feature.properties["ISO3166-1-Alpha-2"]; 
                         
-                        if (countryISO && visitedCountriesISO_A2.includes(countryISO.toUpperCase())) { 
-                            console.log("Highlighting Visited:", countryISO, feature.properties.name); // Changed from ADMIN to name based on your screenshot
+                        if (countryISO && livedInCountriesISO_A2.includes(countryISO.toUpperCase())) {
+                            return livedInStyle; // Lived in takes precedence
+                        } else if (countryISO && visitedCountriesISO_A2.includes(countryISO.toUpperCase())) { 
                             return visitedStyle;
                         }
                         return defaultStyle;
                     },
                     onEachFeature: function(feature, layer) {
-                        // Use 'name' for the popup, as seen in your screenshot
                         let countryName = feature.properties.name; 
                         if (countryName) {
                             layer.bindPopup(countryName);
