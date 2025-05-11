@@ -109,41 +109,51 @@ footer { /* ... rest of footer styles ... */
     .search-container input[type="text"] { width: 80vw; }
 }
 
-/* Styles for the Travel Page Map Container */
 body.travel-page-background {
-    background-color: #0a0a18; /* Ensure this is the desired page background */
-    overflow: hidden; /* Prevent scrollbars from main content if it slightly over-extends */
+    background-color: #0a0a18;
+    overflow: hidden; /* Prevent scrollbars on the body itself */
+    margin: 0; /* Ensure no default body margin */
+    padding: 0; /* Ensure no default body padding */
+    height: 100vh; /* Make body take full viewport height */
+    position: relative; /* For positioning map container absolutely if needed */
 }
 
+/* main.travel-main is no longer directly sizing the map container. 
+   It's more for semantic content if you add text above/below the map later.
+   If main solely contains the map, we can simplify.
+   For now, let's remove height constraints from main if it's just a wrapper. */
 main.travel-main {
-    display: flex; /* Use flexbox to center the map container easily if needed */
-    justify-content: center;
-    align-items: center;
-    padding-top: calc(60px + 20px); /* Header height (approx 60px) + top margin for map-outer-container */
-    padding-bottom: 20px; /* Bottom margin for map-outer-container */
-    box-sizing: border-box;
-    height: 100vh; /* Full viewport height */
-    width: 100vw;  /* Full viewport width */
+    /* padding-top: 0; /* Remove fixed padding if header is accounted for by map-outer-container's top */
+    /* height: auto; /* Allow main to be sized by its content */
+    /* The above might not be needed if we position .map-outer-container absolutely */
 }
 
 .map-outer-container {
-    width: calc(100% - 40px); /* Near the edge, 20px margin on each side */
-    height: calc(100% - 40px); /* Near the edge, 20px margin from top (after header) and bottom */
+    position: absolute; /* Position relative to body */
+    top: calc(60px + 20px); /* Header height (approx 60px) + 20px margin */
+    left: 20px;
+    right: 20px;
+    bottom: 20px; /* 20px margin from bottom */
+    /* width: calc(100% - 40px); /* This will be handled by left/right/bottom */
+    /* height: calc(100% - 40px - 60px); /* This will be handled by top/bottom */
     max-width: 1800px; /* Optional: max width for very large screens */
-    padding: 15px; /* Padding between the border and the map itself */
-    border: 2px solid rgba(150, 150, 180, 0.5); /* A subtle border color, adjust as you like */
-    border-radius: 25px; /* Rounded edges for the outer container */
-    background-color: rgba(10, 10, 24, 0.3); /* Optional: slight background for the padded area */
-    box-shadow: 0 0 15px rgba(0,0,0,0.3); /* Optional: a subtle shadow */
+    margin-left: auto; /* For centering if max-width is applied */
+    margin-right: auto; /* For centering if max-width is applied */
+    
+    padding: 15px; 
+    border: 2px solid rgba(150, 150, 180, 0.5); 
+    border-radius: 25px; 
+    background-color: rgba(10, 10, 24, 0.3); 
+    box-shadow: 0 0 15px rgba(0,0,0,0.3); 
     box-sizing: border-box;
-    display: flex; /* To make #map fill this container */
+    display: flex; 
 }
 
 #map { 
-    flex-grow: 1; /* Allow map to fill the .map-outer-container */
+    flex-grow: 1; 
     height: 100%; 
     width: 100%; 
-    background-color: #0a0a18; /* This will be the "ocean" color of the map */
-    border-radius: 15px; /* Rounded corners for the map div itself, inside the padded border */
-    overflow: hidden; /* Enures Leaflet controls don't poke out of rounded corners */
+    background-color: #0a0a18; 
+    border-radius: 15px; 
+    overflow: hidden; 
 }

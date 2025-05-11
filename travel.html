@@ -9,8 +9,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
      crossorigin=""/>
-
-    <!-- style.css will now handle the map container styles -->
 </head>
 <body class="travel-page-background"> 
     
@@ -27,7 +25,7 @@
         </nav>
     </header>
 
-    <main class="travel-main">
+    <main class="travel-main"> {/* This main tag might become less important for direct map sizing */}
         <div class="map-outer-container">
             <div id="map"></div>
         </div>
@@ -38,39 +36,40 @@
      crossorigin=""></script>
 
     <script>
-        // List of visited countries (USE ISO A2 CODES: e.g., "US", "CA", "FR")
+        // IMPORTANT: Double-check these ISO A2 codes. They MUST be uppercase and correct.
+        // Test with a very small, known-good list first if highlighting fails.
+        // e.g., const visitedCountriesISO_A2 = ["US", "CA", "FR"];
         const visitedCountriesISO_A2 = [
             "US", "CA", "MX", "FR", "DE", "IT", "ES", "GB", "JP", "AU", 
             "CN", "RU", "IN", "BR", "PT", "AR", "CL", "ZA", "EG", "KE", 
             "NG", "GH", "MA", "SE", "NO", "FI", "PL", "UA", "TR", "IR", 
-            "SA", "ID", "TH", "VN", "PH", "MY", "KR", "NZ"]; 
+            "SA", "ID", "TH", "VN", "PH", "MY", "KR", "NZ" 
+            // Add or remove countries as needed using their 2-letter ISO A2 codes
+        ]; 
 
         const map = L.map('map', {
             center: [20, 0], 
-            zoom: 2,        
+            zoom: 2, // Start zoomed out to see the whole map
             minZoom: 2,     
             maxZoom: 8,     
             worldCopyJump: true,
             attributionControl: false,
-            // Optional: to make the map feel more like your reference image, you could set a maxBounds
-            maxBounds: [[-90, -180], [90, 180]], // Prevents panning beyond world edges
-            maxBoundsViscosity: 1.0 // Makes the bounds hard
         });
 
         const defaultStyle = {
-            fillColor: "#383838", // Slightly lighter dark grey for unvisited countries
-            weight: 0.5,          // Thinner border
+            fillColor: "#585858", // Made 25% lighter (was #383838)
+            weight: 0.5,          
             opacity: 1,
-            color: '#101010',    // Darker border color
+            color: '#101010',    
             fillOpacity: 0.7
         };
 
         const visitedStyle = {
-            fillColor: "#FFFFFF", // White for visited countries
-            weight: 0.7,          // Slightly more prominent border for visited
+            fillColor: "#FFFFFF", 
+            weight: 0.7,          
             opacity: 1,
-            color: '#000000',    // Black border for visited for contrast
-            fillOpacity: 0.9     // More opaque
+            color: '#000000',    
+            fillOpacity: 0.9     
         };
 
         fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson') 
@@ -83,8 +82,9 @@
             .then(data => {
                 L.geoJson(data, {
                     style: function(feature) {
-                        const countryISO = feature.properties.ISO_A2; 
+                        const countryISO = feature.properties.ISO_A2; // This is correct for this GeoJSON
                         if (visitedCountriesISO_A2.includes(countryISO)) {
+                            // console.log("Visited:", countryISO, feature.properties.ADMIN); // For debugging
                             return visitedStyle;
                         }
                         return defaultStyle;
@@ -104,8 +104,6 @@
                     mapDiv.innerHTML = `<p style="text-align:center; padding-top: 50px; color: white;">Could not load map data. Error: ${error.message}</p>`;
                 }
             });
-
-        // L.control.scale({imperial: false}).addTo(map); // Optional scale
     </script>
 
 </body>
