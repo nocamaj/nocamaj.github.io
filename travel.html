@@ -36,11 +36,8 @@
      crossorigin=""></script>
 
     <script>
-        // IMPORTANT: ENSURE THESE ARE CORRECT UPPERCASE ISO A2 CODES.
-        const visitedCountriesISO_A2 = [
-            "US", "CA", "MX", "FR", "DE", "IT", "ES", "GB", "JP", "AU", "SE" 
-            // Add a few known good ones like "SE" for Sweden to test.
-        ]; 
+        // TEST WITH A VERY SMALL LIST FIRST!
+        const visitedCountriesISO_A2 = ["US", "CA", "FR", "DE", "JP"]; // Uppercase ISO A2 codes
 
         const map = L.map('map', {
             center: [20, 0], 
@@ -52,7 +49,7 @@
         });
 
         const defaultStyle = {
-            fillColor: "#585858", // Kept as per last update
+            fillColor: "#585858", // Lighter grey for unvisited countries
             weight: 0.5,          
             opacity: 1,
             color: '#101010',    
@@ -60,14 +57,14 @@
         };
 
         const visitedStyle = {
-            fillColor: "#FFB732", // Light Orange
+            fillColor: "#FFC04D", // Light orange for visited countries
             weight: 0.7,          
             opacity: 1,
             color: '#000000',    
             fillOpacity: 0.9     
         };
-        
-        let geoJsonLayer; // To potentially re-style later if needed
+
+        let featureCounter = 0; // For limiting console.log
 
         fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson') 
             .then(response => {
@@ -77,32 +74,34 @@
                 return response.json();
             })
             .then(data => {
-                // For debugging the first few features from GeoJSON:
-                // console.log("First 3 GeoJSON features properties:", data.features.slice(0,3).map(f => f.properties));
-
-                geoJsonLayer = L.geoJson(data, {
+                L.geoJson(data, {
                     style: function(feature) {
-                        // Try multiple common property names for ISO A2 code, prioritizing ISO_A2
-                        const countryISO = feature.properties.ISO_A2 || feature.properties.iso_a2 || feature.properties.ISO_A2_EH;
-                        
-                        if (visitedCountriesISO_A2.includes(String(countryISO).toUpperCase())) { // Ensure comparison is robust
-                            // console.log("MATCHED Visited:", countryISO, feature.properties.ADMIN); 
+                        // Log properties for the first few features to help debug
+                        if (featureCounter < 5) {
+                            console.log("Feature properties:", feature.properties);
+                            featureCounter++;
+                        }
+
+                        const countryISO = feature.properties.ISO_A2; 
+                        if (countryISO && visitedCountriesISO_A2.includes(countryISO.toUpperCase())) { // Ensure comparison is robust
+                            // console.log("Highlighting Visited:", countryISO, feature.properties.ADMIN); 
                             return visitedStyle;
                         }
                         return defaultStyle;
                     },
                     onEachFeature: function(feature, layer) {
-                        // Try multiple common property names for country name
-                        let countryName = feature.properties.ADMIN || feature.properties.NAME || feature.properties.name || feature.properties. sovereignt; 
+                        let countryName = feature.properties.ADMIN; 
                         if (countryName) {
                             layer.bindPopup(countryName);
                         }
                     }
                 }).addTo(map);
 
-                // Optional: Fit map to the bounds of the GeoJSON layer after it's added
-                // This can help ensure the whole world is visible initially if zoom/center is off
-                // map.fitBounds(geoJsonLayer.getBounds(), {padding: [10,10]}); // Add slight padding
+                // After data is added, ensure map size is correct, especially if container was resized by CSS
+                setTimeout(() => {
+                    map.invalidateSize();
+                }, 100); // Small delay to ensure DOM is fully updated
+
             })
             .catch(error => {
                 console.error('Error loading or parsing GeoJSON:', error);

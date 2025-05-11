@@ -3,22 +3,18 @@ body, html {
     padding: 0;
     height: 100%;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    /* background-color: #121212; /* Base background for index, travel page overrides */
+    /* background-color: #121212; /* Base background for index */
     color: #F5F5F5; 
     overflow: hidden; 
 }
 
-body.travel-page-background {
-    background-color: #0a0a18; /* Specific for travel page */
-    overflow: hidden; 
-    margin: 0; 
-    padding: 0; 
-    height: 100vh; 
-    position: relative; 
+/* Ensures index.html gets its specific darker background if not overridden by travel-page specific class */
+body:not(.travel-page-background) {
+    background-color: #121212;
 }
 
-/* General styles (used by both index.html and Travel.html) */
-.background-animation { /* Only used by index.html */
+
+.background-animation {
     position: fixed;
     top: 0;
     left: 0;
@@ -30,7 +26,7 @@ body.travel-page-background {
     background-color: transparent; 
 }
 
-.background-animation canvas { /* Only used by index.html */
+.background-animation canvas {
     display: block !important;
     position: absolute !important;
     top: 0 !important;
@@ -52,7 +48,6 @@ header {
     z-index: 10; 
     box-sizing: border-box;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    height: 60px; /* Explicit header height for calculations */
 }
 
 nav {
@@ -62,11 +57,10 @@ nav {
     width: 100%;
     max-width: 1600px;
     margin: 0 auto;
-    height: 100%; /* Ensure nav takes full header height for vertical alignment */
 }
 
-.nav-left { display: flex; margin-right: auto; align-items: center;}
-.nav-right { display: flex; margin-left: auto; align-items: center;}
+.nav-left { display: flex; margin-right: auto; }
+.nav-right { display: flex; margin-left: auto; }
 .nav-left .nav-button, .nav-right .nav-button {
     color: #F5F5F5; text-decoration: none; padding: 8px 15px; margin: 0 8px;
     border-radius: 5px; transition: all 0.3s ease; white-space: nowrap;
@@ -82,17 +76,13 @@ nav {
 }
 .nav-left .nav-button:hover::before, .nav-right .nav-button:hover::before { transform: translateY(0); }
 
-main { /* For index.html */
-    position: relative; 
-    padding-top: 80px; /* Header height + some space */
-    padding-bottom: 80px; /* Footer height + some space */
-    min-height: calc(100vh - 160px); 
-    z-index: 5; 
-    background-color: #121212; /* Ensure index page main has its distinct bg if body bg changes */
+/* Styles for main content area on index.html */
+main:not(.travel-main) { 
+    position: relative; padding-top: 80px; padding-bottom: 80px;
+    min-height: calc(100vh - 160px); z-index: 5; 
 }
 
-
-footer { /* For index.html */
+footer { 
     position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px 0;
     background-color: rgba(18, 18, 18, 0.00);
     backdrop-filter: blur(8.5px); 
@@ -103,7 +93,7 @@ footer { /* For index.html */
     box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.search-container input[type="text"] { /* For index.html */
+.search-container input[type="text"] { 
     width: 400px; padding: 12px 20px; border: 1px solid rgba(255,255,255,0.1);
     border-radius: 25px; background-color: rgba(18,18,18,0.5); color: #F5F5F5;
     font-size: 16px; outline: none; transition: all 0.3s ease; max-width: 90vw;
@@ -117,47 +107,56 @@ footer { /* For index.html */
 }
 
 @media (max-width: 768px) { 
-    main { padding-top: 70px; padding-bottom: 70px; min-height: calc(100vh - 140px); }
     nav { padding: 0 5px; }
     .nav-right { justify-content: flex-end; }
     .nav-left .nav-button, .nav-right .nav-button { padding: 6px 10px; margin: 0 3px; }
     .search-container input[type="text"] { width: 80vw; }
 }
 
-/* Styles specific to Travel Page */
+/* === Travel Page Specific Styles === */
+body.travel-page-background {
+    background-color: #0a0a18; /* Specific dark blue for travel page */
+    overflow: hidden; 
+    margin: 0; 
+    padding: 0; 
+    height: 100vh; 
+    position: relative; 
+}
+
 main.travel-main {
-    /* This main tag is primarily a semantic container for travel page content.
-       Sizing of the map area is handled by .map-outer-container now. */
-    padding: 0; /* Remove padding if map container is positioned absolutely */
-    height: 100vh; /* Ensure it can be a reference for absolute positioning if needed */
+    /* This main tag will effectively be a full-screen container for the map's outer box */
+    position: relative; /* Changed from absolute for simplicity if map-outer-container is absolute */
+    height: 100vh;
+    width: 100vw;
+    padding: 0; /* Remove padding if .map-outer-container handles it */
     box-sizing: border-box;
-    background-color: transparent; /* Should inherit from body.travel-page-background */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .map-outer-container {
-    position: absolute; 
-    top: calc(60px + 30px); /* Explicit header height (60px) + 30px top margin */
-    left: 30px;             /* 30px left margin */
-    right: 30px;            /* 30px right margin */
-    bottom: 30px;           /* 30px bottom margin */
-    max-width: 1800px; 
-    margin-left: auto; 
-    margin-right: auto; 
+    /* This container will be sized and centered */
+    width: calc(100% - 80px);  /* Increased side margins (was 40px total) making it ~10% smaller overall */
+    height: calc(100% - 60px - 80px); /* Header (60px) + top/bottom margins (40px each) */
+    /* max-width: 1600px; /* Adjusted max-width */
+    /* max-height: 900px; /* Optional max height */
     
-    padding: 25px; /* Increased padding to make inner map appear smaller */
-    border: 2px solid rgba(150, 150, 180, 0.4); /* Slightly more subtle border */
-    border-radius: 30px; /* Slightly larger radius */
-    background-color: rgba(20, 20, 40, 0.2); /* Slightly different bg for the padded area */
-    box-shadow: 0 0 20px rgba(0,0,0,0.35); 
+    padding: 15px; 
+    border: 2px solid rgba(150, 150, 180, 0.5); 
+    border-radius: 25px; 
+    background-color: rgba(10, 10, 24, 0.3); 
+    box-shadow: 0 0 15px rgba(0,0,0,0.3); 
     box-sizing: border-box;
-    display: flex; 
+    display: flex; /* To make #map fill this container */
+    margin-top: 60px; /* To push it below the fixed header */
 }
 
 #map { 
     flex-grow: 1; 
     height: 100%; 
     width: 100%; 
-    background-color: #0c0c1f; /* Darker "ocean" color, distinct from page bg */
-    border-radius: 20px; /* Rounded corners for the map div itself */
+    background-color: #0a0a18; /* Ocean color */
+    border-radius: 15px; 
     overflow: hidden; 
 }
