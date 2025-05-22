@@ -15,41 +15,168 @@
             </div>
             <div class="nav-right">
                 <a href="metrics.html" class="nav-button">Metrics</a> 
-                <a href="ideas.html" class="nav-button">Ideas</a>
+                <a href="ideas.html" class="nav-button">Ideas</a> 
                 <a href="travel.html" class="nav-button">Travel</a> 
             </div>
         </nav>
     </header>
 
     <main class="ideas-main-content">
+        <h1>Blog Categories</h1>
         <div class="category-grid">
-            <a href="category-personal.html" class="category-item">
+            <!-- Use data-category to identify which articles to load -->
+            <div class="category-item" data-category="personal" data-category-name="Personal Stories">
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
                 <p>Personal Stories</p>
-            </a>
-            <a href="category-ai.html" class="category-item">
-                <img src="iimages/folder-icon.svg" alt="Folder Icon" class="folder-icon">
+            </div>
+            <div class="category-item" data-category="ai" data-category-name="Artificial Intelligence">
+                <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
                 <p>Artificial Intelligence</p>
-            </a>
-            <a href="#" class="category-item category-undefined">
+            </div>
+            <div class="category-item category-undefined" data-category="cat3" data-category-name="Category 3">
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
-                <p>[undefined]</p>
-            </a>
-            <a href="#" class="category-item category-undefined">
+                <p>Category 3</p>
+            </div>
+            <div class="category-item category-undefined" data-category="cat4" data-category-name="Category 4">
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
-                <p>[undefined]</p>
-            </a>
-            <a href="#" class="category-item category-undefined">
+                <p>Category 4</p>
+            </div>
+            <div class="category-item category-undefined" data-category="cat5" data-category-name="Category 5">
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
-                <p>[undefined]</p>
-            </a>
-            <a href="#" class="category-item category-undefined">
+                <p>Category 5</p>
+            </div>
+            <div class="category-item category-undefined" data-category="cat6" data-category-name="Category 6">
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
-                <p>[undefined]</p>
-            </a>
+                <p>Category 6</p>
+            </div>
         </div>
     </main>
+
+    <!-- Modal Structure (Initially Hidden) -->
+    <div class="modal-overlay" id="categoryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalCategoryTitle">Category Articles</h2>
+                <button class="modal-close-button" id="modalCloseButton">×</button>
+            </div>
+            <div class="modal-body">
+                <ul class="modal-article-list" id="modalArticleList">
+                    <!-- Article links will be populated by JavaScript -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const categoryItems = document.querySelectorAll('.category-item');
+            const modalOverlay = document.getElementById('categoryModal');
+            const modalContent = modalOverlay.querySelector('.modal-content');
+            const modalCloseButton = document.getElementById('modalCloseButton');
+            const modalCategoryTitle = document.getElementById('modalCategoryTitle');
+            const modalArticleList = document.getElementById('modalArticleList');
+
+            // --- Dummy Article Data (Replace with your actual data source later) ---
+            // For now, links point to #, but should point to actual .html files
+            // e.g., 'blog/my-first-story.html'
+            const articlesByCategory = {
+                personal: [
+                    { title: "My Journey into Coding", date: "May 20, 2025", url: "blog/personal-journey.html" },
+                    { title: "Lessons Learned from Traveling Solo", date: "Apr 10, 2025", url: "#" }
+                ],
+                ai: [
+                    { title: "The Future of LLMs", date: "May 15, 2025", url: "blog/future-of-llms.html" },
+                    { title: "Understanding Vector Databases", date: "May 01, 2025", url: "#" },
+                    { title: "AI Ethics in Development", date: "Apr 20, 2025", url: "#" }
+                ],
+                cat3: [
+                    { title: "Topic 3 Article 1", date: "Jan 01, 2025", url: "#" }
+                ],
+                cat4: [], // Example of an empty category
+                cat5: [ { title: "Topic 5 Article 1", date: "Feb 01, 2025", url: "#" }],
+                cat6: [ { title: "Topic 6 Article 1", date: "Mar 01, 2025", url: "#" }]
+            };
+            // --- End Dummy Article Data ---
+
+            categoryItems.forEach(item => {
+                item.addEventListener('click', (event) => {
+                    event.preventDefault(); // Prevent default if it was an <a> tag before
+                    const category = item.dataset.category;
+                    const categoryName = item.dataset.categoryName || "Category"; // Fallback name
+                    const articles = articlesByCategory[category] || [];
+
+                    modalCategoryTitle.textContent = categoryName;
+                    modalArticleList.innerHTML = ''; // Clear previous articles
+
+                    if (articles.length === 0) {
+                        const li = document.createElement('li');
+                        li.textContent = 'No articles in this category yet.';
+                        modalArticleList.appendChild(li);
+                        // Animate this single item
+                        setTimeout(() => li.classList.add('show-item'), 50);
+                    } else {
+                        articles.forEach((article, index) => {
+                            const li = document.createElement('li');
+                            li.innerHTML = `
+                                <a href="${article.url}" class="article-title">${article.title}</a>
+                                <p class="article-date">${article.date}</p>
+                            `;
+                            modalArticleList.appendChild(li);
+                            // Sequential animation for list items
+                            setTimeout(() => {
+                                li.classList.add('show-item');
+                            }, index * 100 + 50); // Stagger animation, add initial delay
+                        });
+                    }
+
+                    // Animation: Expand from icon
+                    const iconRect = item.querySelector('.folder-icon').getBoundingClientRect();
+                    const modalStartLeft = iconRect.left + (iconRect.width / 2);
+                    const modalStartTop = iconRect.top + (iconRect.height / 2);
+                    
+                    modalContent.style.transformOrigin = `${modalStartLeft - modalOverlay.getBoundingClientRect().left}px ${modalStartTop - modalOverlay.getBoundingClientRect().top}px`;
+                    modalContent.style.transform = 'scale(0.1)'; // Start small, from where icon was
+                    modalContent.style.opacity = '0';
+                    
+                    modalOverlay.classList.add('visible');
+
+                    // Force reflow for transition to pick up initial scale(0.1) state
+                    // Then apply the final state for animation
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                             modalContent.style.transform = 'scale(1)';
+                             modalContent.style.opacity = '1';
+                        });
+                    });
+                });
+            });
+
+            function closeModal() {
+                // For reverse animation, get current center of modal for transform-origin
+                // This is a simplified reverse; true reverse to icon is harder if icon scrolled out of view
+                const modalRect = modalContent.getBoundingClientRect();
+                modalContent.style.transformOrigin = `${modalRect.width / 2}px ${modalRect.height / 2}px`;
+                
+                modalContent.style.transform = 'scale(0.5)'; // Shrink back
+                modalContent.style.opacity = '0';
+                
+                // Wait for modal content animation to finish before hiding overlay
+                modalOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    modalOverlay.classList.remove('visible');
+                }, 300); // Match opacity transition duration
+            }
+
+            modalCloseButton.addEventListener('click', closeModal);
+
+            // Close modal if overlay is clicked (outside content)
+            modalOverlay.addEventListener('click', (event) => {
+                if (event.target === modalOverlay) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+
 </body>
 </html>
-
-<!--bah -->
