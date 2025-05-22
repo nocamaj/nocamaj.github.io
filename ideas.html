@@ -24,7 +24,7 @@
     <main class="ideas-main-content">
         <h1>Blog Categories</h1>
         <div class="category-grid">
-            <!-- Use data-category to identify which articles to load -->
+            <!-- Added data-category-name for cleaner title fetching -->
             <div class="category-item" data-category="personal" data-category-name="Personal Stories">
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
                 <p>Personal Stories</p>
@@ -52,12 +52,12 @@
         </div>
     </main>
 
-    <!-- Modal Structure (Initially Hidden) -->
+    <!-- Modal Structure (Initially Hidden by CSS) -->
     <div class="modal-overlay" id="categoryModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="modalCategoryTitle">Category Articles</h2>
-                <button class="modal-close-button" id="modalCloseButton">×</button>
+                <button class="modal-close-button" id="modalCloseButton">×</button> <!-- Using × for a nicer X -->
             </div>
             <div class="modal-body">
                 <ul class="modal-article-list" id="modalArticleList">
@@ -77,43 +77,40 @@
             const modalArticleList = document.getElementById('modalArticleList');
 
             // --- Dummy Article Data (Replace with your actual data source later) ---
-            // For now, links point to #, but should point to actual .html files
-            // e.g., 'blog/my-first-story.html'
+            // Links should point to actual .html files, e.g., 'blog/my-first-story.html'
+            // Create a 'blog' subfolder for your posts.
             const articlesByCategory = {
                 personal: [
                     { title: "My Journey into Coding", date: "May 20, 2025", url: "blog/personal-journey.html" },
-                    { title: "Lessons Learned from Traveling Solo", date: "Apr 10, 2025", url: "#" }
+                    { title: "Lessons Learned from Traveling Solo", date: "Apr 10, 2025", url: "blog/travel-lessons.html" }
                 ],
                 ai: [
                     { title: "The Future of LLMs", date: "May 15, 2025", url: "blog/future-of-llms.html" },
-                    { title: "Understanding Vector Databases", date: "May 01, 2025", url: "#" },
-                    { title: "AI Ethics in Development", date: "Apr 20, 2025", url: "#" }
+                    { title: "Understanding Vector Databases", date: "May 01, 2025", url: "blog/vector-databases.html" },
+                    { title: "AI Ethics in Development", date: "Apr 20, 2025", url: "blog/ai-ethics.html" }
                 ],
-                cat3: [
-                    { title: "Topic 3 Article 1", date: "Jan 01, 2025", url: "#" }
-                ],
+                cat3: [ { title: "Topic 3 Article 1", date: "Jan 01, 2025", url: "#" } ],
                 cat4: [], // Example of an empty category
-                cat5: [ { title: "Topic 5 Article 1", date: "Feb 01, 2025", url: "#" }],
-                cat6: [ { title: "Topic 6 Article 1", date: "Mar 01, 2025", url: "#" }]
+                cat5: [ { title: "Topic 5 Article 1", date: "Feb 01, 2025", url: "#" } ],
+                cat6: [ { title: "Topic 6 Article 1", date: "Mar 01, 2025", url: "#" } ]
             };
             // --- End Dummy Article Data ---
 
             categoryItems.forEach(item => {
-                item.addEventListener('click', (event) => {
-                    event.preventDefault(); // Prevent default if it was an <a> tag before
+                // Changed from 'a' tag to 'div' so click doesn't try to navigate
+                item.addEventListener('click', () => { 
                     const category = item.dataset.category;
-                    const categoryName = item.dataset.categoryName || "Category"; // Fallback name
+                    const categoryName = item.dataset.categoryName || "Category"; 
                     const articles = articlesByCategory[category] || [];
 
                     modalCategoryTitle.textContent = categoryName;
-                    modalArticleList.innerHTML = ''; // Clear previous articles
+                    modalArticleList.innerHTML = ''; 
 
                     if (articles.length === 0) {
                         const li = document.createElement('li');
                         li.textContent = 'No articles in this category yet.';
                         modalArticleList.appendChild(li);
-                        // Animate this single item
-                        setTimeout(() => li.classList.add('show-item'), 50);
+                        setTimeout(() => li.classList.add('show-item'), 50); // Animate this single item
                     } else {
                         articles.forEach((article, index) => {
                             const li = document.createElement('li');
@@ -125,25 +122,29 @@
                             // Sequential animation for list items
                             setTimeout(() => {
                                 li.classList.add('show-item');
-                            }, index * 100 + 50); // Stagger animation, add initial delay
+                            }, index * 100 + 50); // Stagger animation
                         });
                     }
 
                     // Animation: Expand from icon
                     const iconRect = item.querySelector('.folder-icon').getBoundingClientRect();
-                    const modalStartLeft = iconRect.left + (iconRect.width / 2);
-                    const modalStartTop = iconRect.top + (iconRect.height / 2);
                     
-                    modalContent.style.transformOrigin = `${modalStartLeft - modalOverlay.getBoundingClientRect().left}px ${modalStartTop - modalOverlay.getBoundingClientRect().top}px`;
-                    modalContent.style.transform = 'scale(0.1)'; // Start small, from where icon was
+                    // Calculate the center of the icon relative to the viewport
+                    const iconCenterX = iconRect.left + iconRect.width / 2;
+                    const iconCenterY = iconRect.top + iconRect.height / 2;
+
+                    // Convert this to be relative to the modalOverlay for transform-origin
+                    // This assumes modalOverlay is fullscreen.
+                    modalContent.style.transformOrigin = `${iconCenterX}px ${iconCenterY}px`;
+                    modalContent.style.transform = 'scale(0.05)'; // Start very small, from where icon was
                     modalContent.style.opacity = '0';
                     
+                    modalOverlay.style.opacity = '0'; // Start overlay transparent for its own fade-in
                     modalOverlay.classList.add('visible');
-
-                    // Force reflow for transition to pick up initial scale(0.1) state
-                    // Then apply the final state for animation
-                    requestAnimationFrame(() => {
-                        requestAnimationFrame(() => {
+                    
+                    requestAnimationFrame(() => { // Ensure overlay starts its transition
+                        modalOverlay.style.opacity = '1'; 
+                        requestAnimationFrame(() => { // Then start modal content animation
                              modalContent.style.transform = 'scale(1)';
                              modalContent.style.opacity = '1';
                         });
@@ -152,26 +153,32 @@
             });
 
             function closeModal() {
-                // For reverse animation, get current center of modal for transform-origin
-                // This is a simplified reverse; true reverse to icon is harder if icon scrolled out of view
+                // Simple shrink and fade out for now. 
+                // Reverse animation to icon is more complex if page has scrolled.
                 const modalRect = modalContent.getBoundingClientRect();
-                modalContent.style.transformOrigin = `${modalRect.width / 2}px ${modalRect.height / 2}px`;
+                modalContent.style.transformOrigin = `${modalRect.width / 2}px ${modalRect.height / 2}px`; // Re-center origin for symmetrical shrink
                 
-                modalContent.style.transform = 'scale(0.5)'; // Shrink back
+                modalContent.style.transform = 'scale(0.5)'; 
                 modalContent.style.opacity = '0';
                 
-                // Wait for modal content animation to finish before hiding overlay
                 modalOverlay.style.opacity = '0';
                 setTimeout(() => {
                     modalOverlay.classList.remove('visible');
-                }, 300); // Match opacity transition duration
+                    // Reset transform and opacity for next open
+                    modalContent.style.transform = 'scale(0.5)'; 
+                    modalContent.style.opacity = '0';
+                }, 300); // Match CSS transition duration for opacity
             }
 
             modalCloseButton.addEventListener('click', closeModal);
-
-            // Close modal if overlay is clicked (outside content)
             modalOverlay.addEventListener('click', (event) => {
                 if (event.target === modalOverlay) {
+                    closeModal();
+                }
+            });
+            // Optional: Close modal with Escape key
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && modalOverlay.classList.contains('visible')) {
                     closeModal();
                 }
             });
