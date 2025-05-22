@@ -10,11 +10,9 @@
      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
      crossorigin=""/>
     
-    <!-- script.js (for ASCII animation) is NO LONGER included here -->
+    <!-- script.js is intentionally NOT here if ASCII background is removed from this page -->
 </head>
 <body class="travel-page-background"> 
-
-    <!-- Background Animation Div has been REMOVED -->
     
     <header>
         <nav>
@@ -22,9 +20,9 @@
                 <a href="index.html" class="nav-button">Home</a> 
             </div>
             <div class="nav-right">
-                <a href="#" class="nav-button">Metrics</a> 
-                <a href="#" class="nav-button">Ideas</a>   
-                <a href="travel.html" class="nav-button">Travel</a> 
+                <a href="metrics.html" class="nav-button">Metrics</a> 
+                <a href="ideas.html" class="nav-button">Ideas</a>   
+                <a href="travel.html" class="nav-button">Travel</a> {/* Current page */}
             </div>
         </nav>
     </header>
@@ -48,7 +46,7 @@
      crossorigin=""></script>
 
     <script>
-        // Map JavaScript (Leaflet) - This logic remains specific to the travel page
+        // Map JavaScript (Leaflet)
         const visitedCountriesISO_A2 = [
             "AT", "BZ", "BA", "CA", "CN", "HR", "GR", "HU", "IT", "MK", 
             "MX", "ME", "NL", "PE", "PL", "LC", "VC", "RS", "SK", "ES", "CH", 
