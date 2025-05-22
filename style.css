@@ -1,187 +1,181 @@
-/* ... (all existing styles for body, header, nav, footer, etc. remain the same) ... */
-
-/* === Ideas Page Specific Styles === */
-main.ideas-main-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center; 
-    padding-top: 80px; 
-    padding-bottom: 40px;
-    min-height: calc(100vh - 120px); 
-    box-sizing: border-box;
-    width: 100%; /* Ensure main content takes full width for centering category-grid */
-}
-
-main.ideas-main-content h1 {
-    margin-bottom: 40px;
-    font-size: 2.5em;
-    color: #F5F5F5;
-}
-
-.category-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(150px, 220px)); /* 3 columns, define min/max size */
-    gap: 40px; /* Increased gap */
-    max-width: 800px; 
-    width: 90%; 
-    margin: 20px auto; /* More margin and ensure centering */
-    padding: 20px;
-}
-
-.category-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    text-decoration: none; 
-    color: #F5F5F5;        
-    padding: 20px;
-    background-color: rgba(255, 255, 255, 0.03); 
-    border-radius: 10px;
-    transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
-    cursor: pointer; /* Indicate it's clickable */
-}
-
-.folder-icon {
-    width: 72px; /* Slightly larger icon */
-    height: 72px; 
-    margin-bottom: 15px;
-    object-fit: contain; 
-}
-
-.category-item p {
+body, html {
     margin: 0;
-    font-size: 1.1em;
-    font-weight: 500;
+    padding: 0;
+    height: 100%;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0a0a18; 
+    color: #F5F5F5; 
+    overflow: hidden; 
 }
 
-.category-item:hover, 
-.category-item:focus { 
-    color: #ADD8E6; 
-    transform: translateY(-3px);
-    background-color: rgba(173, 216, 230, 0.1); /* Subtle background on hover */
-}
-
-/* === Modal (Pop-up) Styles === */
-.modal-overlay {
+.background-animation { 
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent backdrop */
-    display: none; /* Hidden by default */
-    align-items: center;
-    justify-content: center;
-    z-index: 1000; /* Above everything else */
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
+    z-index: 1; 
+    overflow: hidden; 
+    pointer-events: none; 
+    background-color: transparent; 
 }
 
-.modal-overlay.visible {
-    display: flex; /* Show it */
-    opacity: 1;
+.background-animation canvas {
+    display: block !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
 }
 
-.modal-content {
-    background-color: #181825; /* Darker, distinct background for modal */
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    width: 80%;
-    max-width: 700px;
-    height: 70%;
-    max-height: 600px;
-    position: relative; /* For close button and transform origin */
-    opacity: 0;
-    transform: scale(0.5); /* Initial state for animation */
-    /* transform-origin will be set by JS */
-    transition: transform 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity 0.3s ease-in-out; /* cubic-bezier for "emerge" feel */
-    display: flex;
-    flex-direction: column;
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(18, 18, 18, 0.00); 
+    backdrop-filter: blur(8.5px);
+    -webkit-backdrop-filter: blur(8.5px);
+    padding: 15px 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    z-index: 10; 
+    box-sizing: border-box;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.modal-overlay.visible .modal-content {
-    opacity: 1;
-    transform: scale(1);
-}
-
-.modal-header {
+nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding-bottom: 15px;
+    width: 100%;
+    max-width: 1600px;
+    margin: 0 auto;
 }
 
-.modal-header h2 {
-    margin: 0;
-    font-size: 1.8em;
+.nav-left { display: flex; margin-right: auto; }
+.nav-right { display: flex; margin-left: auto; }
+.nav-left .nav-button, .nav-right .nav-button {
+    color: #F5F5F5; text-decoration: none; padding: 8px 15px; margin: 0 8px;
+    border-radius: 5px; transition: all 0.3s ease; white-space: nowrap;
+    letter-spacing: 0.5px; font-weight: 500; position: relative; overflow: hidden; z-index: 1;
+}
+.nav-left .nav-button::before, .nav-right .nav-button::before {
+    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(255, 255, 255, 0.1); transform: translateY(100%);
+    transition: transform 0.3s ease; z-index: -1; border-radius: 5px;
+}
+.nav-left .nav-button:hover, .nav-right .nav-button:hover {
+    color: #ffffff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+.nav-left .nav-button:hover::before, .nav-right .nav-button:hover::before { transform: translateY(0); }
+
+main:not(.travel-main) { 
+    position: relative; padding-top: 80px; padding-bottom: 80px;
+    min-height: calc(100vh - 160px); 
+    z-index: 5; 
+}
+
+footer { 
+    position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px 0;
+    background-color: rgba(18, 18, 18, 0.00);
+    backdrop-filter: blur(8.5px); 
+    -webkit-backdrop-filter: blur(8.5px);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 10; 
+    box-sizing: border-box;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.search-container input[type="text"] { 
+    width: 400px; padding: 12px 20px; border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 25px; background-color: rgba(18,18,18,0.5); color: #F5F5F5;
+    font-size: 16px; outline: none; transition: all 0.3s ease; max-width: 90vw;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15); backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+}
+.search-container input[type="text"]::placeholder { color: rgba(255,255,255,0.6); }
+.search-container input[type="text"]:focus {
+    border-color: rgba(255,255,255,0.3); box-shadow: 0 0 15px rgba(255,255,255,0.1);
+    background-color: rgba(26,26,26,0.7); transform: translateY(-2px);
+}
+
+@media (max-width: 768px) { 
+    nav { padding: 0 5px; }
+    .nav-right { justify-content: flex-end; }
+    .nav-left .nav-button, .nav-right .nav-button { padding: 6px 10px; margin: 0 3px; }
+    .search-container input[type="text"] { width: 80vw; }
+}
+
+/* === Travel Page Specific Styles === */
+body.travel-page-background {
+    overflow: hidden; 
+    margin: 0; 
+    padding: 0; 
+    height: 100vh; 
+}
+
+main.travel-main {
+    position: relative; 
+    height: 100vh;
+    width: 100vw;
+    padding: 0; 
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2; 
+}
+
+.map-outer-container {
+    width: calc(100% - 80px);  
+    height: calc(100vh - 60px - 80px); 
+    padding: 15px; 
+    border: 2px solid rgba(150, 150, 180, 0.5); 
+    border-radius: 25px; 
+    background-color: #0a0a18; /* Changed to normal page background color */
+    box-shadow: 0 0 15px rgba(0,0,0,0.3); 
+    box-sizing: border-box;
+    display: flex; 
+    margin-top: 60px; 
+    position: relative; 
+    z-index: 3; 
+}
+
+.map-legend {
+    flex: 0 0 180px; 
+    padding-right: 15px; 
+    box-sizing: border-box;
     color: #F5F5F5;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; 
+    padding-top: 10px; 
+    position: relative; 
+    z-index: 4; 
 }
 
-.modal-close-button {
-    background: none;
-    border: none;
-    color: #aaa;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-    padding: 0 5px;
-    line-height: 1;
-}
-.modal-close-button:hover {
-    color: #fff;
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
 }
 
-.modal-body {
-    overflow-y: auto; /* Scroll if many articles */
-    flex-grow: 1;
+.legend-color-box {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    border: 1px solid #555; 
 }
 
-.modal-article-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.modal-article-list li {
-    padding: 10px 5px;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
-    opacity: 0; /* Initial state for loading animation */
-    transform: translateY(15px); /* Initial state for loading animation */
-    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
-}
-
-.modal-article-list li:last-child {
-    border-bottom: none;
-}
-
-.modal-article-list li.show-item {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.modal-article-list .article-title {
-    font-size: 1.2em;
-    color: #ADD8E6; /* Link color inside modal */
-    text-decoration: none;
-    display: block;
-    margin-bottom: 4px;
-}
-.modal-article-list .article-title:hover {
-    text-decoration: underline;
-    color: #cceeff;
-}
-
-.modal-article-list .article-date {
-    font-size: 0.9em;
-    color: #888;
-    margin: 0;
-}
-
-/* General page background class for consistent main content padding */
-body.page-background main {
-    padding-top: 80px; /* Ensure content starts below header */
+#map { 
+    flex-grow: 1; 
+    height: 100%; 
+    width: 100%; 
+    background-color: #121f3a; /* Lighter blue ocean color */
+    border-radius: 15px; 
+    overflow: hidden; 
+    position: relative; 
+    z-index: 3; 
 }
