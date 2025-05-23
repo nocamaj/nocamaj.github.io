@@ -195,9 +195,9 @@ main.ideas-main-content {
 
 .category-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(180px, 1fr)); /* Adjusted min for new icon size */
-    gap: 35px; /* Adjusted gap */
-    max-width: 850px; /* Adjusted max width slightly */
+    grid-template-columns: repeat(3, minmax(180px, 1fr)); 
+    gap: 35px; 
+    max-width: 850px; 
     width: 90%; 
     margin: 0 auto; 
 }
@@ -219,23 +219,23 @@ main.ideas-main-content {
 }
 
 .folder-icon {
-    width: 150px; /* Changed to 150px */
-    height: 150px; /* Changed to 150px */
-    margin-bottom: 12px; /* Adjusted space for lines */
+    width: 150px; 
+    height: 150px; 
+    margin-bottom: 12px; 
     object-fit: contain; 
     transition: transform 0.3s ease; 
 }
 
 .category-item .title-container {
     position: relative; 
-    padding: 2px 6px; /* Padding around text: vertical horizontal */
+    padding: 4px 12px; /* Increased horizontal padding for more x-axis space for lines */
     display: inline-block; 
 }
 
 .category-item p {
     margin: 0;
     font-size: 0.9em; 
-    font-weight: 500; /* Back to 500 for a bit more presence */
+    font-weight: 500; 
     color: #b0b0b0; 
     transition: color 0.3s ease;
     position: relative; 
@@ -247,26 +247,24 @@ main.ideas-main-content {
     position: absolute;
     background-color: #ADD8E6; 
     opacity: 0;
-    transition: opacity 0.2s ease, width 0.2s ease, height 0.2s ease; /* Smoother transition */
-    z-index: 0; /* Behind the text */
+    transition: opacity 0.2s ease, width 0.2s ease, height 0.2s ease; 
+    z-index: 0; 
 }
 
-/* Horizontal lines */
 .title-container .tl-h, .title-container .tr-h,
 .title-container .bl-h, .title-container .br-h { height: 2px; width: 0; }
-/* Vertical lines */
 .title-container .tl-v, .title-container .tr-v,
 .title-container .bl-v, .title-container .br-v { width: 2px; height: 0; }
 
-/* Positioning each line segment */
-.title-container .tl-h { top: -2px; left: -2px; transform-origin: left; } /* Extend slightly past text box */
-.title-container .tl-v { top: -2px; left: -2px; transform-origin: top; }
-.title-container .tr-h { top: -2px; right: -2px; transform-origin: right; }
-.title-container .tr-v { top: -2px; right: -2px; transform-origin: top; }
-.title-container .bl-h { bottom: -2px; left: -2px; transform-origin: left; }
-.title-container .bl-v { bottom: -2px; left: -2px; transform-origin: bottom; }
-.title-container .br-h { bottom: -2px; right: -2px; transform-origin: right; }
-.title-container .br-v { bottom: -2px; right: -2px; transform-origin: bottom; }
+/* Positioning each line segment - adjust -4px to increase x-axis gap */
+.title-container .tl-h { top: -2px; left: -4px; transform-origin: left; } 
+.title-container .tl-v { top: -2px; left: -4px; transform-origin: top; }  /* Pushed further left */
+.title-container .tr-h { top: -2px; right: -4px; transform-origin: right; }
+.title-container .tr-v { top: -2px; right: -4px; transform-origin: top; } /* Pushed further right */
+.title-container .bl-h { bottom: -2px; left: -4px; transform-origin: left; }
+.title-container .bl-v { bottom: -2px; left: -4px; transform-origin: bottom; }/* Pushed further left */
+.title-container .br-h { bottom: -2px; right: -4px; transform-origin: right; }
+.title-container .br-v { bottom: -2px; right: -4px; transform-origin: bottom; }/* Pushed further right */
 
 
 /* Hover state for category item */
@@ -279,69 +277,45 @@ main.ideas-main-content {
 .category-item:hover .corner-line {
     opacity: 1;
 }
-/* Define lengths of lines on hover */
+/* Define FIXED lengths of lines on hover */
 .category-item:hover .tl-h, .category-item:hover .tr-h, 
-.category-item:hover .bl-h, .category-item:hover .br-h { width: 25%; } /* Shorter horizontal lines */
+.category-item:hover .bl-h, .category-item:hover .br-h { width: 15px; } /* Fixed horizontal length */
 
 .category-item:hover .tl-v, .category-item:hover .tr-v,
-.category-item:hover .bl-v, .category-item:hover .br-v { height: 50%; } /* Vertical line length */
+.category-item:hover .bl-v, .category-item:hover .br-v { height: 10px; } /* Fixed vertical length */
 
 
 /* === Modal Styles === */
-.modal-overlay { 
+.modal-overlay { /* ... existing overlay styles ... */
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.0); /* Removed darkening, only blur */
-    backdrop-filter: blur(4px); /* Reduced blur by ~50% (was 8px) */
-    -webkit-backdrop-filter: blur(4px);
+    background-color: rgba(0, 0, 0, 0.0); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
     display: flex; align-items: center; justify-content: center; z-index: 1000; 
     opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s;
 }
 .modal-overlay.visible { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s linear 0s; }
 
-.modal-content {
-    background-color: #141622; /* Slightly adjusted for depth */
-    padding: 0; 
-    border-radius: 0px; 
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); 
-    /* Make modal slightly wider and taller than the grid area */
-    width: 90%; /* Was 75% */
-    max-width: 950px; /* Was 800px, to ensure it covers grid */
-    height: 80vh; /* Use vh for height to make it relative to screen */
-    max-height: 700px; /* Example max height */
-    display: flex; 
-    flex-direction: column;
-    position: relative;
-    transform: scale(0.5); 
-    opacity: 0;
-    transition: transform 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.20), opacity 0.25s ease-out; 
+.modal-content { /* ... existing modal content styles ... */
+    background-color: #141622; padding: 0; border-radius: 0px; 
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5); width: 90%; max-width: 950px; 
+    height: 80vh; max-height: 700px; display: flex; flex-direction: column;
+    position: relative; transform: scale(0.5); opacity: 0;
+    transition: transform 0.35s cubic-bezier(0.18,0.89,0.32,1.20), opacity 0.25s ease-out; 
     transform-origin: center center; 
 }
 .modal-overlay.visible .modal-content { transform: scale(1); opacity: 1; }
 
-.modal-header { 
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 20px; /* Adjusted padding */
-    background-color: #1c1e2c; 
-    border-bottom: 1px solid #2a2d3c; 
+.modal-header { /* ... existing modal header styles ... */
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 20px; background-color: #1c1e2c; border-bottom: 1px solid #2a2d3c; 
 }
 
-.modal-title-bar { 
-    font-size: 0.9em; /* Slightly smaller */
-    color: #b0b0cc;   /* Consistent with column headers */
-    font-weight: 400; /* Not bold */
+.modal-title-bar { /* ... existing title bar styles ... */
+    font-size: 0.9em; color: #b0b0cc; font-weight: 400; 
 }
-.modal-title-bar .path-separator {
-    margin: 0 8px; /* Space around arrow */
-    color: #707090; /* Dimmer color for arrow */
-}
-.modal-title-bar .category-name-in-title {
-    color: #E0E0FF; 
-    font-weight: 400; /* Not bold */
-}
+.modal-title-bar .path-separator { margin: 0 8px; color: #707090; }
+.modal-title-bar .category-name-in-title { color: #E0E0FF; font-weight: 400; }
 
-.modal-close-button { 
+.modal-close-button { /* ... existing close button styles ... */
     background: none; border: none; font-size: 1.8em; 
     color: #AAAAAA; cursor: pointer; padding: 0 5px; line-height: 1;
     transition: color 0.2s ease;
@@ -351,33 +325,31 @@ main.ideas-main-content {
 .modal-column-headers {
     display: flex;
     padding: 10px 20px;
-    background-color: #181a28; /* Slightly different for distinction */
+    background-color: #181a28; 
     border-bottom: 1px solid #2a2d3c;
-    font-size: 0.85em; /* Smaller column headers */
-    color: #9090b0;    /* Dimmer text for headers */
-    font-weight: 500;  /* Less bold */
-    text-align: left; /* Ensure left alignment */
+    font-size: 0.85em; 
+    color: #9090b0;    
+    font-weight: 500;  
+    text-align: left; 
 }
 .modal-column-headers .col-icon { flex: 0 0 40px; }
 .modal-column-headers .col-name { flex-grow: 1; padding-right: 10px; }
-.modal-column-headers .col-date { flex: 0 0 100px; text-align: left; padding-right: 10px;} /* Adjusted width and alignment */
-.modal-column-headers .col-separator {
-    color: #404060; /* Color for separator lines */
-    padding: 0 5px;
-}
+.modal-column-headers .col-separator { color: #404060; padding: 0 5px; }
+.modal-column-headers .col-date { flex: 0 0 100px; text-align: left; padding-right: 10px;} 
+.modal-column-headers .col-revised { flex: 0 0 100px; text-align: left; } /* New Revised Column Header */
 
 
 .modal-body {
     overflow-y: auto; 
-    padding: 0; /* Remove padding, li will handle it */
+    padding: 0; 
 }
 
 .modal-article-list { list-style: none; padding: 0; margin: 0; }
 .modal-article-list li {
     display: flex; 
     align-items: center;
-    padding: 12px 20px; /* Padding now on li */
-    border-bottom: 1px solid rgba(255,255,255,0.05); /* Softer line */
+    padding: 12px 20px; 
+    border-bottom: 1px solid rgba(255,255,255,0.05); 
     opacity: 0; 
     transform: translateY(20px); 
     transition: opacity 0.4s ease-out, transform 0.4s ease-out;
@@ -386,25 +358,29 @@ main.ideas-main-content {
 .modal-article-list li.show-item { opacity: 1; transform: translateY(0); }
 
 .modal-article-list .article-icon {
-    width: 20px; /* Smaller article icon */
+    width: 20px; 
     height: 20px;
-    margin-right: 12px; /* Adjusted margin */
+    margin-right: 12px; 
     object-fit: contain;
-    filter: invert(70%) sepia(10%) saturate(100%) hue-rotate(180deg) brightness(100%) contrast(90%); /* Subtler icon color */
+    filter: invert(70%) sepia(10%) saturate(100%) hue-rotate(180deg) brightness(100%) contrast(90%); 
 }
 
 .modal-article-list .article-info { flex-grow: 1; }
 .modal-article-list .article-title { 
     font-size: 1.05em; 
-    color: #C8C8E0; /* Slightly different link color */
-    text-decoration: none; display: block;
+    color: #C8C8E0; text-decoration: none; display: block;
     margin-bottom: 2px; transition: color 0.2s ease;
 }
 .modal-article-list .article-title:hover { color: #E8E8FF; }
 .modal-article-list .article-date { 
     font-size: 0.8em; color: #8888A0; margin: 0; 
-    text-align: left; flex: 0 0 100px; /* Ensure date column aligns */
+    text-align: left; flex: 0 0 100px; 
 }
+.modal-article-list .article-revised { /* New Style for Revised Date */
+    font-size: 0.8em; color: #8888A0; margin: 0; 
+    text-align: left; flex: 0 0 100px; 
+}
+
 
 /* General page background class */
 body.page-background main { padding-top: 80px; }

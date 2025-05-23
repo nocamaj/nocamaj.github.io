@@ -44,42 +44,42 @@
                     <span class="corner-line br-h"></span><span class="corner-line br-v"></span>
                 </div>
             </div>
-            <div class="category-item category-undefined" data-category="cat3" data-category-name="undefined"> <!-- Uncapitalized -->
+            <div class="category-item category-undefined" data-category="cat3" data-category-name="undefined">
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
                 <div class="title-container">
                     <span class="corner-line tl-h"></span><span class="corner-line tl-v"></span>
                     <span class="corner-line tr-h"></span><span class="corner-line tr-v"></span>
-                    <p>undefined</p> <!-- Uncapitalized -->
+                    <p>undefined</p>
                     <span class="corner-line bl-h"></span><span class="corner-line bl-v"></span>
                     <span class="corner-line br-h"></span><span class="corner-line br-v"></span>
                 </div>
             </div>
-            <div class="category-item category-undefined" data-category="cat4" data-category-name="undefined"> <!-- Uncapitalized -->
+            <div class="category-item category-undefined" data-category="cat4" data-category-name="undefined">
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
                 <div class="title-container">
                     <span class="corner-line tl-h"></span><span class="corner-line tl-v"></span>
                     <span class="corner-line tr-h"></span><span class="corner-line tr-v"></span>
-                    <p>undefined</p> <!-- Uncapitalized -->
+                    <p>undefined</p>
                     <span class="corner-line bl-h"></span><span class="corner-line bl-v"></span>
                     <span class="corner-line br-h"></span><span class="corner-line br-v"></span>
                 </div>
             </div>
-            <div class="category-item category-undefined" data-category="cat5" data-category-name="undefined"> <!-- Uncapitalized -->
+            <div class="category-item category-undefined" data-category="cat5" data-category-name="undefined">
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
                 <div class="title-container">
                     <span class="corner-line tl-h"></span><span class="corner-line tl-v"></span>
                     <span class="corner-line tr-h"></span><span class="corner-line tr-v"></span>
-                    <p>undefined</p> <!-- Uncapitalized -->
+                    <p>undefined</p>
                     <span class="corner-line bl-h"></span><span class="corner-line bl-v"></span>
                     <span class="corner-line br-h"></span><span class="corner-line br-v"></span>
                 </div>
             </div>
-            <div class="category-item category-undefined" data-category="cat6" data-category-name="undefined"> <!-- Uncapitalized -->
+            <div class="category-item category-undefined" data-category="cat6" data-category-name="undefined">
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
                 <div class="title-container">
                     <span class="corner-line tl-h"></span><span class="corner-line tl-v"></span>
                     <span class="corner-line tr-h"></span><span class="corner-line tr-v"></span>
-                    <p>undefined</p> <!-- Uncapitalized -->
+                    <p>undefined</p>
                     <span class="corner-line bl-h"></span><span class="corner-line bl-v"></span>
                     <span class="corner-line br-h"></span><span class="corner-line br-v"></span>
                 </div>
@@ -97,11 +97,12 @@
                 <button class="modal-close-button" id="modalCloseButton">×</button>
             </div>
             <div class="modal-column-headers">
-                <div class="col-icon"> <!-- Icon column header (empty) --> </div>
+                <div class="col-icon"> <!-- Icon column header --> </div>
                 <div class="col-name">Name</div>
                 <span class="col-separator">|</span>
                 <div class="col-date">Date</div>
-                 <!-- Removed "Category" column as it's in the title bar -->
+                <span class="col-separator">|</span>
+                <div class="col-revised">Revised</div>
             </div>
             <div class="modal-body">
                 <ul class="modal-article-list" id="modalArticleList">
@@ -115,53 +116,64 @@
         document.addEventListener('DOMContentLoaded', () => {
             const categoryItems = document.querySelectorAll('.category-item');
             const modalOverlay = document.getElementById('categoryModal');
+            // ... (rest of modal element selections as before) ...
             const modalContent = modalOverlay.querySelector('.modal-content');
             const modalCloseButton = document.getElementById('modalCloseButton');
             const modalBreadcrumbCategoryName = document.getElementById('modalCategoryName');
             const modalArticleList = document.getElementById('modalArticleList');
 
-            const articlesByCategory = { /* ... Same article data as before ... */
-                personal: [ { title: "My Journey into Coding", date: "May 20, 2025", url: "blog/personal-journey.html" }, { title: "Lessons Learned from Traveling Solo", date: "Apr 10, 2025", url: "blog/travel-lessons.html" } ],
-                ai: [ { title: "The Future of LLMs", date: "May 15, 2025", url: "blog/future-of-llms.html" }, { title: "Understanding Vector Databases", date: "May 01, 2025", url: "blog/vector-databases.html" }, { title: "AI Ethics in Development", date: "Apr 20, 2025", url: "blog/ai-ethics.html" } ],
-                cat3: [ { title: "Topic 3 Article 1", date: "Jan 01, 2025", url: "#" } ], cat4: [], 
-                cat5: [ { title: "Topic 5 Article 1", date: "Feb 01, 2025", url: "#" } ], cat6: [ { title: "Topic 6 Article 1", date: "Mar 01, 2025", url: "#" } ]
+
+            const articlesByCategory = {
+                personal: [
+                    // Add a 'revised' property, can be null or a date string
+                    { title: "My Journey into Coding", date: "May 20, 2025", url: "blog/personal-journey.html", revised: null },
+                    { title: "Lessons Learned from Traveling Solo", date: "Apr 10, 2025", url: "blog/travel-lessons.html", revised: "May 05, 2025" }
+                ],
+                ai: [
+                    { title: "The Future of LLMs", date: "May 15, 2025", url: "blog/future-of-llms.html", revised: null },
+                    { title: "Understanding Vector Databases", date: "May 01, 2025", url: "blog/vector-databases.html", revised: null },
+                    { title: "AI Ethics in Development", date: "Apr 20, 2025", url: "blog/ai-ethics.html", revised: "May 10, 2025" }
+                ],
+                cat3: [ { title: "Topic 3 Article 1", date: "Jan 01, 2025", url: "#", revised: null } ],
+                cat4: [], 
+                cat5: [ { title: "Topic 5 Article 1", date: "Feb 01, 2025", url: "#", revised: null } ],
+                cat6: [ { title: "Topic 6 Article 1", date: "Mar 01, 2025", url: "#", revised: null } ]
             };
 
             categoryItems.forEach(item => {
                 item.addEventListener('click', () => { 
                     const category = item.dataset.category;
-                    // Use the text from the <p> tag directly for the category name in the modal
                     const categoryName = item.querySelector('p').textContent || "Category"; 
                     const articles = articlesByCategory[category] || [];
 
                     modalBreadcrumbCategoryName.textContent = categoryName;
                     modalArticleList.innerHTML = ''; 
 
-                    if (articles.length === 0) {
+                    if (articles.length === 0) { /* ... no articles message ... */
                         const li = document.createElement('li');
-                        li.style.textAlign = 'center'; 
-                        li.style.padding = '20px 0';
+                        li.style.textAlign = 'center'; li.style.padding = '20px 0';
                         li.textContent = 'No articles in this category yet.';
                         modalArticleList.appendChild(li);
                         setTimeout(() => li.classList.add('show-item'), 50);
                     } else {
                         articles.forEach((article, index) => {
                             const li = document.createElement('li');
+                            const revisedDate = article.revised ? article.revised : 'X'; // Show 'X' if no revised date
                             li.innerHTML = `
                                 <img src="images/folder-icon.svg" alt="Article" class="article-icon">
                                 <div class="article-info">
                                     <a href="${article.url}" class="article-title">${article.title}</a>
                                 </div>
                                 <p class="article-date">${article.date}</p>
-                            `;
+                                <p class="article-revised">${revisedDate}</p> 
+                            `; // Added revisedDate
                             modalArticleList.appendChild(li);
-                            // Increased stagger and initial delay for more distinct loading
                             setTimeout(() => {
                                 li.classList.add('show-item');
                             }, index * 250 + 150); 
                         });
                     }
-
+                    // ... (rest of modal open animation logic as before) ...
                     const iconRect = item.querySelector('.folder-icon').getBoundingClientRect();
                     const iconCenterX = iconRect.left + iconRect.width / 2;
                     const iconCenterY = iconRect.top + iconRect.height / 2;
