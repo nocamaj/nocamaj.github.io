@@ -195,9 +195,9 @@ main.ideas-main-content {
 
 .category-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(200px, 1fr)); /* Adjusted min for new icon size */
-    gap: 40px; /* Was 20px, increased slightly for larger icons */
-    max-width: 900px; 
+    grid-template-columns: repeat(3, minmax(180px, 1fr)); /* Adjusted min for new icon size */
+    gap: 35px; /* Adjusted gap */
+    max-width: 850px; /* Adjusted max width slightly */
     width: 90%; 
     margin: 0 auto; 
 }
@@ -213,91 +213,102 @@ main.ideas-main-content {
     background-color: transparent; 
     border-radius: 0;          
     border: none;              
-    transition: transform 0.2s ease; /* Only transform for the item itself */
+    transition: transform 0.2s ease; 
     cursor: pointer; 
-    position: relative; /* For positioning hover effects if needed on the item itself */
+    position: relative; 
 }
 
 .folder-icon {
-    width: 170px; /* Changed to 170px */
-    height: 170px; /* Changed to 170px */
-    margin-bottom: 15px; /* Increased space slightly for corner lines */
+    width: 150px; /* Changed to 150px */
+    height: 150px; /* Changed to 150px */
+    margin-bottom: 12px; /* Adjusted space for lines */
     object-fit: contain; 
-    transition: transform 0.3s ease; /* For subtle icon movement on hover */
+    transition: transform 0.3s ease; 
 }
 
 .category-item .title-container {
-    position: relative; /* Parent for corner lines */
-    padding: 5px 10px; /* Padding around the text for lines to wrap */
-    display: inline-block; /* So it only takes width of text */
+    position: relative; 
+    padding: 2px 6px; /* Padding around text: vertical horizontal */
+    display: inline-block; 
 }
 
-.category-item p { /* This is the folder title text */
+.category-item p {
     margin: 0;
     font-size: 0.9em; 
-    font-weight: 500; /* Slightly bolder than previous */
+    font-weight: 500; /* Back to 500 for a bit more presence */
     color: #b0b0b0; 
     transition: color 0.3s ease;
-    position: relative; /* To ensure text is above pseudo-elements if they overlap */
+    position: relative; 
     z-index: 1;
 }
 
 /* Corner lines for hover effect */
 .title-container .corner-line {
     position: absolute;
-    background-color: #ADD8E6; /* Misty/Powdery Blue */
+    background-color: #ADD8E6; 
     opacity: 0;
-    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition: opacity 0.2s ease, width 0.2s ease, height 0.2s ease; /* Smoother transition */
+    z-index: 0; /* Behind the text */
 }
-/* Top-left */
-.title-container .tl-h { top: 0; left: 0; width: 0; height: 2px; transform-origin: left; transform: scaleX(0); }
-.title-container .tl-v { top: 0; left: 0; width: 2px; height: 0; transform-origin: top; transform: scaleY(0); }
-/* Top-right */
-.title-container .tr-h { top: 0; right: 0; width: 0; height: 2px; transform-origin: right; transform: scaleX(0); }
-.title-container .tr-v { top: 0; right: 0; width: 2px; height: 0; transform-origin: top; transform: scaleY(0); }
-/* Bottom-left */
-.title-container .bl-h { bottom: 0; left: 0; width: 0; height: 2px; transform-origin: left; transform: scaleX(0); }
-.title-container .bl-v { bottom: 0; left: 0; width: 2px; height: 0; transform-origin: bottom; transform: scaleY(0); }
-/* Bottom-right */
-.title-container .br-h { bottom: 0; right: 0; width: 0; height: 2px; transform-origin: right; transform: scaleX(0); }
-.title-container .br-v { bottom: 0; right: 0; width: 2px; height: 0; transform-origin: bottom; transform: scaleY(0); }
+
+/* Horizontal lines */
+.title-container .tl-h, .title-container .tr-h,
+.title-container .bl-h, .title-container .br-h { height: 2px; width: 0; }
+/* Vertical lines */
+.title-container .tl-v, .title-container .tr-v,
+.title-container .bl-v, .title-container .br-v { width: 2px; height: 0; }
+
+/* Positioning each line segment */
+.title-container .tl-h { top: -2px; left: -2px; transform-origin: left; } /* Extend slightly past text box */
+.title-container .tl-v { top: -2px; left: -2px; transform-origin: top; }
+.title-container .tr-h { top: -2px; right: -2px; transform-origin: right; }
+.title-container .tr-v { top: -2px; right: -2px; transform-origin: top; }
+.title-container .bl-h { bottom: -2px; left: -2px; transform-origin: left; }
+.title-container .bl-v { bottom: -2px; left: -2px; transform-origin: bottom; }
+.title-container .br-h { bottom: -2px; right: -2px; transform-origin: right; }
+.title-container .br-v { bottom: -2px; right: -2px; transform-origin: bottom; }
+
 
 /* Hover state for category item */
 .category-item:hover .folder-icon {
-    transform: scale(1.05); /* Slight zoom on icon */
+    transform: scale(1.03); 
 }
 .category-item:hover p { 
     color: #ADD8E6; 
 }
 .category-item:hover .corner-line {
     opacity: 1;
-    transform: scaleX(1) scaleY(1); /* Full scale */
 }
+/* Define lengths of lines on hover */
 .category-item:hover .tl-h, .category-item:hover .tr-h, 
-.category-item:hover .bl-h, .category-item:hover .br-h { width: 30%; } /* Adjust line length */
+.category-item:hover .bl-h, .category-item:hover .br-h { width: 25%; } /* Shorter horizontal lines */
+
 .category-item:hover .tl-v, .category-item:hover .tr-v,
-.category-item:hover .bl-v, .category-item:hover .br-v { height: 60%; } /* Adjust line length */
+.category-item:hover .bl-v, .category-item:hover .br-v { height: 50%; } /* Vertical line length */
 
 
 /* === Modal Styles === */
-.modal-overlay { /* ... existing overlay styles ... */
+.modal-overlay { 
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.75); /* Slightly darker overlay */
-    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); /* Stronger blur */
+    background-color: rgba(0, 0, 0, 0.0); /* Removed darkening, only blur */
+    backdrop-filter: blur(4px); /* Reduced blur by ~50% (was 8px) */
+    -webkit-backdrop-filter: blur(4px);
     display: flex; align-items: center; justify-content: center; z-index: 1000; 
     opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s;
 }
 .modal-overlay.visible { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s linear 0s; }
 
 .modal-content {
-    background-color: #10121c; /* Darker, consistent with your visual */
-    padding: 0; /* Padding will be handled by inner elements */
-    border-radius: 0px; /* Hard corners */
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); /* More prominent shadow */
-    width: 75%;
-    max-width: 800px; /* Max width for modal */
-    max-height: 70vh; /* Max height */
-    display: flex; /* Use flex for header, column-headers, body structure */
+    background-color: #141622; /* Slightly adjusted for depth */
+    padding: 0; 
+    border-radius: 0px; 
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); 
+    /* Make modal slightly wider and taller than the grid area */
+    width: 90%; /* Was 75% */
+    max-width: 950px; /* Was 800px, to ensure it covers grid */
+    height: 80vh; /* Use vh for height to make it relative to screen */
+    max-height: 700px; /* Example max height */
+    display: flex; 
     flex-direction: column;
     position: relative;
     transform: scale(0.5); 
@@ -307,27 +318,31 @@ main.ideas-main-content {
 }
 .modal-overlay.visible .modal-content { transform: scale(1); opacity: 1; }
 
-.modal-header { /* This is now the title bar */
+.modal-header { 
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
-    background-color: #1c1e2c; /* Slightly different color for title bar */
-    border-bottom: 1px solid #2a2d3c; /* Separator line */
+    padding: 12px 20px; /* Adjusted padding */
+    background-color: #1c1e2c; 
+    border-bottom: 1px solid #2a2d3c; 
 }
 
-.modal-title-bar { /* For "Ideas > Folder Name" */
-    font-size: 0.95em;
-    color: #a0a0c0;
-    font-weight: 500;
+.modal-title-bar { 
+    font-size: 0.9em; /* Slightly smaller */
+    color: #b0b0cc;   /* Consistent with column headers */
+    font-weight: 400; /* Not bold */
+}
+.modal-title-bar .path-separator {
+    margin: 0 8px; /* Space around arrow */
+    color: #707090; /* Dimmer color for arrow */
 }
 .modal-title-bar .category-name-in-title {
-    color: #E0E0FF; /* Highlight current folder name */
-    font-weight: 600;
+    color: #E0E0FF; 
+    font-weight: 400; /* Not bold */
 }
 
-.modal-close-button { /* ... existing close button styles ... */
-    background: none; border: none; font-size: 1.8em; /* Slightly smaller */
+.modal-close-button { 
+    background: none; border: none; font-size: 1.8em; 
     color: #AAAAAA; cursor: pointer; padding: 0 5px; line-height: 1;
     transition: color 0.2s ease;
 }
@@ -336,52 +351,60 @@ main.ideas-main-content {
 .modal-column-headers {
     display: flex;
     padding: 10px 20px;
-    background-color: #161826; /* Background for header row */
+    background-color: #181a28; /* Slightly different for distinction */
     border-bottom: 1px solid #2a2d3c;
-    font-size: 0.9em;
-    color: #b0b0cc;
-    font-weight: 600;
+    font-size: 0.85em; /* Smaller column headers */
+    color: #9090b0;    /* Dimmer text for headers */
+    font-weight: 500;  /* Less bold */
+    text-align: left; /* Ensure left alignment */
 }
-.modal-column-headers .col-icon { flex: 0 0 40px; /* Space for icon */ }
-.modal-column-headers .col-name { flex-grow: 1; }
-.modal-column-headers .col-date { flex: 0 0 120px; text-align: right; } /* Fixed width for date */
+.modal-column-headers .col-icon { flex: 0 0 40px; }
+.modal-column-headers .col-name { flex-grow: 1; padding-right: 10px; }
+.modal-column-headers .col-date { flex: 0 0 100px; text-align: left; padding-right: 10px;} /* Adjusted width and alignment */
+.modal-column-headers .col-separator {
+    color: #404060; /* Color for separator lines */
+    padding: 0 5px;
+}
+
 
 .modal-body {
-    overflow-y: auto; /* Scroll for article list if it's long */
-    padding: 0 20px; /* Padding for the list items */
+    overflow-y: auto; 
+    padding: 0; /* Remove padding, li will handle it */
 }
 
 .modal-article-list { list-style: none; padding: 0; margin: 0; }
 .modal-article-list li {
-    display: flex; /* For icon, title, date alignment */
+    display: flex; 
     align-items: center;
-    padding: 15px 0; /* Increased padding */
-    border-bottom: 1px solid rgba(255,255,255,0.07);
+    padding: 12px 20px; /* Padding now on li */
+    border-bottom: 1px solid rgba(255,255,255,0.05); /* Softer line */
     opacity: 0; 
-    transform: translateY(20px); /* Start further down for more distinct load */
+    transform: translateY(20px); 
     transition: opacity 0.4s ease-out, transform 0.4s ease-out;
 }
 .modal-article-list li:last-child { border-bottom: none; }
 .modal-article-list li.show-item { opacity: 1; transform: translateY(0); }
 
 .modal-article-list .article-icon {
-    width: 24px; /* Size for article icon */
-    height: 24px;
-    margin-right: 15px;
+    width: 20px; /* Smaller article icon */
+    height: 20px;
+    margin-right: 12px; /* Adjusted margin */
     object-fit: contain;
-    /* filter: invert(80%) sepia(20%) saturate(100%) hue-rotate(180deg) brightness(100%) contrast(80%); */ /* Example to make it look like a file icon */
+    filter: invert(70%) sepia(10%) saturate(100%) hue-rotate(180deg) brightness(100%) contrast(90%); /* Subtler icon color */
 }
 
-.modal-article-list .article-info {
-    flex-grow: 1;
-}
+.modal-article-list .article-info { flex-grow: 1; }
 .modal-article-list .article-title { 
-    font-size: 1.1em; /* Slightly smaller */
-    color: #C0C0FF; text-decoration: none; display: block;
-    margin-bottom: 3px; transition: color 0.2s ease;
+    font-size: 1.05em; 
+    color: #C8C8E0; /* Slightly different link color */
+    text-decoration: none; display: block;
+    margin-bottom: 2px; transition: color 0.2s ease;
 }
-.modal-article-list .article-title:hover { color: #E0E0FF; }
-.modal-article-list .article-date { font-size: 0.85em; color: #9090AA; margin: 0; text-align: right; flex: 0 0 120px; }
+.modal-article-list .article-title:hover { color: #E8E8FF; }
+.modal-article-list .article-date { 
+    font-size: 0.8em; color: #8888A0; margin: 0; 
+    text-align: left; flex: 0 0 100px; /* Ensure date column aligns */
+}
 
 /* General page background class */
 body.page-background main { padding-top: 80px; }

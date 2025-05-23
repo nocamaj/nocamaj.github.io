@@ -44,42 +44,42 @@
                     <span class="corner-line br-h"></span><span class="corner-line br-v"></span>
                 </div>
             </div>
-            <div class="category-item category-undefined" data-category="cat3" data-category-name="Undefined">
+            <div class="category-item category-undefined" data-category="cat3" data-category-name="undefined"> <!-- Uncapitalized -->
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
                 <div class="title-container">
                     <span class="corner-line tl-h"></span><span class="corner-line tl-v"></span>
                     <span class="corner-line tr-h"></span><span class="corner-line tr-v"></span>
-                    <p>Undefined</p>
+                    <p>undefined</p> <!-- Uncapitalized -->
                     <span class="corner-line bl-h"></span><span class="corner-line bl-v"></span>
                     <span class="corner-line br-h"></span><span class="corner-line br-v"></span>
                 </div>
             </div>
-            <div class="category-item category-undefined" data-category="cat4" data-category-name="Undefined">
+            <div class="category-item category-undefined" data-category="cat4" data-category-name="undefined"> <!-- Uncapitalized -->
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
                 <div class="title-container">
                     <span class="corner-line tl-h"></span><span class="corner-line tl-v"></span>
                     <span class="corner-line tr-h"></span><span class="corner-line tr-v"></span>
-                    <p>Undefined</p>
+                    <p>undefined</p> <!-- Uncapitalized -->
                     <span class="corner-line bl-h"></span><span class="corner-line bl-v"></span>
                     <span class="corner-line br-h"></span><span class="corner-line br-v"></span>
                 </div>
             </div>
-            <div class="category-item category-undefined" data-category="cat5" data-category-name="Undefined">
+            <div class="category-item category-undefined" data-category="cat5" data-category-name="undefined"> <!-- Uncapitalized -->
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
                 <div class="title-container">
                     <span class="corner-line tl-h"></span><span class="corner-line tl-v"></span>
                     <span class="corner-line tr-h"></span><span class="corner-line tr-v"></span>
-                    <p>Undefined</p>
+                    <p>undefined</p> <!-- Uncapitalized -->
                     <span class="corner-line bl-h"></span><span class="corner-line bl-v"></span>
                     <span class="corner-line br-h"></span><span class="corner-line br-v"></span>
                 </div>
             </div>
-            <div class="category-item category-undefined" data-category="cat6" data-category-name="Undefined">
+            <div class="category-item category-undefined" data-category="cat6" data-category-name="undefined"> <!-- Uncapitalized -->
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
                 <div class="title-container">
                     <span class="corner-line tl-h"></span><span class="corner-line tl-v"></span>
                     <span class="corner-line tr-h"></span><span class="corner-line tr-v"></span>
-                    <p>Undefined</p>
+                    <p>undefined</p> <!-- Uncapitalized -->
                     <span class="corner-line bl-h"></span><span class="corner-line bl-v"></span>
                     <span class="corner-line br-h"></span><span class="corner-line br-v"></span>
                 </div>
@@ -87,17 +87,21 @@
         </div>
     </main>
 
-    <!-- Modal Structure (Initially Hidden) -->
+    <!-- Modal Structure (Updated) -->
     <div class="modal-overlay" id="categoryModal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title-bar" id="modalBreadcrumb">Ideas > <span class="category-name-in-title" id="modalCategoryName">Category</span></div>
+                <div class="modal-title-bar">
+                    Ideas <span class="path-separator">→</span> <span class="category-name-in-title" id="modalCategoryName">Category</span>
+                </div>
                 <button class="modal-close-button" id="modalCloseButton">×</button>
             </div>
             <div class="modal-column-headers">
-                <div class="col-icon"> <!-- Placeholder for Icon header if needed --> </div>
+                <div class="col-icon"> <!-- Icon column header (empty) --> </div>
                 <div class="col-name">Name</div>
+                <span class="col-separator">|</span>
                 <div class="col-date">Date</div>
+                 <!-- Removed "Category" column as it's in the title bar -->
             </div>
             <div class="modal-body">
                 <ul class="modal-article-list" id="modalArticleList">
@@ -113,7 +117,6 @@
             const modalOverlay = document.getElementById('categoryModal');
             const modalContent = modalOverlay.querySelector('.modal-content');
             const modalCloseButton = document.getElementById('modalCloseButton');
-            // const modalCategoryTitle = document.getElementById('modalCategoryTitle'); // Replaced by breadcrumb
             const modalBreadcrumbCategoryName = document.getElementById('modalCategoryName');
             const modalArticleList = document.getElementById('modalArticleList');
 
@@ -127,16 +130,16 @@
             categoryItems.forEach(item => {
                 item.addEventListener('click', () => { 
                     const category = item.dataset.category;
-                    const categoryName = item.dataset.categoryName || "Category"; 
+                    // Use the text from the <p> tag directly for the category name in the modal
+                    const categoryName = item.querySelector('p').textContent || "Category"; 
                     const articles = articlesByCategory[category] || [];
 
-                    // modalCategoryTitle.textContent = categoryName; // Replaced
                     modalBreadcrumbCategoryName.textContent = categoryName;
                     modalArticleList.innerHTML = ''; 
 
                     if (articles.length === 0) {
                         const li = document.createElement('li');
-                        li.style.textAlign = 'center'; // Center the "no articles" message
+                        li.style.textAlign = 'center'; 
                         li.style.padding = '20px 0';
                         li.textContent = 'No articles in this category yet.';
                         modalArticleList.appendChild(li);
@@ -152,9 +155,10 @@
                                 <p class="article-date">${article.date}</p>
                             `;
                             modalArticleList.appendChild(li);
+                            // Increased stagger and initial delay for more distinct loading
                             setTimeout(() => {
                                 li.classList.add('show-item');
-                            }, index * 200 + 100); // Increased stagger: 200ms between items, 100ms initial delay
+                            }, index * 250 + 150); 
                         });
                     }
 
