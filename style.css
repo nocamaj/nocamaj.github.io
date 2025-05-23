@@ -179,31 +179,27 @@ main.travel-main {
     position: relative; 
     z-index: 3; 
 }
-
+/* === Ideas Page Specific Styles === */
 main.ideas-main-content {
     display: flex;
     flex-direction: column;
     align-items: center; 
-    padding-top: 80px; 
-    padding-bottom: 40px;
-    min-height: calc(100vh - 120px); 
+    padding-top: 100px; /* Increased padding since H1 is gone, adjust as needed for spacing */
+    padding-bottom: 60px; /* Increased bottom padding */
+    min-height: calc(100vh - 160px); /* Adjust if header/footer heights change */
     box-sizing: border-box;
-    width: 100%; /* Ensure main content takes full width to center grid properly */
+    width: 100%; 
 }
 
-main.ideas-main-content h1 {
-    margin-bottom: 40px; /* Was 40px */
-    font-size: 2.5em;
-    color: #F5F5F5;
-}
+/* H1 was removed, so no style needed for it here anymore */
 
 .category-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(180px, 250px)); /* 3 columns, with min/max size */
-    gap: 40px; /* Increased gap */
+    grid-template-columns: repeat(3, minmax(180px, 280px)); /* Slightly wider max for bigger icons */
+    gap: 50px; /* Increased gap for larger icons and more breathing room */
     max-width: 900px; 
     width: 90%; 
-    margin: 20px auto; /* Added top/bottom margin */
+    margin: 0 auto; /* Was 20px auto, 0 auto for centering with main padding */
 }
 
 .category-item {
@@ -213,157 +209,87 @@ main.ideas-main-content h1 {
     text-align: center;
     text-decoration: none; 
     color: #F5F5F5;        
-    padding: 25px; /* Increased padding */
-    background-color: rgba(30, 30, 50, 0.4); /* Slightly more distinct background */
-    border-radius: 15px; /* More rounded */
-    transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-    cursor: pointer; /* Indicate it's clickable */
-    border: 1px solid rgba(255, 255, 255, 0.05); /* Subtle border */
+    padding: 10px; /* Reduced padding as there's no box */
+    background-color: transparent; /* REMOVED background box color */
+    border-radius: 0;          /* REMOVED border-radius for the item itself */
+    border: none;              /* REMOVED border */
+    transition: color 0.3s ease, transform 0.3s ease; /* Transition for text and icon container */
+    cursor: pointer; 
 }
 
 .folder-icon {
-    width: 80px; /* Increased size */
-    height: 80px; 
-    margin-bottom: 15px;
+    width: 120px; /* 50% bigger (was 80px) */
+    height: 120px; /* 50% bigger (was 80px) */
+    margin-bottom: 8px; /* Reduced margin to bring text closer */
     object-fit: contain; 
+    transition: filter 0.3s ease; /* For potential hover effect on icon */
 }
 
 .category-item p {
     margin: 0;
-    font-size: 1.1em;
-    font-weight: 500;
+    font-size: 0.95em; /* Smaller font size */
+    font-weight: 400;  /* Slightly less bold */
+    color: #b0b0b0; /* Initial color for text, slightly dimmer */
+    transition: color 0.3s ease;
 }
 
-.category-item:hover, 
-.category-item:focus { 
-    color: #ADD8E6; 
-    transform: translateY(-5px) scale(1.02); /* More noticeable hover */
-    background-color: rgba(40, 40, 70, 0.6);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+.category-item:hover .folder-icon {
+    /* Optional: if you want the icon to change slightly on hover too */
+    /* filter: brightness(1.2); */
 }
 
-.category-item.category-undefined {
-    /* opacity: 0.7; */ /* Keep it fully visible unless you want to dim placeholders */
+.category-item:hover p { 
+    color: #ADD8E6; /* Light misty/powdery blue for text on hover */
 }
 
-/* === Modal Styles === */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7); /* Darker overlay */
-    backdrop-filter: blur(5px); /* Blur background */
-    -webkit-backdrop-filter: blur(5px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000; /* Above everything else */
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease, visibility 0s linear 0.3s; /* Delay visibility until opaque */
+.category-item:hover {
+    /* No background change, no transform on the whole item if we removed the box */
+    /* transform: translateY(-3px); /* Optional: if you still want a slight lift */
 }
 
-.modal-overlay.visible {
-    opacity: 1;
-    visibility: visible;
-    transition: opacity 0.3s ease, visibility 0s linear 0s;
-}
 
-.modal-content {
-    background-color: #181828; /* Darker modal background */
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-    width: 80%;
-    max-width: 700px;
-    max-height: 80vh;
-    overflow-y: auto;
-    position: relative;
-    transform: scale(0.5); /* Initial state for animation */
-    opacity: 0;
-    transition: transform 0.4s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity 0.3s ease-out; /* S bezier for pop */
-    transform-origin: center center; /* Default, will be overridden by JS */
+/* Modal Styles remain the same as before */
+.modal-overlay { /* ... */
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+    display: flex; align-items: center; justify-content: center; z-index: 1000; 
+    opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s;
 }
-
-.modal-overlay.visible .modal-content {
-    transform: scale(1);
-    opacity: 1;
+.modal-overlay.visible { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s linear 0s; }
+.modal-content { /* ... */
+    background-color: #181828; padding: 30px; border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3); width: 80%; max-width: 700px; max-height: 80vh;
+    overflow-y: auto; position: relative; transform: scale(0.5); opacity: 0;
+    transition: transform 0.4s cubic-bezier(0.18,0.89,0.32,1.28), opacity 0.3s ease-out;
+    transform-origin: center center;
 }
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+.modal-overlay.visible .modal-content { transform: scale(1); opacity: 1; }
+.modal-header { /* ... */
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);
 }
-
-.modal-header h2 {
-    margin: 0;
-    font-size: 1.8em;
-    color: #E0E0E0;
+.modal-header h2 { margin: 0; font-size: 1.8em; color: #E0E0E0; }
+.modal-close-button { /* ... */
+    background: none; border: none; font-size: 2.5em; color: #AAAAAA;
+    cursor: pointer; padding: 0; line-height: 1; transition: color 0.2s ease;
 }
-
-.modal-close-button {
-    background: none;
-    border: none;
-    font-size: 2.5em;
-    color: #AAAAAA;
-    cursor: pointer;
-    padding: 0;
-    line-height: 1;
-    transition: color 0.2s ease;
-}
-
-.modal-close-button:hover {
-    color: #FFFFFF;
-}
-
-.modal-article-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.modal-article-list li {
-    padding: 12px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-    opacity: 0; /* Initial state for sequential animation */
-    transform: translateY(15px);
+.modal-close-button:hover { color: #FFFFFF; }
+.modal-article-list { list-style: none; padding: 0; margin: 0; }
+.modal-article-list li { /* ... */
+    padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.07);
+    opacity: 0; transform: translateY(15px);
     transition: opacity 0.4s ease-out, transform 0.4s ease-out;
 }
-.modal-article-list li:last-child {
-    border-bottom: none;
+.modal-article-list li:last-child { border-bottom: none; }
+.modal-article-list li.show-item { opacity: 1; transform: translateY(0); }
+.modal-article-list .article-title { /* ... */
+    font-size: 1.2em; color: #C0C0FF; text-decoration: none; display: block;
+    margin-bottom: 4px; transition: color 0.2s ease;
 }
+.modal-article-list .article-title:hover { color: #E0E0FF; }
+.modal-article-list .article-date { font-size: 0.9em; color: #9999AA; margin: 0; }
 
-.modal-article-list li.show-item { /* Class added by JS for animation */
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.modal-article-list .article-title {
-    font-size: 1.2em;
-    color: #C0C0FF; /* Link color in modal */
-    text-decoration: none;
-    display: block; /* Make it take full width for easier clicking */
-    margin-bottom: 4px;
-    transition: color 0.2s ease;
-}
-
-.modal-article-list .article-title:hover {
-    color: #E0E0FF;
-}
-
-.modal-article-list .article-date {
-    font-size: 0.9em;
-    color: #9999AA;
-    margin: 0;
-}
-
-/* General page background class if needed for other static pages */
+/* General page background class */
 body.page-background main {
-    padding-top: 80px; /* Ensure content starts below header */
+    padding-top: 80px; 
 }

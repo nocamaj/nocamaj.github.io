@@ -22,9 +22,8 @@
     </header>
 
     <main class="ideas-main-content">
-        <h1>Blog Categories</h1>
+        <!-- Removed H1 "Blog Categories" -->
         <div class="category-grid">
-            <!-- Added data-category-name for cleaner title fetching -->
             <div class="category-item" data-category="personal" data-category-name="Personal Stories">
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
                 <p>Personal Stories</p>
@@ -33,31 +32,31 @@
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
                 <p>Artificial Intelligence</p>
             </div>
-            <div class="category-item category-undefined" data-category="cat3" data-category-name="Category 3">
+            <div class="category-item category-undefined" data-category="cat3" data-category-name="Undefined"> {/* Changed name */}
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
-                <p>Category 3</p>
+                <p>Undefined</p> {/* Changed name */}
             </div>
-            <div class="category-item category-undefined" data-category="cat4" data-category-name="Category 4">
+            <div class="category-item category-undefined" data-category="cat4" data-category-name="Undefined"> {/* Changed name */}
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
-                <p>Category 4</p>
+                <p>Undefined</p> {/* Changed name */}
             </div>
-            <div class="category-item category-undefined" data-category="cat5" data-category-name="Category 5">
+            <div class="category-item category-undefined" data-category="cat5" data-category-name="Undefined"> {/* Changed name */}
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
-                <p>Category 5</p>
+                <p>Undefined</p> {/* Changed name */}
             </div>
-            <div class="category-item category-undefined" data-category="cat6" data-category-name="Category 6">
+            <div class="category-item category-undefined" data-category="cat6" data-category-name="Undefined"> {/* Changed name */}
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
-                <p>Category 6</p>
+                <p>Undefined</p> {/* Changed name */}
             </div>
         </div>
     </main>
 
-    <!-- Modal Structure (Initially Hidden by CSS) -->
+    <!-- Modal Structure (Initially Hidden) -->
     <div class="modal-overlay" id="categoryModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="modalCategoryTitle">Category Articles</h2>
-                <button class="modal-close-button" id="modalCloseButton">×</button> <!-- Using × for a nicer X -->
+                <button class="modal-close-button" id="modalCloseButton">×</button>
             </div>
             <div class="modal-body">
                 <ul class="modal-article-list" id="modalArticleList">
@@ -76,9 +75,6 @@
             const modalCategoryTitle = document.getElementById('modalCategoryTitle');
             const modalArticleList = document.getElementById('modalArticleList');
 
-            // --- Dummy Article Data (Replace with your actual data source later) ---
-            // Links should point to actual .html files, e.g., 'blog/my-first-story.html'
-            // Create a 'blog' subfolder for your posts.
             const articlesByCategory = {
                 personal: [
                     { title: "My Journey into Coding", date: "May 20, 2025", url: "blog/personal-journey.html" },
@@ -90,14 +86,12 @@
                     { title: "AI Ethics in Development", date: "Apr 20, 2025", url: "blog/ai-ethics.html" }
                 ],
                 cat3: [ { title: "Topic 3 Article 1", date: "Jan 01, 2025", url: "#" } ],
-                cat4: [], // Example of an empty category
+                cat4: [], 
                 cat5: [ { title: "Topic 5 Article 1", date: "Feb 01, 2025", url: "#" } ],
                 cat6: [ { title: "Topic 6 Article 1", date: "Mar 01, 2025", url: "#" } ]
             };
-            // --- End Dummy Article Data ---
 
             categoryItems.forEach(item => {
-                // Changed from 'a' tag to 'div' so click doesn't try to navigate
                 item.addEventListener('click', () => { 
                     const category = item.dataset.category;
                     const categoryName = item.dataset.categoryName || "Category"; 
@@ -110,7 +104,7 @@
                         const li = document.createElement('li');
                         li.textContent = 'No articles in this category yet.';
                         modalArticleList.appendChild(li);
-                        setTimeout(() => li.classList.add('show-item'), 50); // Animate this single item
+                        setTimeout(() => li.classList.add('show-item'), 50);
                     } else {
                         articles.forEach((article, index) => {
                             const li = document.createElement('li');
@@ -119,32 +113,23 @@
                                 <p class="article-date">${article.date}</p>
                             `;
                             modalArticleList.appendChild(li);
-                            // Sequential animation for list items
                             setTimeout(() => {
                                 li.classList.add('show-item');
-                            }, index * 100 + 50); // Stagger animation
+                            }, index * 100 + 50); 
                         });
                     }
 
-                    // Animation: Expand from icon
                     const iconRect = item.querySelector('.folder-icon').getBoundingClientRect();
-                    
-                    // Calculate the center of the icon relative to the viewport
                     const iconCenterX = iconRect.left + iconRect.width / 2;
                     const iconCenterY = iconRect.top + iconRect.height / 2;
-
-                    // Convert this to be relative to the modalOverlay for transform-origin
-                    // This assumes modalOverlay is fullscreen.
                     modalContent.style.transformOrigin = `${iconCenterX}px ${iconCenterY}px`;
-                    modalContent.style.transform = 'scale(0.05)'; // Start very small, from where icon was
+                    modalContent.style.transform = 'scale(0.05)'; 
                     modalContent.style.opacity = '0';
-                    
-                    modalOverlay.style.opacity = '0'; // Start overlay transparent for its own fade-in
+                    modalOverlay.style.opacity = '0'; 
                     modalOverlay.classList.add('visible');
-                    
-                    requestAnimationFrame(() => { // Ensure overlay starts its transition
+                    requestAnimationFrame(() => { 
                         modalOverlay.style.opacity = '1'; 
-                        requestAnimationFrame(() => { // Then start modal content animation
+                        requestAnimationFrame(() => { 
                              modalContent.style.transform = 'scale(1)';
                              modalContent.style.opacity = '1';
                         });
@@ -153,34 +138,24 @@
             });
 
             function closeModal() {
-                // Simple shrink and fade out for now. 
-                // Reverse animation to icon is more complex if page has scrolled.
                 const modalRect = modalContent.getBoundingClientRect();
-                modalContent.style.transformOrigin = `${modalRect.width / 2}px ${modalRect.height / 2}px`; // Re-center origin for symmetrical shrink
-                
+                modalContent.style.transformOrigin = `${modalRect.width / 2}px ${modalRect.height / 2}px`;
                 modalContent.style.transform = 'scale(0.5)'; 
                 modalContent.style.opacity = '0';
-                
                 modalOverlay.style.opacity = '0';
                 setTimeout(() => {
                     modalOverlay.classList.remove('visible');
-                    // Reset transform and opacity for next open
                     modalContent.style.transform = 'scale(0.5)'; 
                     modalContent.style.opacity = '0';
-                }, 300); // Match CSS transition duration for opacity
+                }, 300); 
             }
 
             modalCloseButton.addEventListener('click', closeModal);
             modalOverlay.addEventListener('click', (event) => {
-                if (event.target === modalOverlay) {
-                    closeModal();
-                }
+                if (event.target === modalOverlay) { closeModal(); }
             });
-            // Optional: Close modal with Escape key
             document.addEventListener('keydown', (event) => {
-                if (event.key === 'Escape' && modalOverlay.classList.contains('visible')) {
-                    closeModal();
-                }
+                if (event.key === 'Escape' && modalOverlay.classList.contains('visible')) { closeModal(); }
             });
         });
     </script>
