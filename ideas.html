@@ -87,6 +87,7 @@
     </main>
 
     <div class="modal-overlay" id="categoryModal">
+        <!-- ... Modal HTML structure unchanged ... -->
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title-bar">
@@ -112,8 +113,9 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const categoryGrid = document.querySelector('.category-grid');
-            const categoryItems = Array.from(categoryGrid.querySelectorAll('.category-item')); 
+            const categoryItems = Array.from(document.querySelectorAll('.category-item'));
+            const folderIcons = Array.from(document.querySelectorAll('.category-item .folder-icon'));
+            
             const modalOverlay = document.getElementById('categoryModal');
             const modalContent = modalOverlay.querySelector('.modal-content');
             const modalCloseButton = document.getElementById('modalCloseButton');
@@ -127,12 +129,46 @@
                 cat5: [ { title: "Topic 5 Article 1", date: "Feb 01, 2025", url: "#", revised: null } ], cat6: [ { title: "Topic 6 Article 1", date: "Mar 01, 2025", url: "#", revised: null } ]
             };
 
-            // Sequential load animation for category items on page load
-            categoryItems.forEach((item, index) => {
-                setTimeout(() => {
-                    item.classList.add('visible');
-                }, index * 180 + 100); // Slower: 150ms * 1.15 = ~172.5ms, using 180ms
-            });
+            // --- Image Loading Logic ---
+            let imagesLoadedCount = 0;
+            const totalImages = folderIcons.length;
+
+            function imageLoadedOrError() {
+                imagesLoadedCount++;
+                if (imagesLoadedCount >= totalImages) {
+                    // All images have been processed (loaded or errored), start category item animation
+                    console.log("All folder icons processed. Starting animations.");
+                    animateCategoryItems();
+                }
+            }
+
+            if (totalImages === 0) { // If there are no icons for some reason
+                animateCategoryItems(); // Proceed directly
+            } else {
+                folderIcons.forEach(iconImg => {
+                    // Check if image is already loaded (e.g., from cache)
+                    if (iconImg.complete && iconImg.naturalHeight !== 0) {
+                        // console.log("Image already complete:", iconImg.src);
+                        imageLoadedOrError();
+                    } else {
+                        iconImg.addEventListener('load', imageLoadedOrError);
+                        iconImg.addEventListener('error', () => {
+                            console.warn("Error loading image:", iconImg.src);
+                            imageLoadedOrError(); // Still count it as processed
+                        });
+                    }
+                });
+            }
+            // --- End Image Loading Logic ---
+
+
+            function animateCategoryItems() {
+                categoryItems.forEach((item, index) => {
+                    setTimeout(() => {
+                        item.classList.add('visible');
+                    }, index * 180 + 100); 
+                });
+            }
 
 
             categoryItems.forEach(item => { /* ... item click listener unchanged ... */
