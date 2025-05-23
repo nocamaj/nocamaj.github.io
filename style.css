@@ -4,8 +4,7 @@ body, html {
     height: 100%;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #0a0a18; 
-    color: #F5F5F5; 
-    overflow: hidden; 
+    color: #F5F5F5;
 }
 
 .background-animation { 
@@ -338,11 +337,12 @@ body.page-background main {
 
 /* === Blog Post Specific Styles === */
 main.blog-post-content {
-    padding-top: 100px; /* Below fixed header */
+    padding-top: 100px; 
     padding-bottom: 60px;
-    max-width: 800px; /* Readable line length */
-    margin: 0 auto; /* Center content */
-    color: #E0E0E0; /* Slightly softer white for body text */
+    max-width: 800px; 
+    margin: 0 auto; 
+    color: #E0E0E0; 
+    min-height: auto; /* Override any min-height that might be pushing things */
 }
 
 .blog-post-content article {
