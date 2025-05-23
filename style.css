@@ -132,20 +132,17 @@ main.travel-main { /* ... travel-main styles ... */
 /* ... (Keep all existing styles from before: body, header, nav, footer, etc.) ... */
 
 /* === Ideas Page Specific Styles === */
-main.ideas-main-content, main.metrics-main-content { /* Apply consistent padding for these pages */
+main.ideas-main-content, main.metrics-main-content { 
     display: flex;
     flex-direction: column;
     align-items: center; 
     padding-top: 100px; 
     padding-bottom: 60px; 
-    min-height: calc(100vh - 160px); /* Header(60) + padding(100) roughly */
+    min-height: calc(100vh - 160px); 
     box-sizing: border-box;
     width: 100%; 
 }
-/* Specific for metrics if needed later */
-main.metrics-main-content h1, main.metrics-main-content p {
-    color: #F5F5F5;
-}
+main.metrics-main-content h1, main.metrics-main-content p { color: #F5F5F5; }
 
 
 .category-grid {
@@ -171,28 +168,29 @@ main.metrics-main-content h1, main.metrics-main-content p {
     transition: transform 0.2s ease; 
     cursor: pointer; 
     position: relative; 
-    opacity: 0; /* Initially hidden for sequential load */
-    transform: translateY(20px); /* Start slightly down */
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    opacity: 0; 
+    transform: translateY(20px); 
+    /* Transition for the item itself */
+    transition: opacity 0.5s ease-out 0.1s, transform 0.5s ease-out 0.1s; /* Added small delay to item */
 }
 
-.category-item.visible { /* Class added by JS for load animation */
+.category-item.visible { 
     opacity: 1;
     transform: translateY(0);
 }
 
-
 .folder-icon {
     width: 150px; 
     height: 150px; 
-    margin-bottom: 8px; /* Reduced to bring title slightly closer, was 12px */
+    margin-bottom: 8px; 
     object-fit: contain; 
     transition: transform 0.3s ease; 
 }
 
 .category-item .title-container {
     position: relative; 
-    padding: 2px 8px; /* Vertical padding decreased, horizontal increased for line space */
+    /* Padding adjusted: more horizontal for line offset, less vertical */
+    padding: 3px 10px; 
     display: inline-block; 
 }
 
@@ -201,10 +199,15 @@ main.metrics-main-content h1, main.metrics-main-content p {
     font-size: 0.9em; 
     font-weight: 500; 
     color: #b0b0b0; 
-    transition: color 0.3s ease;
-    position: relative; 
-    z-index: 1;
+    /* Add transition for text opacity for sync attempt */
+    transition: color 0.3s ease, opacity 0.3s ease 0.05s; /* Text fades in slightly after container */
+    opacity: 1; /* Default for when .visible is applied to parent */
 }
+
+.category-item.visible p {
+    opacity: 1;
+}
+
 
 /* Corner lines for hover effect */
 .title-container .corner-line {
@@ -220,15 +223,15 @@ main.metrics-main-content h1, main.metrics-main-content p {
 .title-container .tl-v, .title-container .tr-v,
 .title-container .bl-v, .title-container .br-v { width: 2px; height: 0; }
 
-/* Positioning - adjusted left/right to make them "tighter" by being closer to padding edge */
-.title-container .tl-h { top: 0; left: 0; transform-origin: left; } 
-.title-container .tl-v { top: 0; left: 0; transform-origin: top; }  
-.title-container .tr-h { top: 0; right: 0; transform-origin: right; }
-.title-container .tr-v { top: 0; right: 0; transform-origin: top; } 
-.title-container .bl-h { bottom: 0; left: 0; transform-origin: left; }
-.title-container .bl-v { bottom: 0; left: 0; transform-origin: bottom; }
-.title-container .br-h { bottom: 0; right: 0; transform-origin: right; }
-.title-container .br-v { bottom: 0; right: 0; transform-origin: bottom; }
+/* Positioning - -2px pushes them slightly out from the padding box edge */
+.title-container .tl-h { top: 0; left: -2px; transform-origin: left; } 
+.title-container .tl-v { top: 0; left: -2px; transform-origin: top; }  
+.title-container .tr-h { top: 0; right: -2px; transform-origin: right; }
+.title-container .tr-v { top: 0; right: -2px; transform-origin: top; } 
+.title-container .bl-h { bottom: 0; left: -2px; transform-origin: left; }
+.title-container .bl-v { bottom: 0; left: -2px; transform-origin: bottom; }
+.title-container .br-h { bottom: 0; right: -2px; transform-origin: right; }
+.title-container .br-v { bottom: 0; right: -2px; transform-origin: bottom; }
 
 
 .category-item:hover .folder-icon { transform: scale(1.03); }
@@ -241,20 +244,19 @@ main.metrics-main-content h1, main.metrics-main-content p {
 
 
 /* === Modal Styles === */
-.modal-overlay { /* ... existing overlay styles with blur change ... */
+.modal-overlay { /* ... existing overlay styles ... */
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.0); /* No darkening */
-    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); /* Blur from previous step */
+    background-color: rgba(0, 0, 0, 0.0); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
     display: flex; align-items: center; justify-content: center; z-index: 1000; 
     opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s;
 }
 .modal-overlay.visible { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s linear 0s; }
 
-.modal-content { /* ... existing modal content styles with size adjustments ... */
+.modal-content { /* ... existing modal content styles ... */
     background-color: #141622; padding: 0; border-radius: 0px; 
     box-shadow: 0 10px 40px rgba(0,0,0,0.5); 
     width: 90%; max-width: 950px; 
-    height: 80vh; max-height: 700px; /* Adjust if needed */
+    height: 80vh; max-height: 700px; 
     display: flex; flex-direction: column;
     position: relative; transform: scale(0.5); opacity: 0;
     transition: transform 0.35s cubic-bezier(0.18,0.89,0.32,1.20), opacity 0.25s ease-out; 
@@ -288,9 +290,8 @@ main.metrics-main-content h1, main.metrics-main-content p {
     font-size: 0.85em; 
     color: #9090b0;    
     font-weight: 500;  
-    text-align: left; 
 }
-.modal-column-headers .col-icon { flex: 0 0 40px; text-align: center; } /* Centering icon header if needed */
+.modal-column-headers .col-icon { flex: 0 0 40px; text-align: left; } 
 .modal-column-headers .col-name { flex-grow: 1; padding-right: 10px; text-align: left; }
 .modal-column-headers .col-separator { color: #404060; padding: 0 5px; }
 .modal-column-headers .col-date { flex: 0 0 100px; text-align: left; padding-right: 10px;} 
@@ -314,18 +315,19 @@ main.metrics-main-content h1, main.metrics-main-content p {
     filter: invert(70%) sepia(10%) saturate(100%) hue-rotate(180deg) brightness(100%) contrast(90%); 
 }
 
-.modal-article-list .article-info { flex-grow: 1; }
+.modal-article-list .article-info { flex-grow: 1; text-align: left; } /* Ensure text in title is left aligned */
 .modal-article-list .article-title { 
     font-size: 1.05em; color: #C8C8E0; text-decoration: none; display: block;
     margin-bottom: 2px; transition: color 0.2s ease;
 }
 .modal-article-list .article-title:hover { color: #E8E8FF; }
+
 .modal-article-list .article-date,
 .modal-article-list .article-revised { 
     font-size: 0.8em; color: #8888A0; margin: 0; 
-    text-align: left; /* Ensures left justification within their columns */
-    flex-basis: 100px; /* Matches header column width */
-    flex-shrink: 0; /* Prevents shrinking if title is long */
+    text-align: left; 
+    flex-basis: 100px; 
+    flex-shrink: 0; 
 }
 
 

@@ -22,7 +22,6 @@
     </header>
 
     <main class="ideas-main-content">
-        <!-- H1 "Blog Categories" was removed -->
         <div class="category-grid">
             <div class="category-item" data-category="personal" data-category-name="Personal Stories">
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
@@ -113,8 +112,8 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const categoryGrid = document.querySelector('.category-grid'); // Get the grid container
-            const categoryItems = Array.from(categoryGrid.querySelectorAll('.category-item')); // Convert NodeList to Array
+            const categoryGrid = document.querySelector('.category-grid');
+            const categoryItems = Array.from(categoryGrid.querySelectorAll('.category-item')); 
             const modalOverlay = document.getElementById('categoryModal');
             const modalContent = modalOverlay.querySelector('.modal-content');
             const modalCloseButton = document.getElementById('modalCloseButton');
@@ -132,71 +131,34 @@
             categoryItems.forEach((item, index) => {
                 setTimeout(() => {
                     item.classList.add('visible');
-                }, index * 150 + 100); // Stagger the appearance of each folder
+                }, index * 180 + 100); // Slower: 150ms * 1.15 = ~172.5ms, using 180ms
             });
 
 
-            categoryItems.forEach(item => {
+            categoryItems.forEach(item => { /* ... item click listener unchanged ... */
                 item.addEventListener('click', () => { 
-                    const category = item.dataset.category;
-                    const categoryName = item.querySelector('p').textContent || "Category"; 
+                    const category = item.dataset.category; const categoryName = item.querySelector('p').textContent || "Category"; 
                     const articles = articlesByCategory[category] || [];
-
-                    modalBreadcrumbCategoryName.textContent = categoryName;
-                    modalArticleList.innerHTML = ''; 
-
-                    if (articles.length === 0) { /* ... no articles message ... */
-                        const li = document.createElement('li');
-                        li.style.textAlign = 'center'; li.style.padding = '20px 0';
-                        li.textContent = 'No articles in this category yet.';
-                        modalArticleList.appendChild(li);
-                        setTimeout(() => li.classList.add('show-item'), 50);
+                    modalBreadcrumbCategoryName.textContent = categoryName; modalArticleList.innerHTML = ''; 
+                    if (articles.length === 0) { const li = document.createElement('li'); li.style.textAlign = 'center'; li.style.padding = '20px 0'; li.textContent = 'No articles in this category yet.'; modalArticleList.appendChild(li); setTimeout(() => li.classList.add('show-item'), 50);
                     } else {
                         articles.forEach((article, index) => {
-                            const li = document.createElement('li');
-                            const revisedDate = article.revised ? article.revised : 'X'; 
-                            li.innerHTML = `
-                                <img src="images/folder-icon.svg" alt="Article" class="article-icon">
-                                <div class="article-info">
-                                    <a href="${article.url}" class="article-title">${article.title}</a>
-                                </div>
-                                <p class="article-date">${article.date}</p>
-                                <p class="article-revised">${revisedDate}</p> 
-                            `; 
-                            modalArticleList.appendChild(li);
-                            setTimeout(() => {
-                                li.classList.add('show-item');
-                            }, index * 250 + 150); // Keep this for articles in modal
+                            const li = document.createElement('li'); const revisedDate = article.revised ? article.revised : 'X'; 
+                            li.innerHTML = `<img src="images/folder-icon.svg" alt="Article" class="article-icon"><div class="article-info"><a href="${article.url}" class="article-title">${article.title}</a></div><p class="article-date">${article.date}</p><p class="article-revised">${revisedDate}</p>`; 
+                            modalArticleList.appendChild(li); setTimeout(() => { li.classList.add('show-item'); }, index * 250 + 150); 
                         });
                     }
-                    // ... (rest of modal open animation logic) ...
-                    const iconRect = item.querySelector('.folder-icon').getBoundingClientRect();
-                    const iconCenterX = iconRect.left + iconRect.width / 2;
-                    const iconCenterY = iconRect.top + iconRect.height / 2;
-                    modalContent.style.transformOrigin = `${iconCenterX}px ${iconCenterY}px`;
-                    modalContent.style.transform = 'scale(0.05)'; 
-                    modalContent.style.opacity = '0';
-                    modalOverlay.style.opacity = '0'; 
-                    modalOverlay.classList.add('visible');
-                    requestAnimationFrame(() => { 
-                        modalOverlay.style.opacity = '1'; 
-                        requestAnimationFrame(() => { 
-                             modalContent.style.transform = 'scale(1)';
-                             modalContent.style.opacity = '1';
-                        });
-                    });
+                    const iconRect = item.querySelector('.folder-icon').getBoundingClientRect(); const iconCenterX = iconRect.left + iconRect.width / 2; const iconCenterY = iconRect.top + iconRect.height / 2;
+                    modalContent.style.transformOrigin = `${iconCenterX}px ${iconCenterY}px`; modalContent.style.transform = 'scale(0.05)'; modalContent.style.opacity = '0';
+                    modalOverlay.style.opacity = '0'; modalOverlay.classList.add('visible');
+                    requestAnimationFrame(() => { modalOverlay.style.opacity = '1'; requestAnimationFrame(() => { modalContent.style.transform = 'scale(1)'; modalContent.style.opacity = '1'; }); });
                 });
             });
 
             function closeModal() { /* ... closeModal unchanged ... */
-                const modalRect = modalContent.getBoundingClientRect();
-                modalContent.style.transformOrigin = `${modalRect.width / 2}px ${modalRect.height / 2}px`;
-                modalContent.style.transform = 'scale(0.5)'; modalContent.style.opacity = '0';
-                modalOverlay.style.opacity = '0';
-                setTimeout(() => {
-                    modalOverlay.classList.remove('visible');
-                    modalContent.style.transform = 'scale(0.5)'; modalContent.style.opacity = '0';
-                }, 300); 
+                const modalRect = modalContent.getBoundingClientRect(); modalContent.style.transformOrigin = `${modalRect.width / 2}px ${modalRect.height / 2}px`;
+                modalContent.style.transform = 'scale(0.5)'; modalContent.style.opacity = '0'; modalOverlay.style.opacity = '0';
+                setTimeout(() => { modalOverlay.classList.remove('visible'); modalContent.style.transform = 'scale(0.5)'; modalContent.style.opacity = '0'; }, 300); 
             }
 
             modalCloseButton.addEventListener('click', closeModal);
