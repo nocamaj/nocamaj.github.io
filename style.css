@@ -2,7 +2,7 @@ body, html {
     margin: 0;
     padding: 0;
     height: 100%;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'monospace', 'Courier New', Courier,  sans-serif; /* System-wide monospace */
     background-color: #0a0a18; 
     color: #F5F5F5; 
     overflow: hidden; 
@@ -109,89 +109,44 @@ footer {
 }
 
 /* === Travel Page Specific Styles === */
-body.travel-page-background {
-    overflow: hidden; 
-    margin: 0; 
-    padding: 0; 
-    height: 100vh; 
+body.travel-page-background { overflow: hidden; margin: 0; padding: 0; height: 100vh; }
+main.travel-main { /* ... travel-main styles ... */
+    position: relative; height: 100vh; width: 100vw; padding: 0; box-sizing: border-box;
+    display: flex; align-items: center; justify-content: center; z-index: 2; 
 }
+.map-outer-container { /* ... map-outer-container styles ... */
+    width: calc(100% - 80px); height: calc(100vh - 60px - 80px); padding: 15px; 
+    border: 2px solid rgba(150,150,180,0.5); border-radius: 25px; background-color: #0a0a18;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3); box-sizing: border-box; display: flex; 
+    margin-top: 60px; position: relative; z-index: 3; 
+}
+.map-legend { /* ... map-legend styles ... */
+    flex: 0 0 180px; padding-right: 15px; box-sizing: border-box; color: #F5F5F5;
+    display: flex; flex-direction: column; justify-content: flex-start; padding-top: 10px; 
+    position: relative; z-index: 4; 
+}
+.legend-item { display: flex; align-items: center; margin-bottom: 8px; }
+.legend-color-box { width: 20px; height: 20px; margin-right: 10px; border: 1px solid #555; }
+#map { flex-grow: 1; height: 100%; width: 100%; background-color: #121f3a; border-radius: 15px; overflow: hidden; position: relative; z-index: 3; }
 
-main.travel-main {
-    position: relative; 
-    height: 100vh;
-    width: 100vw;
-    padding: 0; 
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 2; 
-}
-
-.map-outer-container {
-    width: calc(100% - 80px);  
-    height: calc(100vh - 60px - 80px); 
-    padding: 15px; 
-    border: 2px solid rgba(150, 150, 180, 0.5); 
-    border-radius: 25px; 
-    background-color: #0a0a18; /* Changed to normal page background color */
-    box-shadow: 0 0 15px rgba(0,0,0,0.3); 
-    box-sizing: border-box;
-    display: flex; 
-    margin-top: 60px; 
-    position: relative; 
-    z-index: 3; 
-}
-
-.map-legend {
-    flex: 0 0 180px; 
-    padding-right: 15px; 
-    box-sizing: border-box;
-    color: #F5F5F5;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start; 
-    padding-top: 10px; 
-    position: relative; 
-    z-index: 4; 
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-}
-
-.legend-color-box {
-    width: 20px;
-    height: 20px;
-    margin-right: 10px;
-    border: 1px solid #555; 
-}
-
-#map { 
-    flex-grow: 1; 
-    height: 100%; 
-    width: 100%; 
-    background-color: #121f3a; /* Lighter blue ocean color */
-    border-radius: 15px; 
-    overflow: hidden; 
-    position: relative; 
-    z-index: 3; 
-}
 /* ... (Keep all existing styles from before: body, header, nav, footer, etc.) ... */
 
 /* === Ideas Page Specific Styles === */
-main.ideas-main-content {
+main.ideas-main-content, main.metrics-main-content { /* Apply consistent padding for these pages */
     display: flex;
     flex-direction: column;
     align-items: center; 
-    padding-top: 80px; 
+    padding-top: 100px; 
     padding-bottom: 60px; 
-    min-height: calc(100vh - 140px); 
+    min-height: calc(100vh - 160px); /* Header(60) + padding(100) roughly */
     box-sizing: border-box;
     width: 100%; 
 }
+/* Specific for metrics if needed later */
+main.metrics-main-content h1, main.metrics-main-content p {
+    color: #F5F5F5;
+}
+
 
 .category-grid {
     display: grid;
@@ -209,26 +164,35 @@ main.ideas-main-content {
     text-align: center;
     text-decoration: none; 
     color: #F5F5F5;        
-    padding: 10px; 
+    padding: 5px; 
     background-color: transparent; 
     border-radius: 0;          
     border: none;              
     transition: transform 0.2s ease; 
     cursor: pointer; 
     position: relative; 
+    opacity: 0; /* Initially hidden for sequential load */
+    transform: translateY(20px); /* Start slightly down */
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
 }
+
+.category-item.visible { /* Class added by JS for load animation */
+    opacity: 1;
+    transform: translateY(0);
+}
+
 
 .folder-icon {
     width: 150px; 
     height: 150px; 
-    margin-bottom: 12px; 
+    margin-bottom: 8px; /* Reduced to bring title slightly closer, was 12px */
     object-fit: contain; 
     transition: transform 0.3s ease; 
 }
 
 .category-item .title-container {
     position: relative; 
-    padding: 4px 12px; /* Increased horizontal padding for more x-axis space for lines */
+    padding: 2px 8px; /* Vertical padding decreased, horizontal increased for line space */
     display: inline-block; 
 }
 
@@ -256,48 +220,42 @@ main.ideas-main-content {
 .title-container .tl-v, .title-container .tr-v,
 .title-container .bl-v, .title-container .br-v { width: 2px; height: 0; }
 
-/* Positioning each line segment - adjust -4px to increase x-axis gap */
-.title-container .tl-h { top: -2px; left: -4px; transform-origin: left; } 
-.title-container .tl-v { top: -2px; left: -4px; transform-origin: top; }  /* Pushed further left */
-.title-container .tr-h { top: -2px; right: -4px; transform-origin: right; }
-.title-container .tr-v { top: -2px; right: -4px; transform-origin: top; } /* Pushed further right */
-.title-container .bl-h { bottom: -2px; left: -4px; transform-origin: left; }
-.title-container .bl-v { bottom: -2px; left: -4px; transform-origin: bottom; }/* Pushed further left */
-.title-container .br-h { bottom: -2px; right: -4px; transform-origin: right; }
-.title-container .br-v { bottom: -2px; right: -4px; transform-origin: bottom; }/* Pushed further right */
+/* Positioning - adjusted left/right to make them "tighter" by being closer to padding edge */
+.title-container .tl-h { top: 0; left: 0; transform-origin: left; } 
+.title-container .tl-v { top: 0; left: 0; transform-origin: top; }  
+.title-container .tr-h { top: 0; right: 0; transform-origin: right; }
+.title-container .tr-v { top: 0; right: 0; transform-origin: top; } 
+.title-container .bl-h { bottom: 0; left: 0; transform-origin: left; }
+.title-container .bl-v { bottom: 0; left: 0; transform-origin: bottom; }
+.title-container .br-h { bottom: 0; right: 0; transform-origin: right; }
+.title-container .br-v { bottom: 0; right: 0; transform-origin: bottom; }
 
 
-/* Hover state for category item */
-.category-item:hover .folder-icon {
-    transform: scale(1.03); 
-}
-.category-item:hover p { 
-    color: #ADD8E6; 
-}
-.category-item:hover .corner-line {
-    opacity: 1;
-}
-/* Define FIXED lengths of lines on hover */
+.category-item:hover .folder-icon { transform: scale(1.03); }
+.category-item:hover p { color: #ADD8E6; }
+.category-item:hover .corner-line { opacity: 1; }
 .category-item:hover .tl-h, .category-item:hover .tr-h, 
-.category-item:hover .bl-h, .category-item:hover .br-h { width: 15px; } /* Fixed horizontal length */
-
+.category-item:hover .bl-h, .category-item:hover .br-h { width: 15px; } 
 .category-item:hover .tl-v, .category-item:hover .tr-v,
-.category-item:hover .bl-v, .category-item:hover .br-v { height: 10px; } /* Fixed vertical length */
+.category-item:hover .bl-v, .category-item:hover .br-v { height: 10px; } 
 
 
 /* === Modal Styles === */
-.modal-overlay { /* ... existing overlay styles ... */
+.modal-overlay { /* ... existing overlay styles with blur change ... */
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.0); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    background-color: rgba(0, 0, 0, 0.0); /* No darkening */
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); /* Blur from previous step */
     display: flex; align-items: center; justify-content: center; z-index: 1000; 
     opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s;
 }
 .modal-overlay.visible { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s linear 0s; }
 
-.modal-content { /* ... existing modal content styles ... */
+.modal-content { /* ... existing modal content styles with size adjustments ... */
     background-color: #141622; padding: 0; border-radius: 0px; 
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5); width: 90%; max-width: 950px; 
-    height: 80vh; max-height: 700px; display: flex; flex-direction: column;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5); 
+    width: 90%; max-width: 950px; 
+    height: 80vh; max-height: 700px; /* Adjust if needed */
+    display: flex; flex-direction: column;
     position: relative; transform: scale(0.5); opacity: 0;
     transition: transform 0.35s cubic-bezier(0.18,0.89,0.32,1.20), opacity 0.25s ease-out; 
     transform-origin: center center; 
@@ -332,55 +290,46 @@ main.ideas-main-content {
     font-weight: 500;  
     text-align: left; 
 }
-.modal-column-headers .col-icon { flex: 0 0 40px; }
-.modal-column-headers .col-name { flex-grow: 1; padding-right: 10px; }
+.modal-column-headers .col-icon { flex: 0 0 40px; text-align: center; } /* Centering icon header if needed */
+.modal-column-headers .col-name { flex-grow: 1; padding-right: 10px; text-align: left; }
 .modal-column-headers .col-separator { color: #404060; padding: 0 5px; }
 .modal-column-headers .col-date { flex: 0 0 100px; text-align: left; padding-right: 10px;} 
-.modal-column-headers .col-revised { flex: 0 0 100px; text-align: left; } /* New Revised Column Header */
+.modal-column-headers .col-revised { flex: 0 0 100px; text-align: left; } 
 
 
-.modal-body {
-    overflow-y: auto; 
-    padding: 0; 
-}
-
+.modal-body { overflow-y: auto; padding: 0; }
 .modal-article-list { list-style: none; padding: 0; margin: 0; }
 .modal-article-list li {
-    display: flex; 
-    align-items: center;
-    padding: 12px 20px; 
+    display: flex; align-items: center; padding: 12px 20px; 
     border-bottom: 1px solid rgba(255,255,255,0.05); 
-    opacity: 0; 
-    transform: translateY(20px); 
+    opacity: 0; transform: translateY(20px); 
     transition: opacity 0.4s ease-out, transform 0.4s ease-out;
 }
 .modal-article-list li:last-child { border-bottom: none; }
 .modal-article-list li.show-item { opacity: 1; transform: translateY(0); }
 
 .modal-article-list .article-icon {
-    width: 20px; 
-    height: 20px;
-    margin-right: 12px; 
+    width: 20px; height: 20px; margin-right: 12px; 
     object-fit: contain;
     filter: invert(70%) sepia(10%) saturate(100%) hue-rotate(180deg) brightness(100%) contrast(90%); 
 }
 
 .modal-article-list .article-info { flex-grow: 1; }
 .modal-article-list .article-title { 
-    font-size: 1.05em; 
-    color: #C8C8E0; text-decoration: none; display: block;
+    font-size: 1.05em; color: #C8C8E0; text-decoration: none; display: block;
     margin-bottom: 2px; transition: color 0.2s ease;
 }
 .modal-article-list .article-title:hover { color: #E8E8FF; }
-.modal-article-list .article-date { 
+.modal-article-list .article-date,
+.modal-article-list .article-revised { 
     font-size: 0.8em; color: #8888A0; margin: 0; 
-    text-align: left; flex: 0 0 100px; 
-}
-.modal-article-list .article-revised { /* New Style for Revised Date */
-    font-size: 0.8em; color: #8888A0; margin: 0; 
-    text-align: left; flex: 0 0 100px; 
+    text-align: left; /* Ensures left justification within their columns */
+    flex-basis: 100px; /* Matches header column width */
+    flex-shrink: 0; /* Prevents shrinking if title is long */
 }
 
 
-/* General page background class */
-body.page-background main { padding-top: 80px; }
+/* General page background class if needed for other static pages */
+body.page-background main {
+    padding-top: 80px; 
+}

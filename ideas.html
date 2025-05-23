@@ -87,7 +87,6 @@
         </div>
     </main>
 
-    <!-- Modal Structure (Updated) -->
     <div class="modal-overlay" id="categoryModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -114,31 +113,28 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const categoryItems = document.querySelectorAll('.category-item');
+            const categoryGrid = document.querySelector('.category-grid'); // Get the grid container
+            const categoryItems = Array.from(categoryGrid.querySelectorAll('.category-item')); // Convert NodeList to Array
             const modalOverlay = document.getElementById('categoryModal');
-            // ... (rest of modal element selections as before) ...
             const modalContent = modalOverlay.querySelector('.modal-content');
             const modalCloseButton = document.getElementById('modalCloseButton');
             const modalBreadcrumbCategoryName = document.getElementById('modalCategoryName');
             const modalArticleList = document.getElementById('modalArticleList');
 
-
-            const articlesByCategory = {
-                personal: [
-                    // Add a 'revised' property, can be null or a date string
-                    { title: "My Journey into Coding", date: "May 20, 2025", url: "blog/personal-journey.html", revised: null },
-                    { title: "Lessons Learned from Traveling Solo", date: "Apr 10, 2025", url: "blog/travel-lessons.html", revised: "May 05, 2025" }
-                ],
-                ai: [
-                    { title: "The Future of LLMs", date: "May 15, 2025", url: "blog/future-of-llms.html", revised: null },
-                    { title: "Understanding Vector Databases", date: "May 01, 2025", url: "blog/vector-databases.html", revised: null },
-                    { title: "AI Ethics in Development", date: "Apr 20, 2025", url: "blog/ai-ethics.html", revised: "May 10, 2025" }
-                ],
-                cat3: [ { title: "Topic 3 Article 1", date: "Jan 01, 2025", url: "#", revised: null } ],
-                cat4: [], 
-                cat5: [ { title: "Topic 5 Article 1", date: "Feb 01, 2025", url: "#", revised: null } ],
-                cat6: [ { title: "Topic 6 Article 1", date: "Mar 01, 2025", url: "#", revised: null } ]
+            const articlesByCategory = { /* ... Same article data ... */
+                personal: [ { title: "My Journey into Coding", date: "May 20, 2025", url: "blog/personal-journey.html", revised: null }, { title: "Lessons Learned from Traveling Solo", date: "Apr 10, 2025", url: "blog/travel-lessons.html", revised: "May 05, 2025" } ],
+                ai: [ { title: "The Future of LLMs", date: "May 15, 2025", url: "blog/future-of-llms.html", revised: null }, { title: "Understanding Vector Databases", date: "May 01, 2025", url: "blog/vector-databases.html", revised: null }, { title: "AI Ethics in Development", date: "Apr 20, 2025", url: "blog/ai-ethics.html", revised: "May 10, 2025" } ],
+                cat3: [ { title: "Topic 3 Article 1", date: "Jan 01, 2025", url: "#", revised: null } ], cat4: [], 
+                cat5: [ { title: "Topic 5 Article 1", date: "Feb 01, 2025", url: "#", revised: null } ], cat6: [ { title: "Topic 6 Article 1", date: "Mar 01, 2025", url: "#", revised: null } ]
             };
+
+            // Sequential load animation for category items on page load
+            categoryItems.forEach((item, index) => {
+                setTimeout(() => {
+                    item.classList.add('visible');
+                }, index * 150 + 100); // Stagger the appearance of each folder
+            });
+
 
             categoryItems.forEach(item => {
                 item.addEventListener('click', () => { 
@@ -158,7 +154,7 @@
                     } else {
                         articles.forEach((article, index) => {
                             const li = document.createElement('li');
-                            const revisedDate = article.revised ? article.revised : 'X'; // Show 'X' if no revised date
+                            const revisedDate = article.revised ? article.revised : 'X'; 
                             li.innerHTML = `
                                 <img src="images/folder-icon.svg" alt="Article" class="article-icon">
                                 <div class="article-info">
@@ -166,14 +162,14 @@
                                 </div>
                                 <p class="article-date">${article.date}</p>
                                 <p class="article-revised">${revisedDate}</p> 
-                            `; // Added revisedDate
+                            `; 
                             modalArticleList.appendChild(li);
                             setTimeout(() => {
                                 li.classList.add('show-item');
-                            }, index * 250 + 150); 
+                            }, index * 250 + 150); // Keep this for articles in modal
                         });
                     }
-                    // ... (rest of modal open animation logic as before) ...
+                    // ... (rest of modal open animation logic) ...
                     const iconRect = item.querySelector('.folder-icon').getBoundingClientRect();
                     const iconCenterX = iconRect.left + iconRect.width / 2;
                     const iconCenterY = iconRect.top + iconRect.height / 2;
@@ -192,7 +188,7 @@
                 });
             });
 
-            function closeModal() { /* ... closeModal function unchanged ... */
+            function closeModal() { /* ... closeModal unchanged ... */
                 const modalRect = modalContent.getBoundingClientRect();
                 modalContent.style.transformOrigin = `${modalRect.width / 2}px ${modalRect.height / 2}px`;
                 modalContent.style.transform = 'scale(0.5)'; modalContent.style.opacity = '0';
