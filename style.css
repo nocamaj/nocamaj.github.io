@@ -179,27 +179,27 @@ main.travel-main {
     position: relative; 
     z-index: 3; 
 }
+/* ... (Keep all existing styles from before: body, header, nav, footer, etc.) ... */
+
 /* === Ideas Page Specific Styles === */
 main.ideas-main-content {
     display: flex;
     flex-direction: column;
     align-items: center; 
-    padding-top: 100px; /* Increased padding since H1 is gone, adjust as needed for spacing */
-    padding-bottom: 60px; /* Increased bottom padding */
-    min-height: calc(100vh - 160px); /* Adjust if header/footer heights change */
+    padding-top: 80px; /* Adjusted spacing after H1 removal, was 100px */
+    padding-bottom: 60px; 
+    min-height: calc(100vh - 140px); /* Header + padding */
     box-sizing: border-box;
     width: 100%; 
 }
 
-/* H1 was removed, so no style needed for it here anymore */
-
 .category-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(180px, 280px)); /* Slightly wider max for bigger icons */
-    gap: 50px; /* Increased gap for larger icons and more breathing room */
-    max-width: 900px; 
+    grid-template-columns: repeat(3, minmax(220px, 1fr)); /* Min increased for larger icon, max flexible */
+    gap: 20px; /* Reduced gap for tighter grid */
+    max-width: 900px; /* Can adjust if needed based on new icon size */
     width: 90%; 
-    margin: 0 auto; /* Was 20px auto, 0 auto for centering with main padding */
+    margin: 0 auto; 
 }
 
 .category-item {
@@ -209,42 +209,36 @@ main.ideas-main-content {
     text-align: center;
     text-decoration: none; 
     color: #F5F5F5;        
-    padding: 10px; /* Reduced padding as there's no box */
-    background-color: transparent; /* REMOVED background box color */
-    border-radius: 0;          /* REMOVED border-radius for the item itself */
-    border: none;              /* REMOVED border */
-    transition: color 0.3s ease, transform 0.3s ease; /* Transition for text and icon container */
+    padding: 5px; /* Reduced padding further as there's no box */
+    background-color: transparent; 
+    border-radius: 0;          
+    border: none;              
+    transition: color 0.3s ease, transform 0.3s ease; 
     cursor: pointer; 
 }
 
 .folder-icon {
-    width: 120px; /* 50% bigger (was 80px) */
-    height: 120px; /* 50% bigger (was 80px) */
-    margin-bottom: 8px; /* Reduced margin to bring text closer */
+    width: 200px; /* Changed to 200px */
+    height: 200px; /* Changed to 200px */
+    margin-bottom: 4px; /* Reduced margin to bring text much closer */
     object-fit: contain; 
-    transition: filter 0.3s ease; /* For potential hover effect on icon */
+    transition: filter 0.3s ease; 
 }
 
 .category-item p {
     margin: 0;
-    font-size: 0.95em; /* Smaller font size */
-    font-weight: 400;  /* Slightly less bold */
-    color: #b0b0b0; /* Initial color for text, slightly dimmer */
+    font-size: 0.9em; /* Slightly smaller again for balance with huge icon */
+    font-weight: 400;  
+    color: #b0b0b0; 
     transition: color 0.3s ease;
 }
 
-.category-item:hover .folder-icon {
-    /* Optional: if you want the icon to change slightly on hover too */
-    /* filter: brightness(1.2); */
-}
-
 .category-item:hover p { 
-    color: #ADD8E6; /* Light misty/powdery blue for text on hover */
+    color: #ADD8E6; 
 }
 
-.category-item:hover {
-    /* No background change, no transform on the whole item if we removed the box */
-    /* transform: translateY(-3px); /* Optional: if you still want a slight lift */
+.category-item:hover .folder-icon {
+    /* filter: brightness(1.15); */ /* Optional: subtle brightness on icon hover */
 }
 
 
