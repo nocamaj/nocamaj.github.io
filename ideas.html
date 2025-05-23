@@ -113,6 +113,7 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // ... (modal element selections as before) ...
             const categoryItems = Array.from(document.querySelectorAll('.category-item'));
             const folderIcons = Array.from(document.querySelectorAll('.category-item .folder-icon'));
             
@@ -121,47 +122,53 @@
             const modalCloseButton = document.getElementById('modalCloseButton');
             const modalBreadcrumbCategoryName = document.getElementById('modalCategoryName');
             const modalArticleList = document.getElementById('modalArticleList');
-
-            const articlesByCategory = { /* ... Same article data ... */
-                personal: [ { title: "My Journey into Coding", date: "May 20, 2025", url: "blog/personal-journey.html", revised: null }, { title: "Lessons Learned from Traveling Solo", date: "Apr 10, 2025", url: "blog/travel-lessons.html", revised: "May 05, 2025" } ],
-                ai: [ { title: "The Future of LLMs", date: "May 15, 2025", url: "blog/future-of-llms.html", revised: null }, { title: "Understanding Vector Databases", date: "May 01, 2025", url: "blog/vector-databases.html", revised: null }, { title: "AI Ethics in Development", date: "Apr 20, 2025", url: "blog/ai-ethics.html", revised: "May 10, 2025" } ],
-                cat3: [ { title: "Topic 3 Article 1", date: "Jan 01, 2025", url: "#", revised: null } ], cat4: [], 
-                cat5: [ { title: "Topic 5 Article 1", date: "Feb 01, 2025", url: "#", revised: null } ], cat6: [ { title: "Topic 6 Article 1", date: "Mar 01, 2025", url: "#", revised: null } ]
+    
+    
+            const articlesByCategory = {
+                personal: [
+                    // UPDATED URLs and added new story
+                    { title: "Belgrade Bar Story", date: "May 28, 2025", url: "blog/belgrade-bar-story.html", revised: null },
+                    { title: "Greece Hotel Story", date: "May 29, 2025", url: "blog/greece-hotel-story.html", revised: null }
+                    // Add more personal stories here
+                ],
+                ai: [
+                    { title: "The Future of LLMs", date: "May 15, 2025", url: "blog/future-of-llms.html", revised: null },
+                    { title: "Understanding Vector Databases", date: "May 01, 2025", url: "blog/vector-databases.html", revised: null },
+                    { title: "AI Ethics in Development", date: "Apr 20, 2025", url: "blog/ai-ethics.html", revised: "May 10, 2025" }
+                ],
+                cat3: [ { title: "Topic 3 Article 1", date: "Jan 01, 2025", url: "#", revised: null } ],
+                cat4: [], 
+                cat5: [ { title: "Topic 5 Article 1", date: "Feb 01, 2025", url: "#", revised: null } ],
+                cat6: [ { title: "Topic 6 Article 1", date: "Mar 01, 2025", url: "#", revised: null } ]
             };
-
-            // --- Image Loading Logic ---
+    
+            // --- Image Loading Logic for category items (folder icons) ---
             let imagesLoadedCount = 0;
             const totalImages = folderIcons.length;
-
+    
             function imageLoadedOrError() {
                 imagesLoadedCount++;
                 if (imagesLoadedCount >= totalImages) {
-                    // All images have been processed (loaded or errored), start category item animation
-                    console.log("All folder icons processed. Starting animations.");
                     animateCategoryItems();
                 }
             }
-
-            if (totalImages === 0) { // If there are no icons for some reason
-                animateCategoryItems(); // Proceed directly
+    
+            if (totalImages === 0) {
+                animateCategoryItems(); 
             } else {
                 folderIcons.forEach(iconImg => {
-                    // Check if image is already loaded (e.g., from cache)
-                    if (iconImg.complete && iconImg.naturalHeight !== 0) {
-                        // console.log("Image already complete:", iconImg.src);
+                    if (iconImg.complete && iconImg.naturalHeight !== 0 && iconImg.naturalWidth !== 0) {
                         imageLoadedOrError();
                     } else {
                         iconImg.addEventListener('load', imageLoadedOrError);
                         iconImg.addEventListener('error', () => {
                             console.warn("Error loading image:", iconImg.src);
-                            imageLoadedOrError(); // Still count it as processed
+                            imageLoadedOrError(); 
                         });
                     }
                 });
             }
-            // --- End Image Loading Logic ---
-
-
+            
             function animateCategoryItems() {
                 categoryItems.forEach((item, index) => {
                     setTimeout(() => {
@@ -169,39 +176,78 @@
                     }, index * 180 + 100); 
                 });
             }
-
-
-            categoryItems.forEach(item => { /* ... item click listener unchanged ... */
+            // --- End Image Loading Logic ---
+    
+    
+            categoryItems.forEach(item => {
                 item.addEventListener('click', () => { 
-                    const category = item.dataset.category; const categoryName = item.querySelector('p').textContent || "Category"; 
+                    const category = item.dataset.category;
+                    const categoryName = item.querySelector('p').textContent || "Category"; 
                     const articles = articlesByCategory[category] || [];
-                    modalBreadcrumbCategoryName.textContent = categoryName; modalArticleList.innerHTML = ''; 
-                    if (articles.length === 0) { const li = document.createElement('li'); li.style.textAlign = 'center'; li.style.padding = '20px 0'; li.textContent = 'No articles in this category yet.'; modalArticleList.appendChild(li); setTimeout(() => li.classList.add('show-item'), 50);
+    
+                    modalBreadcrumbCategoryName.textContent = categoryName;
+                    modalArticleList.innerHTML = ''; 
+    
+                    if (articles.length === 0) {
+                        const li = document.createElement('li');
+                        li.style.textAlign = 'center'; 
+                        li.style.padding = '20px 0';
+                        li.textContent = 'No articles in this category yet.';
+                        modalArticleList.appendChild(li);
+                        setTimeout(() => li.classList.add('show-item'), 50);
                     } else {
                         articles.forEach((article, index) => {
-                            const li = document.createElement('li'); const revisedDate = article.revised ? article.revised : 'X'; 
-                            li.innerHTML = `<img src="images/folder-icon.svg" alt="Article" class="article-icon"><div class="article-info"><a href="${article.url}" class="article-title">${article.title}</a></div><p class="article-date">${article.date}</p><p class="article-revised">${revisedDate}</p>`; 
-                            modalArticleList.appendChild(li); setTimeout(() => { li.classList.add('show-item'); }, index * 250 + 150); 
+                            const li = document.createElement('li');
+                            const revisedDate = article.revised ? article.revised : 'X'; 
+                            li.innerHTML = `
+                                <img src="images/folder-icon.svg" alt="Article" class="article-icon">
+                                <div class="article-info">
+                                    <a href="${article.url}" class="article-title">${article.title}</a>
+                                </div>
+                                <p class="article-date">${article.date}</p>
+                                <p class="article-revised">${revisedDate}</p> 
+                            `; 
+                            modalArticleList.appendChild(li);
+                            setTimeout(() => {
+                                li.classList.add('show-item');
+                            }, index * 250 + 150); 
                         });
                     }
-                    const iconRect = item.querySelector('.folder-icon').getBoundingClientRect(); const iconCenterX = iconRect.left + iconRect.width / 2; const iconCenterY = iconRect.top + iconRect.height / 2;
-                    modalContent.style.transformOrigin = `${iconCenterX}px ${iconCenterY}px`; modalContent.style.transform = 'scale(0.05)'; modalContent.style.opacity = '0';
-                    modalOverlay.style.opacity = '0'; modalOverlay.classList.add('visible');
-                    requestAnimationFrame(() => { modalOverlay.style.opacity = '1'; requestAnimationFrame(() => { modalContent.style.transform = 'scale(1)'; modalContent.style.opacity = '1'; }); });
+                    
+                    const iconRect = item.querySelector('.folder-icon').getBoundingClientRect();
+                    const iconCenterX = iconRect.left + iconRect.width / 2;
+                    const iconCenterY = iconRect.top + iconRect.height / 2;
+                    modalContent.style.transformOrigin = `${iconCenterX}px ${iconCenterY}px`;
+                    modalContent.style.transform = 'scale(0.05)'; 
+                    modalContent.style.opacity = '0';
+                    modalOverlay.style.opacity = '0'; 
+                    modalOverlay.classList.add('visible');
+                    requestAnimationFrame(() => { 
+                        modalOverlay.style.opacity = '1'; 
+                        requestAnimationFrame(() => { 
+                             modalContent.style.transform = 'scale(1)';
+                             modalContent.style.opacity = '1';
+                        });
+                    });
                 });
             });
-
-            function closeModal() { /* ... closeModal unchanged ... */
-                const modalRect = modalContent.getBoundingClientRect(); modalContent.style.transformOrigin = `${modalRect.width / 2}px ${modalRect.height / 2}px`;
-                modalContent.style.transform = 'scale(0.5)'; modalContent.style.opacity = '0'; modalOverlay.style.opacity = '0';
-                setTimeout(() => { modalOverlay.classList.remove('visible'); modalContent.style.transform = 'scale(0.5)'; modalContent.style.opacity = '0'; }, 300); 
+    
+            function closeModal() { /* ... closeModal function unchanged ... */
+                const modalRect = modalContent.getBoundingClientRect();
+                modalContent.style.transformOrigin = `${modalRect.width / 2}px ${modalRect.height / 2}px`;
+                modalContent.style.transform = 'scale(0.5)'; modalContent.style.opacity = '0';
+                modalOverlay.style.opacity = '0';
+                setTimeout(() => {
+                    modalOverlay.classList.remove('visible');
+                    modalContent.style.transform = 'scale(0.5)'; modalContent.style.opacity = '0';
+                }, 300); 
             }
-
+    
             modalCloseButton.addEventListener('click', closeModal);
             modalOverlay.addEventListener('click', (event) => { if (event.target === modalOverlay) { closeModal(); } });
             document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && modalOverlay.classList.contains('visible')) { closeModal(); } });
         });
     </script>
-
-</body>
-</html>
+    
+    </body>
+    </html>
