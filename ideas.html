@@ -26,27 +26,63 @@
         <div class="category-grid">
             <div class="category-item" data-category="personal" data-category-name="Personal Stories">
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
-                <p>Personal Stories</p>
+                <div class="title-container">
+                    <span class="corner-line tl-h"></span><span class="corner-line tl-v"></span>
+                    <span class="corner-line tr-h"></span><span class="corner-line tr-v"></span>
+                    <p>Personal Stories</p>
+                    <span class="corner-line bl-h"></span><span class="corner-line bl-v"></span>
+                    <span class="corner-line br-h"></span><span class="corner-line br-v"></span>
+                </div>
             </div>
             <div class="category-item" data-category="ai" data-category-name="Artificial Intelligence">
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
-                <p>Artificial Intelligence</p>
+                <div class="title-container">
+                    <span class="corner-line tl-h"></span><span class="corner-line tl-v"></span>
+                    <span class="corner-line tr-h"></span><span class="corner-line tr-v"></span>
+                    <p>Artificial Intelligence</p>
+                    <span class="corner-line bl-h"></span><span class="corner-line bl-v"></span>
+                    <span class="corner-line br-h"></span><span class="corner-line br-v"></span>
+                </div>
             </div>
             <div class="category-item category-undefined" data-category="cat3" data-category-name="Undefined">
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
-                <p>Undefined</p>
+                <div class="title-container">
+                    <span class="corner-line tl-h"></span><span class="corner-line tl-v"></span>
+                    <span class="corner-line tr-h"></span><span class="corner-line tr-v"></span>
+                    <p>Undefined</p>
+                    <span class="corner-line bl-h"></span><span class="corner-line bl-v"></span>
+                    <span class="corner-line br-h"></span><span class="corner-line br-v"></span>
+                </div>
             </div>
             <div class="category-item category-undefined" data-category="cat4" data-category-name="Undefined">
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
-                <p>Undefined</p>
+                <div class="title-container">
+                    <span class="corner-line tl-h"></span><span class="corner-line tl-v"></span>
+                    <span class="corner-line tr-h"></span><span class="corner-line tr-v"></span>
+                    <p>Undefined</p>
+                    <span class="corner-line bl-h"></span><span class="corner-line bl-v"></span>
+                    <span class="corner-line br-h"></span><span class="corner-line br-v"></span>
+                </div>
             </div>
             <div class="category-item category-undefined" data-category="cat5" data-category-name="Undefined">
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
-                <p>Undefined</p>
+                <div class="title-container">
+                    <span class="corner-line tl-h"></span><span class="corner-line tl-v"></span>
+                    <span class="corner-line tr-h"></span><span class="corner-line tr-v"></span>
+                    <p>Undefined</p>
+                    <span class="corner-line bl-h"></span><span class="corner-line bl-v"></span>
+                    <span class="corner-line br-h"></span><span class="corner-line br-v"></span>
+                </div>
             </div>
             <div class="category-item category-undefined" data-category="cat6" data-category-name="Undefined">
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
-                <p>Undefined</p>
+                <div class="title-container">
+                    <span class="corner-line tl-h"></span><span class="corner-line tl-v"></span>
+                    <span class="corner-line tr-h"></span><span class="corner-line tr-v"></span>
+                    <p>Undefined</p>
+                    <span class="corner-line bl-h"></span><span class="corner-line bl-v"></span>
+                    <span class="corner-line br-h"></span><span class="corner-line br-v"></span>
+                </div>
             </div>
         </div>
     </main>
@@ -55,8 +91,13 @@
     <div class="modal-overlay" id="categoryModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modalCategoryTitle">Category Articles</h2>
+                <div class="modal-title-bar" id="modalBreadcrumb">Ideas > <span class="category-name-in-title" id="modalCategoryName">Category</span></div>
                 <button class="modal-close-button" id="modalCloseButton">×</button>
+            </div>
+            <div class="modal-column-headers">
+                <div class="col-icon"> <!-- Placeholder for Icon header if needed --> </div>
+                <div class="col-name">Name</div>
+                <div class="col-date">Date</div>
             </div>
             <div class="modal-body">
                 <ul class="modal-article-list" id="modalArticleList">
@@ -72,23 +113,15 @@
             const modalOverlay = document.getElementById('categoryModal');
             const modalContent = modalOverlay.querySelector('.modal-content');
             const modalCloseButton = document.getElementById('modalCloseButton');
-            const modalCategoryTitle = document.getElementById('modalCategoryTitle');
+            // const modalCategoryTitle = document.getElementById('modalCategoryTitle'); // Replaced by breadcrumb
+            const modalBreadcrumbCategoryName = document.getElementById('modalCategoryName');
             const modalArticleList = document.getElementById('modalArticleList');
 
-            const articlesByCategory = {
-                personal: [
-                    { title: "My Journey into Coding", date: "May 20, 2025", url: "blog/personal-journey.html" },
-                    { title: "Lessons Learned from Traveling Solo", date: "Apr 10, 2025", url: "blog/travel-lessons.html" }
-                ],
-                ai: [
-                    { title: "The Future of LLMs", date: "May 15, 2025", url: "blog/future-of-llms.html" },
-                    { title: "Understanding Vector Databases", date: "May 01, 2025", url: "blog/vector-databases.html" },
-                    { title: "AI Ethics in Development", date: "Apr 20, 2025", url: "blog/ai-ethics.html" }
-                ],
-                cat3: [ { title: "Topic 3 Article 1", date: "Jan 01, 2025", url: "#" } ],
-                cat4: [], 
-                cat5: [ { title: "Topic 5 Article 1", date: "Feb 01, 2025", url: "#" } ],
-                cat6: [ { title: "Topic 6 Article 1", date: "Mar 01, 2025", url: "#" } ]
+            const articlesByCategory = { /* ... Same article data as before ... */
+                personal: [ { title: "My Journey into Coding", date: "May 20, 2025", url: "blog/personal-journey.html" }, { title: "Lessons Learned from Traveling Solo", date: "Apr 10, 2025", url: "blog/travel-lessons.html" } ],
+                ai: [ { title: "The Future of LLMs", date: "May 15, 2025", url: "blog/future-of-llms.html" }, { title: "Understanding Vector Databases", date: "May 01, 2025", url: "blog/vector-databases.html" }, { title: "AI Ethics in Development", date: "Apr 20, 2025", url: "blog/ai-ethics.html" } ],
+                cat3: [ { title: "Topic 3 Article 1", date: "Jan 01, 2025", url: "#" } ], cat4: [], 
+                cat5: [ { title: "Topic 5 Article 1", date: "Feb 01, 2025", url: "#" } ], cat6: [ { title: "Topic 6 Article 1", date: "Mar 01, 2025", url: "#" } ]
             };
 
             categoryItems.forEach(item => {
@@ -97,11 +130,14 @@
                     const categoryName = item.dataset.categoryName || "Category"; 
                     const articles = articlesByCategory[category] || [];
 
-                    modalCategoryTitle.textContent = categoryName;
+                    // modalCategoryTitle.textContent = categoryName; // Replaced
+                    modalBreadcrumbCategoryName.textContent = categoryName;
                     modalArticleList.innerHTML = ''; 
 
                     if (articles.length === 0) {
                         const li = document.createElement('li');
+                        li.style.textAlign = 'center'; // Center the "no articles" message
+                        li.style.padding = '20px 0';
                         li.textContent = 'No articles in this category yet.';
                         modalArticleList.appendChild(li);
                         setTimeout(() => li.classList.add('show-item'), 50);
@@ -109,13 +145,16 @@
                         articles.forEach((article, index) => {
                             const li = document.createElement('li');
                             li.innerHTML = `
-                                <a href="${article.url}" class="article-title">${article.title}</a>
+                                <img src="images/folder-icon.svg" alt="Article" class="article-icon">
+                                <div class="article-info">
+                                    <a href="${article.url}" class="article-title">${article.title}</a>
+                                </div>
                                 <p class="article-date">${article.date}</p>
                             `;
                             modalArticleList.appendChild(li);
                             setTimeout(() => {
                                 li.classList.add('show-item');
-                            }, index * 100 + 50); 
+                            }, index * 200 + 100); // Increased stagger: 200ms between items, 100ms initial delay
                         });
                     }
 
@@ -137,26 +176,20 @@
                 });
             });
 
-            function closeModal() {
+            function closeModal() { /* ... closeModal function unchanged ... */
                 const modalRect = modalContent.getBoundingClientRect();
                 modalContent.style.transformOrigin = `${modalRect.width / 2}px ${modalRect.height / 2}px`;
-                modalContent.style.transform = 'scale(0.5)'; 
-                modalContent.style.opacity = '0';
+                modalContent.style.transform = 'scale(0.5)'; modalContent.style.opacity = '0';
                 modalOverlay.style.opacity = '0';
                 setTimeout(() => {
                     modalOverlay.classList.remove('visible');
-                    modalContent.style.transform = 'scale(0.5)'; 
-                    modalContent.style.opacity = '0';
+                    modalContent.style.transform = 'scale(0.5)'; modalContent.style.opacity = '0';
                 }, 300); 
             }
 
             modalCloseButton.addEventListener('click', closeModal);
-            modalOverlay.addEventListener('click', (event) => {
-                if (event.target === modalOverlay) { closeModal(); }
-            });
-            document.addEventListener('keydown', (event) => {
-                if (event.key === 'Escape' && modalOverlay.classList.contains('visible')) { closeModal(); }
-            });
+            modalOverlay.addEventListener('click', (event) => { if (event.target === modalOverlay) { closeModal(); } });
+            document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && modalOverlay.classList.contains('visible')) { closeModal(); } });
         });
     </script>
 

@@ -186,18 +186,18 @@ main.ideas-main-content {
     display: flex;
     flex-direction: column;
     align-items: center; 
-    padding-top: 80px; /* Adjusted spacing after H1 removal, was 100px */
+    padding-top: 80px; 
     padding-bottom: 60px; 
-    min-height: calc(100vh - 140px); /* Header + padding */
+    min-height: calc(100vh - 140px); 
     box-sizing: border-box;
     width: 100%; 
 }
 
 .category-grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(220px, 1fr)); /* Min increased for larger icon, max flexible */
-    gap: 20px; /* Reduced gap for tighter grid */
-    max-width: 900px; /* Can adjust if needed based on new icon size */
+    grid-template-columns: repeat(3, minmax(200px, 1fr)); /* Adjusted min for new icon size */
+    gap: 40px; /* Was 20px, increased slightly for larger icons */
+    max-width: 900px; 
     width: 90%; 
     margin: 0 auto; 
 }
@@ -209,81 +209,179 @@ main.ideas-main-content {
     text-align: center;
     text-decoration: none; 
     color: #F5F5F5;        
-    padding: 5px; /* Reduced padding further as there's no box */
+    padding: 10px; 
     background-color: transparent; 
     border-radius: 0;          
     border: none;              
-    transition: color 0.3s ease, transform 0.3s ease; 
+    transition: transform 0.2s ease; /* Only transform for the item itself */
     cursor: pointer; 
+    position: relative; /* For positioning hover effects if needed on the item itself */
 }
 
 .folder-icon {
-    width: 200px; /* Changed to 200px */
-    height: 200px; /* Changed to 200px */
-    margin-bottom: 4px; /* Reduced margin to bring text much closer */
+    width: 170px; /* Changed to 170px */
+    height: 170px; /* Changed to 170px */
+    margin-bottom: 15px; /* Increased space slightly for corner lines */
     object-fit: contain; 
-    transition: filter 0.3s ease; 
+    transition: transform 0.3s ease; /* For subtle icon movement on hover */
 }
 
-.category-item p {
+.category-item .title-container {
+    position: relative; /* Parent for corner lines */
+    padding: 5px 10px; /* Padding around the text for lines to wrap */
+    display: inline-block; /* So it only takes width of text */
+}
+
+.category-item p { /* This is the folder title text */
     margin: 0;
-    font-size: 0.9em; /* Slightly smaller again for balance with huge icon */
-    font-weight: 400;  
+    font-size: 0.9em; 
+    font-weight: 500; /* Slightly bolder than previous */
     color: #b0b0b0; 
     transition: color 0.3s ease;
+    position: relative; /* To ensure text is above pseudo-elements if they overlap */
+    z-index: 1;
 }
 
+/* Corner lines for hover effect */
+.title-container .corner-line {
+    position: absolute;
+    background-color: #ADD8E6; /* Misty/Powdery Blue */
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+/* Top-left */
+.title-container .tl-h { top: 0; left: 0; width: 0; height: 2px; transform-origin: left; transform: scaleX(0); }
+.title-container .tl-v { top: 0; left: 0; width: 2px; height: 0; transform-origin: top; transform: scaleY(0); }
+/* Top-right */
+.title-container .tr-h { top: 0; right: 0; width: 0; height: 2px; transform-origin: right; transform: scaleX(0); }
+.title-container .tr-v { top: 0; right: 0; width: 2px; height: 0; transform-origin: top; transform: scaleY(0); }
+/* Bottom-left */
+.title-container .bl-h { bottom: 0; left: 0; width: 0; height: 2px; transform-origin: left; transform: scaleX(0); }
+.title-container .bl-v { bottom: 0; left: 0; width: 2px; height: 0; transform-origin: bottom; transform: scaleY(0); }
+/* Bottom-right */
+.title-container .br-h { bottom: 0; right: 0; width: 0; height: 2px; transform-origin: right; transform: scaleX(0); }
+.title-container .br-v { bottom: 0; right: 0; width: 2px; height: 0; transform-origin: bottom; transform: scaleY(0); }
+
+/* Hover state for category item */
+.category-item:hover .folder-icon {
+    transform: scale(1.05); /* Slight zoom on icon */
+}
 .category-item:hover p { 
     color: #ADD8E6; 
 }
-
-.category-item:hover .folder-icon {
-    /* filter: brightness(1.15); */ /* Optional: subtle brightness on icon hover */
+.category-item:hover .corner-line {
+    opacity: 1;
+    transform: scaleX(1) scaleY(1); /* Full scale */
 }
+.category-item:hover .tl-h, .category-item:hover .tr-h, 
+.category-item:hover .bl-h, .category-item:hover .br-h { width: 30%; } /* Adjust line length */
+.category-item:hover .tl-v, .category-item:hover .tr-v,
+.category-item:hover .bl-v, .category-item:hover .br-v { height: 60%; } /* Adjust line length */
 
 
-/* Modal Styles remain the same as before */
-.modal-overlay { /* ... */
+/* === Modal Styles === */
+.modal-overlay { /* ... existing overlay styles ... */
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.7); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+    background-color: rgba(0, 0, 0, 0.75); /* Slightly darker overlay */
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); /* Stronger blur */
     display: flex; align-items: center; justify-content: center; z-index: 1000; 
     opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s;
 }
 .modal-overlay.visible { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s linear 0s; }
-.modal-content { /* ... */
-    background-color: #181828; padding: 30px; border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3); width: 80%; max-width: 700px; max-height: 80vh;
-    overflow-y: auto; position: relative; transform: scale(0.5); opacity: 0;
-    transition: transform 0.4s cubic-bezier(0.18,0.89,0.32,1.28), opacity 0.3s ease-out;
-    transform-origin: center center;
+
+.modal-content {
+    background-color: #10121c; /* Darker, consistent with your visual */
+    padding: 0; /* Padding will be handled by inner elements */
+    border-radius: 0px; /* Hard corners */
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); /* More prominent shadow */
+    width: 75%;
+    max-width: 800px; /* Max width for modal */
+    max-height: 70vh; /* Max height */
+    display: flex; /* Use flex for header, column-headers, body structure */
+    flex-direction: column;
+    position: relative;
+    transform: scale(0.5); 
+    opacity: 0;
+    transition: transform 0.35s cubic-bezier(0.18, 0.89, 0.32, 1.20), opacity 0.25s ease-out; 
+    transform-origin: center center; 
 }
 .modal-overlay.visible .modal-content { transform: scale(1); opacity: 1; }
-.modal-header { /* ... */
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1);
+
+.modal-header { /* This is now the title bar */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #1c1e2c; /* Slightly different color for title bar */
+    border-bottom: 1px solid #2a2d3c; /* Separator line */
 }
-.modal-header h2 { margin: 0; font-size: 1.8em; color: #E0E0E0; }
-.modal-close-button { /* ... */
-    background: none; border: none; font-size: 2.5em; color: #AAAAAA;
-    cursor: pointer; padding: 0; line-height: 1; transition: color 0.2s ease;
+
+.modal-title-bar { /* For "Ideas > Folder Name" */
+    font-size: 0.95em;
+    color: #a0a0c0;
+    font-weight: 500;
+}
+.modal-title-bar .category-name-in-title {
+    color: #E0E0FF; /* Highlight current folder name */
+    font-weight: 600;
+}
+
+.modal-close-button { /* ... existing close button styles ... */
+    background: none; border: none; font-size: 1.8em; /* Slightly smaller */
+    color: #AAAAAA; cursor: pointer; padding: 0 5px; line-height: 1;
+    transition: color 0.2s ease;
 }
 .modal-close-button:hover { color: #FFFFFF; }
+
+.modal-column-headers {
+    display: flex;
+    padding: 10px 20px;
+    background-color: #161826; /* Background for header row */
+    border-bottom: 1px solid #2a2d3c;
+    font-size: 0.9em;
+    color: #b0b0cc;
+    font-weight: 600;
+}
+.modal-column-headers .col-icon { flex: 0 0 40px; /* Space for icon */ }
+.modal-column-headers .col-name { flex-grow: 1; }
+.modal-column-headers .col-date { flex: 0 0 120px; text-align: right; } /* Fixed width for date */
+
+.modal-body {
+    overflow-y: auto; /* Scroll for article list if it's long */
+    padding: 0 20px; /* Padding for the list items */
+}
+
 .modal-article-list { list-style: none; padding: 0; margin: 0; }
-.modal-article-list li { /* ... */
-    padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.07);
-    opacity: 0; transform: translateY(15px);
+.modal-article-list li {
+    display: flex; /* For icon, title, date alignment */
+    align-items: center;
+    padding: 15px 0; /* Increased padding */
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    opacity: 0; 
+    transform: translateY(20px); /* Start further down for more distinct load */
     transition: opacity 0.4s ease-out, transform 0.4s ease-out;
 }
 .modal-article-list li:last-child { border-bottom: none; }
 .modal-article-list li.show-item { opacity: 1; transform: translateY(0); }
-.modal-article-list .article-title { /* ... */
-    font-size: 1.2em; color: #C0C0FF; text-decoration: none; display: block;
-    margin-bottom: 4px; transition: color 0.2s ease;
+
+.modal-article-list .article-icon {
+    width: 24px; /* Size for article icon */
+    height: 24px;
+    margin-right: 15px;
+    object-fit: contain;
+    /* filter: invert(80%) sepia(20%) saturate(100%) hue-rotate(180deg) brightness(100%) contrast(80%); */ /* Example to make it look like a file icon */
+}
+
+.modal-article-list .article-info {
+    flex-grow: 1;
+}
+.modal-article-list .article-title { 
+    font-size: 1.1em; /* Slightly smaller */
+    color: #C0C0FF; text-decoration: none; display: block;
+    margin-bottom: 3px; transition: color 0.2s ease;
 }
 .modal-article-list .article-title:hover { color: #E0E0FF; }
-.modal-article-list .article-date { font-size: 0.9em; color: #9999AA; margin: 0; }
+.modal-article-list .article-date { font-size: 0.85em; color: #9090AA; margin: 0; text-align: right; flex: 0 0 120px; }
 
 /* General page background class */
-body.page-background main {
-    padding-top: 80px; 
-}
+body.page-background main { padding-top: 80px; }
