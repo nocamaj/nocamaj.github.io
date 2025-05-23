@@ -7,6 +7,12 @@ body, html {
     color: #F5F5F5;
 }
 
+/* NEW GENERIC MAIN RULE - PLACE IT HERE */
+main {
+    padding-top: 85px; /* Default padding for main elements. Adjust if header height is different. */
+    box-sizing: border-box; 
+}
+
 .background-animation { 
     position: fixed;
     top: 0;
@@ -36,11 +42,16 @@ header {
     background-color: rgba(18, 18, 18, 0.00); 
     backdrop-filter: blur(8.5px);
     -webkit-backdrop-filter: blur(8.5px);
-    padding: 15px 20px;
+    padding: 15px 20px; /* This contributes to header height */
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     z-index: 10; 
     box-sizing: border-box;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    /* Let's find the actual height of the header. 
+       A typical header like this might be around 60px to 70px.
+       Inspect it in your browser to get the exact computed height.
+       For example, if it's 68px high.
+    */
 }
 
 nav {
@@ -329,7 +340,6 @@ main.metrics-main-content h1, main.metrics-main-content p { color: #F5F5F5; }
     flex-shrink: 0; 
 }
 
-
 /* General page background class if needed for other static pages */
 body.page-background main {
     padding-top: 80px; 
@@ -337,28 +347,35 @@ body.page-background main {
 
 /* === Blog Post Specific Styles === */
 main.blog-post-content {
-    padding-top: 100px; 
+    /* This padding-top will ADD to any padding-top on a generic 'main' tag if not reset.
+       Let's make it specific and ensure no double padding. */
+    padding-top: 85px; /* Increased slightly - TUNE THIS VALUE based on your header's actual height */
     padding-bottom: 60px;
+    padding-left: 20px; /* Add some side padding for content */
+    padding-right: 20px; /* Add some side padding for content */
     max-width: 800px; 
-    margin: 0 auto; 
+    margin: 0 auto; /* This centers the 800px block */
     color: #E0E0E0; 
-    min-height: auto; /* Override any min-height that might be pushing things */
+    min-height: auto; /* Ensure it doesn't try to be full viewport height unnecessarily */
+    /* No background or backdrop-filter here that would mimic a header */
 }
 
 .blog-post-content article {
-    /* Add any article-specific wrapper styles if needed */
+    /* No special positioning or background that would cause issues */
 }
 
 .blog-post-content .post-header {
+    margin-top: 0; /* Explicitly remove any default top margin from the post header itself */
     margin-bottom: 30px;
     padding-bottom: 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    /* No background or backdrop-filter here */
 }
 
 .blog-post-content .post-header h1 {
     font-size: 2.8em;
-    color: #F5F5F5; /* Main title color */
-    margin-top: 0;
+    color: #F5F5F5; 
+    margin-top: 0; /* Remove default H1 margin */
     margin-bottom: 10px;
     line-height: 1.2;
 }
@@ -369,41 +386,23 @@ main.blog-post-content {
     margin-top: 0;
 }
 
-.blog-post-content .post-meta time {
-    /* Style for time element if you use it */
-}
-
 .blog-post-content .post-body p {
     font-size: 1.1em;
     line-height: 1.7;
     margin-bottom: 1.5em;
-    color: #C0C0C0; /* Main paragraph text color */
+    color: #C0C0C0; 
 }
 
-.blog-post-content .post-body figure {
-    margin: 30px 0;
-    text-align: center;
+.blog-post-content .post-body figure { /* ... styles for figures/images ... */
+    margin: 30px 0; text-align: center;
 }
+.blog-post-content .post-body figure img { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+.blog-post-content .post-body figcaption { font-size: 0.9em; color: #9999AA; margin-top: 10px; font-style: italic; }
+.blog-post-content blockquote { border-left: 3px solid #FFC04D; padding-left: 20px; margin: 20px 0; font-style: italic; color: #A0A0B0; }
 
-.blog-post-content .post-body figure img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px; /* Optional rounded corners for images */
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2); /* Optional shadow */
-}
-
-.blog-post-content .post-body figcaption {
-    font-size: 0.9em;
-    color: #9999AA;
-    margin-top: 10px;
-    font-style: italic;
-}
-
-/* Add styles for other elements like blockquotes, lists, code blocks if needed */
-.blog-post-content blockquote {
-    border-left: 3px solid #FFC04D; /* Accent color for blockquotes */
-    padding-left: 20px;
-    margin: 20px 0;
-    font-style: italic;
-    color: #A0A0B0;
+/* Ensure no-scroll is correctly applied where needed */
+body.no-scroll {
+    overflow: hidden;
+    /* height: 100vh; /* Can sometimes cause issues if content within is also 100vh.
+                       Use with caution or ensure child elements are sized correctly. */
 }
