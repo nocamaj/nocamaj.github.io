@@ -1,11 +1,10 @@
-<!-- belgrade-bar-story.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>noahcamaj.com</title> 
-    <link rel="stylesheet" href="../style.css"> 
+    <title>noahcamaj.com</title>
+    <link rel="stylesheet" href="../style.css">
 </head>
 <body class="page-background">
     
@@ -24,10 +23,11 @@
 
     <main class="blog-post-content">
         <article>
+            <!-- Title and Meta moved into post-body and given new classes -->
             <section class="post-body">
-                <!-- Paragraphs will be targeted by JS for typing animation -->
-                <h1>Belgrade Bar Story</h1>
-                <p class="post-meta"><time datetime="2024-07-18">July 18, 2024</time></p>
+                <h1 class="blog-title">Belgrade Bar Story</h1>
+                <p class="blog-meta"><time datetime="2024-07-18">July 18, 2024</time></p>
+
                 <p>Whenever I go to a new country I like to find cool bars that specialize in making their own drink recipes.</p>
                 <p>I came to a bar called "Riddle." The door was locked, I had to knock. A bouncer comes out, slurring-his-words drunk. He ushers me in enthusiastically and shakes my hand.</p>
                 <p>I get to the bar and ask for a menu. The bartender says, "We don't have a menu, just tell me what flavors you want and I'll make something good."</p>
@@ -45,70 +45,87 @@
             const postBody = document.querySelector('.blog-post-content .post-body');
             if (!postBody) return;
 
-            const elementsToType = Array.from(postBody.children); // Get h1, p (meta), and all content p tags
-            let currentElementIndex = 0;
-            let currentCharIndex = 0;
-            let currentTextElement = null;
-            let originalTexts = [];
-            let cursorSpan = null;
-
-            const typingSpeed = 10; // Milliseconds per character - Faster
-
-            elementsToType.forEach(el => {
-                if (el.matches('h1') || el.matches('p')) {
-                    originalTexts.push(el.textContent);
-                    el.textContent = ''; // Clear for typing
-                    el.style.opacity = '1'; // Make element visible
-                } else {
-                    originalTexts.push(null); // Placeholder for non-text elements
-                }
-            });
+            const elementsToType = Array.from(postBody.children); // Get H1, P (meta), and all story P tags
+            const typingSpeed = 10; // Milliseconds per character - faster
+            let globalCursor = null;
 
             function createCursor(parentElement) {
-                if (cursorSpan) cursorSpan.remove(); // Remove old cursor
-                cursorSpan = document.createElement('span');
-                cursorSpan.className = 'typing-cursor';
-                parentElement.appendChild(cursorSpan);
+                const cursor = document.createElement('span');
+                cursor.className = 'typing-cursor';
+                parentElement.appendChild(cursor);
+                return cursor;
             }
 
-            function typeWriter() {
-                if (currentElementIndex >= elementsToType.length) {
-                    if (cursorSpan) cursorSpan.style.animation = 'none'; // Stop blinking
-                    return; // All elements processed
+            function removeCursor() {
+                if (globalCursor && globalCursor.parentNode) {
+                    globalCursor.parentNode.removeChild(globalCursor);
                 }
-
-                currentTextElement = elementsToType[currentElementIndex];
-                const originalText = originalTexts[currentElementIndex];
-
-                if (originalText === null) { // Skip non-text elements like figures
-                    currentElementIndex++;
-                    setTimeout(typeWriter, 0); // Move to next element immediately
-                    return;
-                }
-                
-                if (currentCharIndex === 0) { // Start of a new text element
-                    createCursor(currentTextElement);
-                }
-
-                if (currentCharIndex < originalText.length) {
-                    currentTextElement.textContent += originalText.charAt(currentCharIndex);
-                    currentCharIndex++;
-                    // Move cursor to the end of the current text
-                    if (cursorSpan) currentTextElement.appendChild(cursorSpan);
-                    setTimeout(typeWriter, typingSpeed);
-                } else {
-                    // Finished typing current element
-                    if (cursorSpan) cursorSpan.remove(); // Remove cursor from completed element
-                    cursorSpan = null;
-                    currentElementIndex++;
-                    currentCharIndex = 0;
-                    setTimeout(typeWriter, 200); // Pause slightly before typing next element
-                }
+                globalCursor = null;
             }
 
-            if (elementsToType.length > 0) {
-                typeWriter(); // Start typing process
+            async function typeElement(element, isLastElementInSequence) {
+                return new Promise(async (resolve) => {
+                    if (element.nodeName === 'H1' || element.classList.contains('blog-meta')) {
+                        // For H1 and meta, reveal instantly or with a quick fade (optional)
+                        element.style.opacity = '0';
+                        requestAnimationFrame(() => {
+                           element.style.transition = 'opacity 0.3s ease-in';
+                           element.style.opacity = '1';
+                        });
+                        setTimeout(resolve, 100); // Short delay for visual separation
+                        return;
+                    }
+                    
+                    // Only P tags that are direct children of post-body and not blog-meta for typing
+                    if (element.nodeName !== 'P' || element.classList.contains('blog-meta')) {
+                        element.style.opacity = '1'; // Ensure other elements are visible
+                        resolve();
+                        return;
+                    }
+
+                    const originalText = element.getAttribute('data-original-text') || element.textContent;
+                    element.setAttribute('data-original-text', originalText); // Store it if not already
+                    element.textContent = '';
+                    element.style.opacity = '1'; // Make p visible for typing
+
+                    removeCursor(); // Remove previous cursor
+                    globalCursor = createCursor(element); // Add cursor to current paragraph
+
+                    for (let i = 0; i < originalText.length; i++) {
+                        element.insertBefore(document.createTextNode(originalText[i]), globalCursor);
+                        await new Promise(r => setTimeout(r, typingSpeed));
+                    }
+                    
+                    if (!isLastElementInSequence) { // Keep cursor for last paragraph until all done
+                       removeCursor();
+                    }
+                    resolve();
+                });
             }
+
+            async function typeAllElements() {
+                for (let i = 0; i < elementsToType.length; i++) {
+                    // Check if it's a P tag intended for story content
+                    if (elementsToType[i].nodeName === 'P' && !elementsToType[i].classList.contains('blog-meta')) {
+                         elementsToType[i].style.opacity = '0'; // Keep story paragraphs initially hidden
+                    } else {
+                         elementsToType[i].style.opacity = '1'; // H1 and meta are visible by default (or faded by typeElement)
+                    }
+                }
+
+                for (let i = 0; i < elementsToType.length; i++) {
+                    const isLast = i === elementsToType.length - 1;
+                    // For story paragraphs, make them visible one by one before typing
+                    if (elementsToType[i].nodeName === 'P' && !elementsToType[i].classList.contains('blog-meta')) {
+                         elementsToType[i].style.opacity = '1'; // Make current P visible
+                    }
+                    await typeElement(elementsToType[i], isLast && elementsToType[i].nodeName === 'P');
+                }
+                removeCursor(); // Final cursor removal
+                // console.log("All typing done.");
+            }
+
+            typeAllElements();
         });
     </script>
 </body>
