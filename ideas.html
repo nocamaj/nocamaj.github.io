@@ -176,18 +176,7 @@
                     } else {
                         articles.forEach((article, index) => {
                             const li = document.createElement('li'); const revisedDate = article.revised ? article.revised : 'X'; 
-                            li.innerHTML = `
-    <div class="article-icon-container">
-        <img src="images/folder-icon.svg" alt="Article" class="article-icon">
-    </div>
-    <div class="article-info">
-        <a href="${article.url}" class="article-title">${article.title}</a>
-    </div>
-    <span class="list-col-separator">|</span> <!-- ADDED Separator -->
-    <p class="article-date">${article.date}</p>
-    <span class="list-col-separator">|</span> <!-- ADDED Separator -->
-    <p class="article-revised">${revisedDate}</p> 
-`; 
+                            li.innerHTML = `<img src="images/folder-icon.svg" alt="Article" class="article-icon"><div class="article-info"><a href="${article.url}" class="article-title">${article.title}</a></div><p class="article-date">${article.date}</p><p class="article-revised">${revisedDate}</p>`; 
                             modalArticleList.appendChild(li); setTimeout(() => { li.classList.add('show-item'); }, index * 250 + 150); 
                         });
                     }
