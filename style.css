@@ -5,11 +5,17 @@ body, html {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #0a0a18; 
     color: #F5F5F5;
+    /* overflow: hidden; /* REMOVE this global rule to allow scrolling on pages like blog posts */
 }
 
-/* NEW GENERIC MAIN RULE - PLACE IT HERE */
+body.no-scroll { /* Add this class to body on pages where you want to PREVENT scrolling (index, travel) */
+    overflow: hidden;
+    /* height: 100vh; /* Optional, use if needed for specific full-viewport no-scroll layouts */
+}
+
+/* Generic main rule - applies to <main> on all pages unless a more specific rule overrides it */
 main {
-    padding-top: 85px; /* Default padding for main elements. Adjust if header height is different. */
+    padding-top: 85px; /* Default padding to clear the fixed header. Adjust if your header's height changes. */
     box-sizing: border-box; 
 }
 
@@ -42,16 +48,11 @@ header {
     background-color: rgba(18, 18, 18, 0.00); 
     backdrop-filter: blur(8.5px);
     -webkit-backdrop-filter: blur(8.5px);
-    padding: 15px 20px; /* This contributes to header height */
+    padding: 15px 20px; 
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     z-index: 10; 
     box-sizing: border-box;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    /* Let's find the actual height of the header. 
-       A typical header like this might be around 60px to 70px.
-       Inspect it in your browser to get the exact computed height.
-       For example, if it's 68px high.
-    */
 }
 
 nav {
@@ -80,8 +81,11 @@ nav {
 }
 .nav-left .nav-button:hover::before, .nav-right .nav-button:hover::before { transform: translateY(0); }
 
-main:not(.travel-main) { 
-    position: relative; padding-top: 80px; padding-bottom: 80px;
+/* Main content for index page - specific padding if needed */
+main:not(.travel-main):not(.ideas-main-content):not(.metrics-main-content):not(.blog-post-content) { 
+    position: relative; 
+    /* padding-top: 80px; /* Will inherit 85px from generic 'main' unless explicitly different */
+    padding-bottom: 80px;
     min-height: calc(100vh - 160px); 
     z-index: 5; 
 }
@@ -119,18 +123,18 @@ footer {
 }
 
 /* === Travel Page Specific Styles === */
-body.travel-page-background { overflow: hidden; margin: 0; padding: 0; height: 100vh; }
-main.travel-main { /* ... travel-main styles ... */
-    position: relative; height: 100vh; width: 100vw; padding: 0; box-sizing: border-box;
-    display: flex; align-items: center; justify-content: center; z-index: 2; 
+body.travel-page-background { /* Still useful for specificity if needed */ } 
+main.travel-main {
+    position: relative; height: 100vh; width: 100vw; padding: 0; /* Overrides generic main padding */ 
+    box-sizing: border-box; display: flex; align-items: center; justify-content: center; z-index: 2; 
 }
-.map-outer-container { /* ... map-outer-container styles ... */
+.map-outer-container { 
     width: calc(100% - 80px); height: calc(100vh - 60px - 80px); padding: 15px; 
     border: 2px solid rgba(150,150,180,0.5); border-radius: 25px; background-color: #0a0a18;
     box-shadow: 0 0 15px rgba(0,0,0,0.3); box-sizing: border-box; display: flex; 
     margin-top: 60px; position: relative; z-index: 3; 
 }
-.map-legend { /* ... map-legend styles ... */
+.map-legend { 
     flex: 0 0 180px; padding-right: 15px; box-sizing: border-box; color: #F5F5F5;
     display: flex; flex-direction: column; justify-content: flex-start; padding-top: 10px; 
     position: relative; z-index: 4; 
@@ -139,101 +143,42 @@ main.travel-main { /* ... travel-main styles ... */
 .legend-color-box { width: 20px; height: 20px; margin-right: 10px; border: 1px solid #555; }
 #map { flex-grow: 1; height: 100%; width: 100%; background-color: #121f3a; border-radius: 15px; overflow: hidden; position: relative; z-index: 3; }
 
-/* ... (Keep all existing styles from before: body, header, nav, footer, etc.) ... */
 
-/* === Ideas Page Specific Styles === */
-main.ideas-main-content, main.metrics-main-content { 
+/* === Ideas Page & Metrics Page Specific Styles for main container === */
+main.ideas-main-content, 
+main.metrics-main-content { 
     display: flex;
     flex-direction: column;
     align-items: center; 
-    padding-top: 100px; 
+    padding-top: 100px; /* Specific padding, overrides generic 'main' */
     padding-bottom: 60px; 
     min-height: calc(100vh - 160px); 
     box-sizing: border-box;
     width: 100%; 
 }
-main.metrics-main-content h1, main.metrics-main-content p { color: #F5F5F5; }
+main.metrics-main-content h1, 
+main.metrics-main-content p { color: #F5F5F5; }
 
 
-.category-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(180px, 1fr)); 
-    gap: 35px; 
-    max-width: 850px; 
-    width: 90%; 
-    margin: 0 auto; 
+.category-grid { /* ... styles for .category-grid ... */
+    display: grid; grid-template-columns: repeat(3, minmax(180px, 1fr)); gap: 35px; 
+    max-width: 850px; width: 90%; margin: 0 auto; 
 }
-
-.category-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    text-decoration: none; 
-    color: #F5F5F5;        
-    padding: 5px; 
-    background-color: transparent; 
-    border-radius: 0;          
-    border: none;              
-    transition: transform 0.2s ease; 
-    cursor: pointer; 
-    position: relative; 
-    opacity: 0; 
-    transform: translateY(20px); 
-    /* Transition for the item itself */
-    transition: opacity 0.5s ease-out 0.1s, transform 0.5s ease-out 0.1s; /* Added small delay to item */
+.category-item { /* ... styles for .category-item ... */
+    display: flex; flex-direction: column; align-items: center; text-align: center;
+    text-decoration: none; color: #F5F5F5; padding: 5px; background-color: transparent; 
+    border-radius: 0; border: none; transition: transform 0.2s ease; cursor: pointer; 
+    position: relative; opacity: 0; transform: translateY(20px); 
+    transition: opacity 0.5s ease-out 0.1s, transform 0.5s ease-out 0.1s;
 }
-
-.category-item.visible { 
-    opacity: 1;
-    transform: translateY(0);
-}
-
-.folder-icon {
-    width: 150px; 
-    height: 150px; 
-    margin-bottom: 8px; 
-    object-fit: contain; 
-    transition: transform 0.3s ease; 
-}
-
-.category-item .title-container {
-    position: relative; 
-    /* Padding adjusted: more horizontal for line offset, less vertical */
-    padding: 3px 10px; 
-    display: inline-block; 
-}
-
-.category-item p {
-    margin: 0;
-    font-size: 0.9em; 
-    font-weight: 500; 
-    color: #b0b0b0; 
-    /* Add transition for text opacity for sync attempt */
-    transition: color 0.3s ease, opacity 0.3s ease 0.05s; /* Text fades in slightly after container */
-    opacity: 1; /* Default for when .visible is applied to parent */
-}
-
-.category-item.visible p {
-    opacity: 1;
-}
-
-
-/* Corner lines for hover effect */
-.title-container .corner-line {
-    position: absolute;
-    background-color: #ADD8E6; 
-    opacity: 0;
-    transition: opacity 0.2s ease, width 0.2s ease, height 0.2s ease; 
-    z-index: 0; 
-}
-
-.title-container .tl-h, .title-container .tr-h,
-.title-container .bl-h, .title-container .br-h { height: 2px; width: 0; }
-.title-container .tl-v, .title-container .tr-v,
-.title-container .bl-v, .title-container .br-v { width: 2px; height: 0; }
-
-/* Positioning - -2px pushes them slightly out from the padding box edge */
+.category-item.visible { opacity: 1; transform: translateY(0); }
+.folder-icon { width: 150px; height: 150px; margin-bottom: 8px; object-fit: contain; transition: transform 0.3s ease; }
+.category-item .title-container { position: relative; padding: 3px 10px; display: inline-block; }
+.category-item p { margin: 0; font-size: 0.9em; font-weight: 500; color: #b0b0b0; transition: color 0.3s ease, opacity 0.3s ease 0.05s; opacity: 1; position: relative; z-index: 1;}
+.category-item.visible p { opacity: 1; }
+.title-container .corner-line { position: absolute; background-color: #ADD8E6; opacity: 0; transition: opacity 0.2s ease, width 0.2s ease, height 0.2s ease; z-index: 0; }
+.title-container .tl-h, .title-container .tr-h, .title-container .bl-h, .title-container .br-h { height: 2px; width: 0; }
+.title-container .tl-v, .title-container .tr-v, .title-container .bl-v, .title-container .br-v { width: 2px; height: 0; }
 .title-container .tl-h { top: 0; left: -2px; transform-origin: left; } 
 .title-container .tl-v { top: 0; left: -2px; transform-origin: top; }  
 .title-container .tr-h { top: 0; right: -2px; transform-origin: right; }
@@ -242,140 +187,66 @@ main.metrics-main-content h1, main.metrics-main-content p { color: #F5F5F5; }
 .title-container .bl-v { bottom: 0; left: -2px; transform-origin: bottom; }
 .title-container .br-h { bottom: 0; right: -2px; transform-origin: right; }
 .title-container .br-v { bottom: 0; right: -2px; transform-origin: bottom; }
-
-
 .category-item:hover .folder-icon { transform: scale(1.03); }
 .category-item:hover p { color: #ADD8E6; }
 .category-item:hover .corner-line { opacity: 1; }
-.category-item:hover .tl-h, .category-item:hover .tr-h, 
-.category-item:hover .bl-h, .category-item:hover .br-h { width: 15px; } 
-.category-item:hover .tl-v, .category-item:hover .tr-v,
-.category-item:hover .bl-v, .category-item:hover .br-v { height: 10px; } 
-
+.category-item:hover .tl-h, .category-item:hover .tr-h, .category-item:hover .bl-h, .category-item:hover .br-h { width: 15px; } 
+.category-item:hover .tl-v, .category-item:hover .tr-v, .category-item:hover .bl-v, .category-item:hover .br-v { height: 10px; } 
 
 /* === Modal Styles === */
-.modal-overlay { /* ... existing overlay styles ... */
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.0); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-    display: flex; align-items: center; justify-content: center; z-index: 1000; 
-    opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s;
-}
+/* ... (Modal styles remain unchanged from previous correct version) ... */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.0); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s; }
 .modal-overlay.visible { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s linear 0s; }
-
-.modal-content { /* ... existing modal content styles ... */
-    background-color: #141622; padding: 0; border-radius: 0px; 
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5); 
-    width: 90%; max-width: 950px; 
-    height: 80vh; max-height: 700px; 
-    display: flex; flex-direction: column;
-    position: relative; transform: scale(0.5); opacity: 0;
-    transition: transform 0.35s cubic-bezier(0.18,0.89,0.32,1.20), opacity 0.25s ease-out; 
-    transform-origin: center center; 
-}
+.modal-content { background-color: #141622; padding: 0; border-radius: 0px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); width: 90%; max-width: 950px; height: 80vh; max-height: 700px; display: flex; flex-direction: column; position: relative; transform: scale(0.5); opacity: 0; transition: transform 0.35s cubic-bezier(0.18,0.89,0.32,1.20), opacity 0.25s ease-out; transform-origin: center center; }
 .modal-overlay.visible .modal-content { transform: scale(1); opacity: 1; }
-
-.modal-header { /* ... existing modal header styles ... */
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 12px 20px; background-color: #1c1e2c; border-bottom: 1px solid #2a2d3c; 
-}
-
-.modal-title-bar { /* ... existing title bar styles ... */
-    font-size: 0.9em; color: #b0b0cc; font-weight: 400; 
-}
+.modal-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 20px; background-color: #1c1e2c; border-bottom: 1px solid #2a2d3c; }
+.modal-title-bar { font-size: 0.9em; color: #b0b0cc; font-weight: 400; }
 .modal-title-bar .path-separator { margin: 0 8px; color: #707090; }
 .modal-title-bar .category-name-in-title { color: #E0E0FF; font-weight: 400; }
-
-.modal-close-button { /* ... existing close button styles ... */
-    background: none; border: none; font-size: 1.8em; 
-    color: #AAAAAA; cursor: pointer; padding: 0 5px; line-height: 1;
-    transition: color 0.2s ease;
-}
+.modal-close-button { background: none; border: none; font-size: 1.8em; color: #AAAAAA; cursor: pointer; padding: 0 5px; line-height: 1; transition: color 0.2s ease; }
 .modal-close-button:hover { color: #FFFFFF; }
-
-.modal-column-headers {
-    display: flex;
-    padding: 10px 20px;
-    background-color: #181a28; 
-    border-bottom: 1px solid #2a2d3c;
-    font-size: 0.85em; 
-    color: #9090b0;    
-    font-weight: 500;  
-}
+.modal-column-headers { display: flex; padding: 10px 20px; background-color: #181a28; border-bottom: 1px solid #2a2d3c; font-size: 0.85em; color: #9090b0; font-weight: 500; text-align: left; }
 .modal-column-headers .col-icon { flex: 0 0 40px; text-align: left; } 
 .modal-column-headers .col-name { flex-grow: 1; padding-right: 10px; text-align: left; }
 .modal-column-headers .col-separator { color: #404060; padding: 0 5px; }
 .modal-column-headers .col-date { flex: 0 0 100px; text-align: left; padding-right: 10px;} 
 .modal-column-headers .col-revised { flex: 0 0 100px; text-align: left; } 
-
-
 .modal-body { overflow-y: auto; padding: 0; }
 .modal-article-list { list-style: none; padding: 0; margin: 0; }
-.modal-article-list li {
-    display: flex; align-items: center; padding: 12px 20px; 
-    border-bottom: 1px solid rgba(255,255,255,0.05); 
-    opacity: 0; transform: translateY(20px); 
-    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
-}
+.modal-article-list li { display: flex; align-items: center; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); opacity: 0; transform: translateY(20px); transition: opacity 0.4s ease-out, transform 0.4s ease-out; }
 .modal-article-list li:last-child { border-bottom: none; }
 .modal-article-list li.show-item { opacity: 1; transform: translateY(0); }
-
-.modal-article-list .article-icon {
-    width: 20px; height: 20px; margin-right: 12px; 
-    object-fit: contain;
-    filter: invert(70%) sepia(10%) saturate(100%) hue-rotate(180deg) brightness(100%) contrast(90%); 
-}
-
-.modal-article-list .article-info { flex-grow: 1; text-align: left; } /* Ensure text in title is left aligned */
-.modal-article-list .article-title { 
-    font-size: 1.05em; color: #C8C8E0; text-decoration: none; display: block;
-    margin-bottom: 2px; transition: color 0.2s ease;
-}
+.modal-article-list .article-icon { width: 20px; height: 20px; margin-right: 12px; object-fit: contain; filter: invert(70%) sepia(10%) saturate(100%) hue-rotate(180deg) brightness(100%) contrast(90%); }
+.modal-article-list .article-info { flex-grow: 1; text-align: left; } 
+.modal-article-list .article-title { font-size: 1.05em; color: #C8C8E0; text-decoration: none; display: block; margin-bottom: 2px; transition: color 0.2s ease; }
 .modal-article-list .article-title:hover { color: #E8E8FF; }
-
-.modal-article-list .article-date,
-.modal-article-list .article-revised { 
-    font-size: 0.8em; color: #8888A0; margin: 0; 
-    text-align: left; 
-    flex-basis: 100px; 
-    flex-shrink: 0; 
-}
-
-/* General page background class if needed for other static pages */
-body.page-background main {
-    padding-top: 80px; 
-}
+.modal-article-list .article-date, .modal-article-list .article-revised { font-size: 0.8em; color: #8888A0; margin: 0; text-align: left; flex-basis: 100px; flex-shrink: 0; }
 
 /* === Blog Post Specific Styles === */
 main.blog-post-content {
-    /* This padding-top will ADD to any padding-top on a generic 'main' tag if not reset.
-       Let's make it specific and ensure no double padding. */
-    padding-top: 85px; /* Increased slightly - TUNE THIS VALUE based on your header's actual height */
+    padding-top: 100px; /* Explicit, higher specificity padding for blog posts */
     padding-bottom: 60px;
-    padding-left: 20px; /* Add some side padding for content */
-    padding-right: 20px; /* Add some side padding for content */
+    padding-left: 20px; 
+    padding-right: 20px; 
     max-width: 800px; 
-    margin: 0 auto; /* This centers the 800px block */
+    margin: 0 auto; 
     color: #E0E0E0; 
-    min-height: auto; /* Ensure it doesn't try to be full viewport height unnecessarily */
-    /* No background or backdrop-filter here that would mimic a header */
+    min-height: auto; 
 }
 
-.blog-post-content article {
-    /* No special positioning or background that would cause issues */
-}
+.blog-post-content article {}
 
 .blog-post-content .post-header {
-    margin-top: 0; /* Explicitly remove any default top margin from the post header itself */
+    margin-top: 0; 
     margin-bottom: 30px;
     padding-bottom: 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    /* No background or backdrop-filter here */
 }
 
 .blog-post-content .post-header h1 {
     font-size: 2.8em;
     color: #F5F5F5; 
-    margin-top: 0; /* Remove default H1 margin */
+    margin-top: 0; 
     margin-bottom: 10px;
     line-height: 1.2;
 }
@@ -393,16 +264,7 @@ main.blog-post-content {
     color: #C0C0C0; 
 }
 
-.blog-post-content .post-body figure { /* ... styles for figures/images ... */
-    margin: 30px 0; text-align: center;
-}
+.blog-post-content .post-body figure { margin: 30px 0; text-align: center; }
 .blog-post-content .post-body figure img { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 .blog-post-content .post-body figcaption { font-size: 0.9em; color: #9999AA; margin-top: 10px; font-style: italic; }
 .blog-post-content blockquote { border-left: 3px solid #FFC04D; padding-left: 20px; margin: 20px 0; font-style: italic; color: #A0A0B0; }
-
-/* Ensure no-scroll is correctly applied where needed */
-body.no-scroll {
-    overflow: hidden;
-    /* height: 100vh; /* Can sometimes cause issues if content within is also 100vh.
-                       Use with caution or ensure child elements are sized correctly. */
-}
