@@ -1,10 +1,11 @@
+<!-- belgrade-bar-story.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>noahcamaj.com</title> <!-- Consistent title -->
-    <link rel="stylesheet" href="../style.css"> <!-- Path to CSS is now ../style.css -->
+    <title>noahcamaj.com</title> 
+    <link rel="stylesheet" href="../style.css"> 
 </head>
 <body class="page-background">
     
@@ -23,8 +24,13 @@
 
     <main class="blog-post-content">
         <article>
+            <header class="post-header">
+                <h1>Belgrade Bar Story</h1>
+                <p class="post-meta"><time datetime="2024-07-18">July 18, 2024</time></p>
+            </header>
             
             <section class="post-body">
+                <!-- Paragraphs will be targeted by JS for typing animation -->
                 <p>Whenever I go to a new country I like to find cool bars that specialize in making their own drink recipes.</p>
                 <p>I came to a bar called "Riddle." The door was locked, I had to knock. A bouncer comes out, slurring-his-words drunk. He ushers me in enthusiastically and shakes my hand.</p>
                 <p>I get to the bar and ask for a menu. The bartender says, "We don't have a menu, just tell me what flavors you want and I'll make something good."</p>
@@ -37,6 +43,37 @@
         </article>
     </main>
 
-    <!-- No footer for blog posts unless desired -->
+    <script>
+        // Typing animation for blog post paragraphs
+        document.addEventListener('DOMContentLoaded', () => {
+            const paragraphs = document.querySelectorAll('.blog-post-content .post-body p');
+            let overallCharIndex = 0;
+            const typingSpeed = 20; // Milliseconds per character
+
+            function typeParagraph(pIndex) {
+                if (pIndex >= paragraphs.length) return; // All paragraphs typed
+
+                const pElement = paragraphs[pIndex];
+                const originalText = pElement.textContent;
+                pElement.textContent = ''; // Clear current text
+                pElement.style.opacity = '1'; // Make paragraph visible before typing starts
+                let charIndex = 0;
+
+                function typeChar() {
+                    if (charIndex < originalText.length) {
+                        pElement.textContent += originalText.charAt(charIndex);
+                        charIndex++;
+                        overallCharIndex++;
+                        setTimeout(typeChar, typingSpeed);
+                    } else {
+                        // Move to next paragraph
+                        typeParagraph(pIndex + 1);
+                    }
+                }
+                typeChar();
+            }
+            typeParagraph(0); // Start typing from the first paragraph
+        });
+    </script>
 </body>
 </html>

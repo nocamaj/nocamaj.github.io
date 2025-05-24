@@ -9,6 +9,7 @@
 <body class="page-background"> 
     
     <header>
+        <!-- ... header nav ... -->
         <nav>
             <div class="nav-left">
                 <a href="index.html" class="nav-button">Home</a> 
@@ -22,6 +23,7 @@
     </header>
 
     <main class="ideas-main-content">
+        <!-- ... category-grid ... -->
         <div class="category-grid">
             <div class="category-item" data-category="personal" data-category-name="Personal Stories">
                 <img src="images/folder-icon.svg" alt="Folder Icon" class="folder-icon">
@@ -87,7 +89,7 @@
     </main>
 
     <div class="modal-overlay" id="categoryModal">
-        <!-- ... Modal HTML structure unchanged ... -->
+        <!-- ... Modal HTML structure ... -->
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title-bar">
@@ -113,8 +115,9 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // ... (modal element selections as before) ...
-            const categoryItems = Array.from(document.querySelectorAll('.category-item'));
+            // ... (modal and category item selections as before) ...
+            const categoryGrid = document.querySelector('.category-grid');
+            const categoryItems = Array.from(categoryGrid.querySelectorAll('.category-item')); 
             const folderIcons = Array.from(document.querySelectorAll('.category-item .folder-icon'));
             
             const modalOverlay = document.getElementById('categoryModal');
@@ -122,14 +125,11 @@
             const modalCloseButton = document.getElementById('modalCloseButton');
             const modalBreadcrumbCategoryName = document.getElementById('modalCategoryName');
             const modalArticleList = document.getElementById('modalArticleList');
-    
-    
+
             const articlesByCategory = {
                 personal: [
-                    // UPDATED URLs and added new story
-                    { title: "Belgrade Bar Story", date: "May 28, 2025", url: "blog/belgrade-bar-story.html", revised: null },
-                    { title: "Greece Hotel Story", date: "May 29, 2025", url: "blog/greece-hotel-story.html", revised: null }
-                    // Add more personal stories here
+                    { title: "Belgrade Bar Story", date: "July 18, 2024", url: "blog/belgrade-bar-story.html", revised: null },
+                    { title: "Greece Hotel Story", date: "February 8, 2025", url: "blog/greece-hotel-story.html", revised: "May 05, 2025" }
                 ],
                 ai: [
                     { title: "The Future of LLMs", date: "May 15, 2025", url: "blog/future-of-llms.html", revised: null },
@@ -141,113 +141,63 @@
                 cat5: [ { title: "Topic 5 Article 1", date: "Feb 01, 2025", url: "#", revised: null } ],
                 cat6: [ { title: "Topic 6 Article 1", date: "Mar 01, 2025", url: "#", revised: null } ]
             };
-    
-            // --- Image Loading Logic for category items (folder icons) ---
+
+            // --- Image Loading Logic for category items ---
             let imagesLoadedCount = 0;
             const totalImages = folderIcons.length;
-    
+
             function imageLoadedOrError() {
                 imagesLoadedCount++;
                 if (imagesLoadedCount >= totalImages) {
                     animateCategoryItems();
                 }
             }
-    
-            if (totalImages === 0) {
-                animateCategoryItems(); 
-            } else {
+            if (totalImages === 0) { animateCategoryItems(); } 
+            else {
                 folderIcons.forEach(iconImg => {
-                    if (iconImg.complete && iconImg.naturalHeight !== 0 && iconImg.naturalWidth !== 0) {
-                        imageLoadedOrError();
-                    } else {
+                    if (iconImg.complete && iconImg.naturalHeight !== 0 && iconImg.naturalWidth !== 0) { imageLoadedOrError(); } 
+                    else {
                         iconImg.addEventListener('load', imageLoadedOrError);
-                        iconImg.addEventListener('error', () => {
-                            console.warn("Error loading image:", iconImg.src);
-                            imageLoadedOrError(); 
-                        });
+                        iconImg.addEventListener('error', () => { console.warn("Error loading image:", iconImg.src); imageLoadedOrError(); });
                     }
                 });
             }
-            
-            function animateCategoryItems() {
-                categoryItems.forEach((item, index) => {
-                    setTimeout(() => {
-                        item.classList.add('visible');
-                    }, index * 180 + 100); 
-                });
+            function animateCategoryItems() { /* ... unchanged ... */
+                categoryItems.forEach((item, index) => { setTimeout(() => { item.classList.add('visible'); }, index * 180 + 100); });
             }
             // --- End Image Loading Logic ---
-    
-    
-            categoryItems.forEach(item => {
+
+            categoryItems.forEach(item => { /* ... item click listener unchanged ... */
                 item.addEventListener('click', () => { 
-                    const category = item.dataset.category;
-                    const categoryName = item.querySelector('p').textContent || "Category"; 
+                    const category = item.dataset.category; const categoryName = item.querySelector('p').textContent || "Category"; 
                     const articles = articlesByCategory[category] || [];
-    
-                    modalBreadcrumbCategoryName.textContent = categoryName;
-                    modalArticleList.innerHTML = ''; 
-    
-                    if (articles.length === 0) {
-                        const li = document.createElement('li');
-                        li.style.textAlign = 'center'; 
-                        li.style.padding = '20px 0';
-                        li.textContent = 'No articles in this category yet.';
-                        modalArticleList.appendChild(li);
-                        setTimeout(() => li.classList.add('show-item'), 50);
+                    modalBreadcrumbCategoryName.textContent = categoryName; modalArticleList.innerHTML = ''; 
+                    if (articles.length === 0) { const li = document.createElement('li'); li.style.textAlign = 'center'; li.style.padding = '20px 0'; li.textContent = 'No articles in this category yet.'; modalArticleList.appendChild(li); setTimeout(() => li.classList.add('show-item'), 50);
                     } else {
                         articles.forEach((article, index) => {
-                            const li = document.createElement('li');
-                            const revisedDate = article.revised ? article.revised : 'X'; 
-                            li.innerHTML = `
-                                <img src="images/folder-icon.svg" alt="Article" class="article-icon">
-                                <div class="article-info">
-                                    <a href="${article.url}" class="article-title">${article.title}</a>
-                                </div>
-                                <p class="article-date">${article.date}</p>
-                                <p class="article-revised">${revisedDate}</p> 
-                            `; 
-                            modalArticleList.appendChild(li);
-                            setTimeout(() => {
-                                li.classList.add('show-item');
-                            }, index * 250 + 150); 
+                            const li = document.createElement('li'); const revisedDate = article.revised ? article.revised : 'X'; 
+                            li.innerHTML = `<img src="images/folder-icon.svg" alt="Article" class="article-icon"><div class="article-info"><a href="${article.url}" class="article-title">${article.title}</a></div><p class="article-date">${article.date}</p><p class="article-revised">${revisedDate}</p>`; 
+                            modalArticleList.appendChild(li); setTimeout(() => { li.classList.add('show-item'); }, index * 250 + 150); 
                         });
                     }
-                    
-                    const iconRect = item.querySelector('.folder-icon').getBoundingClientRect();
-                    const iconCenterX = iconRect.left + iconRect.width / 2;
-                    const iconCenterY = iconRect.top + iconRect.height / 2;
-                    modalContent.style.transformOrigin = `${iconCenterX}px ${iconCenterY}px`;
-                    modalContent.style.transform = 'scale(0.05)'; 
-                    modalContent.style.opacity = '0';
-                    modalOverlay.style.opacity = '0'; 
-                    modalOverlay.classList.add('visible');
-                    requestAnimationFrame(() => { 
-                        modalOverlay.style.opacity = '1'; 
-                        requestAnimationFrame(() => { 
-                             modalContent.style.transform = 'scale(1)';
-                             modalContent.style.opacity = '1';
-                        });
-                    });
+                    const iconRect = item.querySelector('.folder-icon').getBoundingClientRect(); const iconCenterX = iconRect.left + iconRect.width / 2; const iconCenterY = iconRect.top + iconRect.height / 2;
+                    modalContent.style.transformOrigin = `${iconCenterX}px ${iconCenterY}px`; modalContent.style.transform = 'scale(0.05)'; modalContent.style.opacity = '0';
+                    modalOverlay.style.opacity = '0'; modalOverlay.classList.add('visible');
+                    requestAnimationFrame(() => { modalOverlay.style.opacity = '1'; requestAnimationFrame(() => { modalContent.style.transform = 'scale(1)'; modalContent.style.opacity = '1'; }); });
                 });
             });
-    
-            function closeModal() { /* ... closeModal function unchanged ... */
-                const modalRect = modalContent.getBoundingClientRect();
-                modalContent.style.transformOrigin = `${modalRect.width / 2}px ${modalRect.height / 2}px`;
-                modalContent.style.transform = 'scale(0.5)'; modalContent.style.opacity = '0';
-                modalOverlay.style.opacity = '0';
-                setTimeout(() => {
-                    modalOverlay.classList.remove('visible');
-                    modalContent.style.transform = 'scale(0.5)'; modalContent.style.opacity = '0';
-                }, 300); 
+
+            function closeModal() { /* ... closeModal unchanged ... */
+                const modalRect = modalContent.getBoundingClientRect(); modalContent.style.transformOrigin = `${modalRect.width / 2}px ${modalRect.height / 2}px`;
+                modalContent.style.transform = 'scale(0.5)'; modalContent.style.opacity = '0'; modalOverlay.style.opacity = '0';
+                setTimeout(() => { modalOverlay.classList.remove('visible'); modalContent.style.transform = 'scale(0.5)'; modalContent.style.opacity = '0'; }, 300); 
             }
-    
+
             modalCloseButton.addEventListener('click', closeModal);
             modalOverlay.addEventListener('click', (event) => { if (event.target === modalOverlay) { closeModal(); } });
             document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && modalOverlay.classList.contains('visible')) { closeModal(); } });
         });
     </script>
-    
-    </body>
-    </html>
+
+</body>
+</html>

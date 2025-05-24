@@ -1,10 +1,11 @@
+<!-- greece-hotel-story.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>noahcamaj.com</title> <!-- Consistent title -->
-    <link rel="stylesheet" href="../style.css"> <!-- Path to CSS is now ../style.css -->
+    <title>noahcamaj.com</title> 
+    <link rel="stylesheet" href="../style.css"> 
 </head>
 <body class="page-background">
     
@@ -23,6 +24,10 @@
 
     <main class="blog-post-content">
         <article>
+            <header class="post-header">
+                <h1>Greece Hotel Story</h1>
+                <p class="post-meta"><time datetime="2025-02-08">February 8, 2025</time></p>
+            </header>
             
             <section class="post-body">
                 <p>When I bought my apartment in Albania, I took a trip to Greece with some friends to buy some furniture. They have an IKEA and overall better quality goods. We spent the night in a cool small town. We were looking for a hotel online, but knowing that we were booking a hotel same day, I said, "Hey let's just go into places and try to bargain, it's last minute."</p>
@@ -41,5 +46,36 @@
         </article>
     </main>
 
+    <script>
+        // Typing animation for blog post paragraphs
+        document.addEventListener('DOMContentLoaded', () => {
+            const paragraphs = document.querySelectorAll('.blog-post-content .post-body p');
+            let overallCharIndex = 0;
+            const typingSpeed = 20; // Milliseconds per character
+
+            function typeParagraph(pIndex) {
+                if (pIndex >= paragraphs.length) return;
+
+                const pElement = paragraphs[pIndex];
+                const originalText = pElement.textContent;
+                pElement.textContent = ''; 
+                pElement.style.opacity = '1'; 
+                let charIndex = 0;
+
+                function typeChar() {
+                    if (charIndex < originalText.length) {
+                        pElement.textContent += originalText.charAt(charIndex);
+                        charIndex++;
+                        overallCharIndex++;
+                        setTimeout(typeChar, typingSpeed);
+                    } else {
+                        typeParagraph(pIndex + 1);
+                    }
+                }
+                typeChar();
+            }
+            typeParagraph(0);
+        });
+    </script>
 </body>
 </html>
