@@ -5,40 +5,20 @@ body, html {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #0a0a18; 
     color: #F5F5F5;
-    /* overflow: hidden; /* REMOVE this global rule to allow scrolling on pages like blog posts */
 }
 
-body.no-scroll { /* Add this class to body on pages where you want to PREVENT scrolling (index, travel) */
+body.no-scroll {
     overflow: hidden;
-    /* height: 100vh; /* Optional, use if needed for specific full-viewport no-scroll layouts */
 }
 
 /* Generic main rule - applies to <main> on all pages unless a more specific rule overrides it */
 main {
-    padding-top: 85px; /* Default padding to clear the fixed header. Adjust if your header's height changes. */
+    /* padding-top: 85px; /* Default padding to clear the fixed header. We'll make blog-post-content more explicit. */
     box-sizing: border-box; 
 }
 
-.background-animation { 
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1; 
-    overflow: hidden; 
-    pointer-events: none; 
-    background-color: transparent; 
-}
-
-.background-animation canvas {
-    display: block !important;
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-}
+.background-animation { /* ... */ }
+.background-animation canvas { /* ... */ }
 
 header {
     position: fixed;
@@ -50,95 +30,42 @@ header {
     -webkit-backdrop-filter: blur(8.5px);
     padding: 15px 20px; 
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    z-index: 10; 
+    z-index: 10; /* Ensures header is on top */
     box-sizing: border-box;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    /* Forcing a defined height can sometimes help stabilize fixed elements */
+    height: 70px; /* Example: Adjust this to your actual header height after padding */
 }
 
-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    max-width: 1600px;
-    margin: 0 auto;
-}
+nav { /* ... */ }
+.nav-left { /* ... */ }
+.nav-right { /* ... */ }
+.nav-left .nav-button, .nav-right .nav-button { /* ... */ }
+.nav-left .nav-button::before, .nav-right .nav-button::before { /* ... */ }
+.nav-left .nav-button:hover, .nav-right .nav-button:hover { /* ... */ }
+.nav-left .nav-button:hover::before, .nav-right .nav-button:hover::before { /* ... */ }
 
-.nav-left { display: flex; margin-right: auto; }
-.nav-right { display: flex; margin-left: auto; }
-.nav-left .nav-button, .nav-right .nav-button {
-    color: #F5F5F5; text-decoration: none; padding: 8px 15px; margin: 0 8px;
-    border-radius: 5px; transition: all 0.3s ease; white-space: nowrap;
-    letter-spacing: 0.5px; font-weight: 500; position: relative; overflow: hidden; z-index: 1;
-}
-.nav-left .nav-button::before, .nav-right .nav-button::before {
-    content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(255, 255, 255, 0.1); transform: translateY(100%);
-    transition: transform 0.3s ease; z-index: -1; border-radius: 5px;
-}
-.nav-left .nav-button:hover, .nav-right .nav-button:hover {
-    color: #ffffff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-}
-.nav-left .nav-button:hover::before, .nav-right .nav-button:hover::before { transform: translateY(0); }
-
-/* Main content for index page - specific padding if needed */
+/* Main content for index page */
 main:not(.travel-main):not(.ideas-main-content):not(.metrics-main-content):not(.blog-post-content) { 
     position: relative; 
-    /* padding-top: 80px; /* Will inherit 85px from generic 'main' unless explicitly different */
+    padding-top: 85px; /* Specific for index main if different from blog */
     padding-bottom: 80px;
     min-height: calc(100vh - 160px); 
-    z-index: 5; 
+    z-index: 5; /* Below header */
 }
 
-footer { 
-    position: fixed; bottom: 0; left: 0; width: 100%; padding: 20px 0;
-    background-color: rgba(18, 18, 18, 0.00);
-    backdrop-filter: blur(8.5px); 
-    -webkit-backdrop-filter: blur(8.5px);
-    display: flex; justify-content: center; align-items: center;
-    z-index: 10; 
-    box-sizing: border-box;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.search-container input[type="text"] { 
-    width: 400px; padding: 12px 20px; border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 25px; background-color: rgba(18,18,18,0.5); color: #F5F5F5;
-    font-size: 16px; outline: none; transition: all 0.3s ease; max-width: 90vw;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.15); backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-}
-.search-container input[type="text"]::placeholder { color: rgba(255,255,255,0.6); }
-.search-container input[type="text"]:focus {
-    border-color: rgba(255,255,255,0.3); box-shadow: 0 0 15px rgba(255,255,255,0.1);
-    background-color: rgba(26,26,26,0.7); transform: translateY(-2px);
-}
-
-@media (max-width: 768px) { 
-    nav { padding: 0 5px; }
-    .nav-right { justify-content: flex-end; }
-    .nav-left .nav-button, .nav-right .nav-button { padding: 6px 10px; margin: 0 3px; }
-    .search-container input[type="text"] { width: 80vw; }
-}
+footer { /* ... */ }
+.search-container input[type="text"] { /* ... */ }
+.search-container input[type="text"]::placeholder { /* ... */ }
+.search-container input[type="text"]:focus { /* ... */ }
+@media (max-width: 768px) { /* ... */ }
 
 /* === Travel Page Specific Styles === */
-body.travel-page-background { /* Still useful for specificity if needed */ } 
-main.travel-main {
-    position: relative; height: 100vh; width: 100vw; padding: 0; /* Overrides generic main padding */ 
-    box-sizing: border-box; display: flex; align-items: center; justify-content: center; z-index: 2; 
-}
-.map-outer-container { 
-    width: calc(100% - 80px); height: calc(100vh - 60px - 80px); padding: 15px; 
-    border: 2px solid rgba(150,150,180,0.5); border-radius: 25px; background-color: #0a0a18;
-    box-shadow: 0 0 15px rgba(0,0,0,0.3); box-sizing: border-box; display: flex; 
-    margin-top: 60px; position: relative; z-index: 3; 
-}
-.map-legend { 
-    flex: 0 0 180px; padding-right: 15px; box-sizing: border-box; color: #F5F5F5;
-    display: flex; flex-direction: column; justify-content: flex-start; padding-top: 10px; 
-    position: relative; z-index: 4; 
-}
+/* ... (Keep travel page styles as they are) ... */
+body.travel-page-background {} 
+main.travel-main { position: relative; height: 100vh; width: 100vw; padding: 0; box-sizing: border-box; display: flex; align-items: center; justify-content: center; z-index: 2; }
+.map-outer-container { width: calc(100% - 80px); height: calc(100vh - 60px - 80px); padding: 15px; border: 2px solid rgba(150,150,180,0.5); border-radius: 25px; background-color: #0a0a18; box-shadow: 0 0 15px rgba(0,0,0,0.3); box-sizing: border-box; display: flex; margin-top: 60px; position: relative; z-index: 3; }
+.map-legend { flex: 0 0 180px; padding-right: 15px; box-sizing: border-box; color: #F5F5F5; display: flex; flex-direction: column; justify-content: flex-start; padding-top: 10px; position: relative; z-index: 4; }
 .legend-item { display: flex; align-items: center; margin-bottom: 8px; }
 .legend-color-box { width: 20px; height: 20px; margin-right: 10px; border: 1px solid #555; }
 #map { flex-grow: 1; height: 100%; width: 100%; background-color: #121f3a; border-radius: 15px; overflow: hidden; position: relative; z-index: 3; }
@@ -147,30 +74,16 @@ main.travel-main {
 /* === Ideas Page & Metrics Page Specific Styles for main container === */
 main.ideas-main-content, 
 main.metrics-main-content { 
-    display: flex;
-    flex-direction: column;
-    align-items: center; 
-    padding-top: 100px; /* Specific padding, overrides generic 'main' */
-    padding-bottom: 60px; 
+    display: flex; flex-direction: column; align-items: center; 
+    padding-top: 100px; padding-bottom: 60px; 
     min-height: calc(100vh - 160px); 
-    box-sizing: border-box;
-    width: 100%; 
+    box-sizing: border-box; width: 100%; 
+    z-index: 5; /* Below header */
 }
-main.metrics-main-content h1, 
-main.metrics-main-content p { color: #F5F5F5; }
-
-
-.category-grid { /* ... styles for .category-grid ... */
-    display: grid; grid-template-columns: repeat(3, minmax(180px, 1fr)); gap: 35px; 
-    max-width: 850px; width: 90%; margin: 0 auto; 
-}
-.category-item { /* ... styles for .category-item ... */
-    display: flex; flex-direction: column; align-items: center; text-align: center;
-    text-decoration: none; color: #F5F5F5; padding: 5px; background-color: transparent; 
-    border-radius: 0; border: none; transition: transform 0.2s ease; cursor: pointer; 
-    position: relative; opacity: 0; transform: translateY(20px); 
-    transition: opacity 0.5s ease-out 0.1s, transform 0.5s ease-out 0.1s;
-}
+main.metrics-main-content h1, main.metrics-main-content p { color: #F5F5F5; }
+/* ... (Keep category grid, item, modal styles as they are) ... */
+.category-grid { display: grid; grid-template-columns: repeat(3, minmax(180px, 1fr)); gap: 35px; max-width: 850px; width: 90%; margin: 0 auto; }
+.category-item { display: flex; flex-direction: column; align-items: center; text-align: center; text-decoration: none; color: #F5F5F5; padding: 5px; background-color: transparent; border-radius: 0; border: none; transition: transform 0.2s ease; cursor: pointer; position: relative; opacity: 0; transform: translateY(20px); transition: opacity 0.5s ease-out 0.1s, transform 0.5s ease-out 0.1s; }
 .category-item.visible { opacity: 1; transform: translateY(0); }
 .folder-icon { width: 150px; height: 150px; margin-bottom: 8px; object-fit: contain; transition: transform 0.3s ease; }
 .category-item .title-container { position: relative; padding: 3px 10px; display: inline-block; }
@@ -179,22 +92,8 @@ main.metrics-main-content p { color: #F5F5F5; }
 .title-container .corner-line { position: absolute; background-color: #ADD8E6; opacity: 0; transition: opacity 0.2s ease, width 0.2s ease, height 0.2s ease; z-index: 0; }
 .title-container .tl-h, .title-container .tr-h, .title-container .bl-h, .title-container .br-h { height: 2px; width: 0; }
 .title-container .tl-v, .title-container .tr-v, .title-container .bl-v, .title-container .br-v { width: 2px; height: 0; }
-.title-container .tl-h { top: 0; left: -2px; transform-origin: left; } 
-.title-container .tl-v { top: 0; left: -2px; transform-origin: top; }  
-.title-container .tr-h { top: 0; right: -2px; transform-origin: right; }
-.title-container .tr-v { top: 0; right: -2px; transform-origin: top; } 
-.title-container .bl-h { bottom: 0; left: -2px; transform-origin: left; }
-.title-container .bl-v { bottom: 0; left: -2px; transform-origin: bottom; }
-.title-container .br-h { bottom: 0; right: -2px; transform-origin: right; }
-.title-container .br-v { bottom: 0; right: -2px; transform-origin: bottom; }
-.category-item:hover .folder-icon { transform: scale(1.03); }
-.category-item:hover p { color: #ADD8E6; }
-.category-item:hover .corner-line { opacity: 1; }
-.category-item:hover .tl-h, .category-item:hover .tr-h, .category-item:hover .bl-h, .category-item:hover .br-h { width: 15px; } 
-.category-item:hover .tl-v, .category-item:hover .tr-v, .category-item:hover .bl-v, .category-item:hover .br-v { height: 10px; } 
-
-/* === Modal Styles === */
-/* ... (Modal styles remain unchanged from previous correct version) ... */
+.title-container .tl-h { top: 0; left: -2px; transform-origin: left; } .title-container .tl-v { top: 0; left: -2px; transform-origin: top; } .title-container .tr-h { top: 0; right: -2px; transform-origin: right; } .title-container .tr-v { top: 0; right: -2px; transform-origin: top; } .title-container .bl-h { bottom: 0; left: -2px; transform-origin: left; } .title-container .bl-v { bottom: 0; left: -2px; transform-origin: bottom; } .title-container .br-h { bottom: 0; right: -2px; transform-origin: right; } .title-container .br-v { bottom: 0; right: -2px; transform-origin: bottom; }
+.category-item:hover .folder-icon { transform: scale(1.03); } .category-item:hover p { color: #ADD8E6; } .category-item:hover .corner-line { opacity: 1; } .category-item:hover .tl-h, .category-item:hover .tr-h, .category-item:hover .bl-h, .category-item:hover .br-h { width: 15px; } .category-item:hover .tl-v, .category-item:hover .tr-v, .category-item:hover .bl-v, .category-item:hover .br-v { height: 10px; } 
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.0); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 1000; opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s; }
 .modal-overlay.visible { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s linear 0s; }
 .modal-content { background-color: #141622; padding: 0; border-radius: 0px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); width: 90%; max-width: 950px; height: 80vh; max-height: 700px; display: flex; flex-direction: column; position: relative; transform: scale(0.5); opacity: 0; transition: transform 0.35s cubic-bezier(0.18,0.89,0.32,1.20), opacity 0.25s ease-out; transform-origin: center center; }
@@ -206,77 +105,55 @@ main.metrics-main-content p { color: #F5F5F5; }
 .modal-close-button { background: none; border: none; font-size: 1.8em; color: #AAAAAA; cursor: pointer; padding: 0 5px; line-height: 1; transition: color 0.2s ease; }
 .modal-close-button:hover { color: #FFFFFF; }
 .modal-column-headers { display: flex; padding: 10px 20px; background-color: #181a28; border-bottom: 1px solid #2a2d3c; font-size: 0.85em; color: #9090b0; font-weight: 500; text-align: left; }
-.modal-column-headers .col-icon { flex: 0 0 40px; text-align: left; } 
-.modal-column-headers .col-name { flex-grow: 1; padding-right: 10px; text-align: left; }
-.modal-column-headers .col-separator { color: #404060; padding: 0 5px; }
-.modal-column-headers .col-date { flex: 0 0 100px; text-align: left; padding-right: 10px;} 
-.modal-column-headers .col-revised { flex: 0 0 100px; text-align: left; } 
-.modal-body { overflow-y: auto; padding: 0; }
-.modal-article-list { list-style: none; padding: 0; margin: 0; }
-.modal-article-list li { display: flex; align-items: center; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); opacity: 0; transform: translateY(20px); transition: opacity 0.4s ease-out, transform 0.4s ease-out; }
-.modal-article-list li:last-child { border-bottom: none; }
-.modal-article-list li.show-item { opacity: 1; transform: translateY(0); }
+.modal-column-headers .col-icon { flex: 0 0 40px; text-align: left; } .modal-column-headers .col-name { flex-grow: 1; padding-right: 10px; text-align: left; } .modal-column-headers .col-separator { color: #404060; padding: 0 5px; } .modal-column-headers .col-date { flex: 0 0 100px; text-align: left; padding-right: 10px;} .modal-column-headers .col-revised { flex: 0 0 100px; text-align: left; } 
+.modal-body { overflow-y: auto; padding: 0; } .modal-article-list { list-style: none; padding: 0; margin: 0; } .modal-article-list li { display: flex; align-items: center; padding: 12px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); opacity: 0; transform: translateY(20px); transition: opacity 0.4s ease-out, transform 0.4s ease-out; }
+.modal-article-list li:last-child { border-bottom: none; } .modal-article-list li.show-item { opacity: 1; transform: translateY(0); }
 .modal-article-list .article-icon { width: 20px; height: 20px; margin-right: 12px; object-fit: contain; filter: invert(70%) sepia(10%) saturate(100%) hue-rotate(180deg) brightness(100%) contrast(90%); }
 .modal-article-list .article-info { flex-grow: 1; text-align: left; } 
 .modal-article-list .article-title { font-size: 1.05em; color: #C8C8E0; text-decoration: none; display: block; margin-bottom: 2px; transition: color 0.2s ease; }
 .modal-article-list .article-title:hover { color: #E8E8FF; }
 .modal-article-list .article-date, .modal-article-list .article-revised { font-size: 0.8em; color: #8888A0; margin: 0; text-align: left; flex-basis: 100px; flex-shrink: 0; }
 
+
 /* === Blog Post Specific Styles === */
 main.blog-post-content {
-    padding-top: 100px; /* THIS IS CRUCIAL: Pushes all blog content below the SITE header. Adjust if needed based on your actual site header height + desired gap. */
-    padding-bottom: 60px;
     padding-left: 20px; 
     padding-right: 20px; 
-    max-width: 800px; /* Readable width for blog content */
-    margin: 0 auto; /* Centers the content block */
+    max-width: 800px; 
+    margin: 0 auto; /* This centers the content block horizontally */
     color: #E0E0E0; 
     min-height: auto; 
+    position: relative; /* Ensure it establishes a stacking context if needed, though not primary fix here */
+    z-index: 5; /* Explicitly below header */
+    padding-top: 100px; /* INCREASED PADDING - Primary fix. Adjust this value! */
 }
 
 .blog-post-content article {
-    /* No special positioning that would interfere with normal flow */
+    background-color: transparent; /* Ensure no conflicting background that might blur */
 }
 
 .blog-post-content .post-header {
-    margin-top: 0; /* Start of the content within main */
-    margin-bottom: 30px; /* Space between title block and body */
-    padding-bottom: 20px; /* Space below title/meta before border */
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Separator line */
-    text-align: left; /* Default, but ensure it's not centered if you only want the H1 centered */
+    margin-top: 0; 
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    /* NO backdrop-filter or fixed positioning here */
 }
 
 .blog-post-content .post-header h1 {
-    font-size: 2.8em; /* Large, prominent title */
+    font-size: 2.8em;
     color: #F5F5F5; 
     margin-top: 0; 
     margin-bottom: 10px;
     line-height: 1.2;
-    text-align: center; /* Center the title text */
-    font-weight: bold;  /* Ensure it's bold */
-    /* NO backdrop-filter, NO fixed/absolute positioning that would make it act like a header */
+    text-align: center; 
+    font-weight: bold;  
+    /* NO backdrop-filter */
 }
 
-.blog-post-content .post-meta {
-    font-size: 0.9em;
-    color: #AAAAAA;
-    margin-top: 0;
-    text-align: center; /* Center the meta text if present */
-}
-
-.blog-post-content .post-body p {
-    font-size: 1.1em;
-    line-height: 1.7;
-    margin-bottom: 1.5em;
-    color: #C0C0C0; 
-}
-
-.blog-post-content .post-body figure { margin: 30px 0; text-align: center; }
-.blog-post-content .post-body figure img { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-.blog-post-content .post-body figcaption { font-size: 0.9em; color: #9999AA; margin-top: 10px; font-style: italic; }
-.blog-post-content blockquote { border-left: 3px solid #FFC04D; padding-left: 20px; margin: 20px 0; font-style: italic; color: #A0A0B0; }
-
-/* Ensure no-scroll is correctly applied where needed on OTHER pages */
-body.no-scroll {
-    overflow: hidden;
-}
+.blog-post-content .post-meta { /* ... */ }
+.blog-post-content .post-body p { /* ... */ }
+.blog-post-content .post-body figure { /* ... */ }
+.blog-post-content .post-body figure img { /* ... */ }
+.blog-post-content .post-body figcaption { /* ... */ }
+.blog-post-content blockquote { /* ... */ }
