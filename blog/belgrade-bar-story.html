@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>noahcamaj.com</title>
-    <link rel="stylesheet" href="../style.css">
+    <title>noahcamaj.com</title> <!-- Consistent title -->
+    <link rel="stylesheet" href="../style.css"> <!-- Path to CSS is now ../style.css -->
 </head>
 <body class="page-background">
     
@@ -23,13 +23,8 @@
 
     <main class="blog-post-content">
         <article>
-            <header class="post-header">
-                <h1>Belgrade Bar Story</h1>
-                <p class="post-meta">Published on <time datetime="2024-07-18">July 18, 2024</time></p>
-            </header>
             
             <section class="post-body">
-                <!-- Paragraphs will be targeted by JS for typing animation -->
                 <p>Whenever I go to a new country I like to find cool bars that specialize in making their own drink recipes.</p>
                 <p>I came to a bar called "Riddle." The door was locked, I had to knock. A bouncer comes out, slurring-his-words drunk. He ushers me in enthusiastically and shakes my hand.</p>
                 <p>I get to the bar and ask for a menu. The bartender says, "We don't have a menu, just tell me what flavors you want and I'll make something good."</p>
@@ -41,63 +36,7 @@
             </section>
         </article>
     </main>
-    <script>
-        // Typing animation for blog posts
-        document.addEventListener('DOMContentLoaded', () => {
-            const postBody = document.querySelector('.blog-post-content .post-body');
-            if (postBody) {
-                const paragraphs = Array.from(postBody.querySelectorAll('p'));
-                const typingSpeed = 30; // Milliseconds per character
 
-                // Initially hide text content and prepare for typing
-                paragraphs.forEach(p => {
-                    p.dataset.originalText = p.textContent; // Store original text
-                    p.textContent = ''; // Clear it
-                    p.classList.add('typing-effect'); // Add class for cursor
-                    p.style.opacity = 1; // Make paragraph visible for cursor
-                });
-
-                let currentParagraphIndex = 0;
-                let charIndex = 0;
-                let cursorInterval;
-
-                function typeCharacter() {
-                    if (currentParagraphIndex < paragraphs.length) {
-                        const currentParagraph = paragraphs[currentParagraphIndex];
-                        const originalText = currentParagraph.dataset.originalText;
-
-                        if (!currentParagraph.querySelector('.typing-cursor')) {
-                            const cursor = document.createElement('span');
-                            cursor.className = 'typing-cursor';
-                            cursor.style.opacity = '1'; // Ensure cursor is visible during typing
-                            currentParagraph.appendChild(cursor);
-                        }
-                        
-                        if (charIndex < originalText.length) {
-                            currentParagraph.childNodes[0].nodeValue += originalText[charIndex]; // Assumes text node is first
-                            charIndex++;
-                            setTimeout(typeCharacter, typingSpeed);
-                        } else {
-                            // Finished typing current paragraph
-                            const cursor = currentParagraph.querySelector('.typing-cursor');
-                            if(cursor) cursor.style.opacity = '0'; // Hide cursor after paragraph
-
-                            currentParagraphIndex++;
-                            charIndex = 0;
-                            if (currentParagraphIndex < paragraphs.length) {
-                                setTimeout(typeCharacter, typingSpeed * 5); // Pause before next paragraph
-                            } else {
-                                // All paragraphs typed
-                                console.log("Typing animation complete.");
-                            }
-                        }
-                    }
-                }
-                
-                // Start typing after a short delay
-                setTimeout(typeCharacter, 500);
-            }
-        });
-    </script>
+    <!-- No footer for blog posts unless desired -->
 </body>
 </html>
