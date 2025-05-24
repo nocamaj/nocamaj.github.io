@@ -194,18 +194,39 @@ main.metrics-main-content p { color: #F5F5F5; }
 .category-item:hover .tl-v, .category-item:hover .tr-v, .category-item:hover .bl-v, .category-item:hover .br-v { height: 10px; } 
 
 /* === Modal Styles === */
-/* ... (Modal styles remain unchanged from previous correct version) ... */
-.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.0);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:1000;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility 0s linear .3s;}
-.modal-overlay.visible{opacity:1;visibility:visible;transition:opacity .3s ease,visibility 0s linear 0s;}
-.modal-content{background-color:#141622;padding:0;border-radius:0px;box-shadow:0 10px 40px rgba(0,0,0,0.5);width:90%;max-width:950px;height:80vh;max-height:700px;display:flex;flex-direction:column;position:relative;transform:scale(.5);opacity:0;transition:transform .35s cubic-bezier(.18,.89,.32,1.2),opacity .25s ease-out;transform-origin:center center;}
-.modal-overlay.visible .modal-content{transform:scale(1);opacity:1;}
-.modal-header{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;background-color:#1c1e2c;border-bottom:1px solid #2a2d3c;}
-.modal-title-bar{font-size:.9em;color:#b0b0cc;font-weight:400;}
-.modal-title-bar .path-separator{margin:0 8px;color:#707090;}
-.modal-title-bar .category-name-in-title{color:#E0E0FF;font-weight:400;}
-.modal-close-button{background:0 0;border:none;font-size:1.8em;color:#AAA;cursor:pointer;padding:0 5px;line-height:1;transition:color .2s ease;}
-.modal-close-button:hover{color:#fff;}
-
+.modal-overlay { /* ... */
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.0); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    display: flex; align-items: center; justify-content: center; z-index: 1000; 
+    opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+}
+.modal-overlay.visible { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s linear 0s; }
+.modal-content { /* ... */
+    background-color: #141622; padding: 0; border-radius: 0px; 
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5); 
+    width: 90%; max-width: 950px; 
+    height: 80vh; max-height: 700px; 
+    display: flex; flex-direction: column;
+    position: relative; transform: scale(0.5); opacity: 0;
+    transition: transform 0.35s cubic-bezier(0.18,0.89,0.32,1.20), opacity 0.25s ease-out; 
+    transform-origin: center center; 
+}
+.modal-overlay.visible .modal-content { transform: scale(1); opacity: 1; }
+.modal-header { /* ... */
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 20px; background-color: #1c1e2c; border-bottom: 1px solid #2a2d3c; 
+}
+.modal-title-bar { /* ... */
+    font-size: 0.9em; color: #b0b0cc; font-weight: 400; 
+}
+.modal-title-bar .path-separator { margin: 0 8px; color: #707090; }
+.modal-title-bar .category-name-in-title { color: #E0E0FF; font-weight: 400; }
+.modal-close-button { /* ... */
+    background: none; border: none; font-size: 1.8em; 
+    color: #AAAAAA; cursor: pointer; padding: 0 5px; line-height: 1;
+    transition: color 0.2s ease;
+}
+.modal-close-button:hover { color: #FFFFFF; }
 
 .modal-column-headers {
     display: flex;
@@ -215,13 +236,13 @@ main.metrics-main-content p { color: #F5F5F5; }
     font-size: 0.85em; 
     color: #9090b0;    
     font-weight: 500;  
-    /* text-align: left; /* Applied to individual columns for clarity */
 }
 .modal-column-headers .col-icon { flex: 0 0 40px; text-align: left; } 
 .modal-column-headers .col-name { flex-grow: 1; padding-right: 10px; text-align: left; }
 .modal-column-headers .col-separator { color: #404060; padding: 0 5px; }
 .modal-column-headers .col-date { flex: 0 0 100px; text-align: left; padding-right: 10px;} 
 .modal-column-headers .col-revised { flex: 0 0 100px; text-align: left; } 
+
 
 .modal-body { overflow-y: auto; padding: 0; }
 .modal-article-list { list-style: none; padding: 0; margin: 0; }
@@ -247,15 +268,19 @@ main.metrics-main-content p { color: #F5F5F5; }
 .modal-article-list .article-info { 
     flex-grow: 1; 
     text-align: left; 
-    /* margin-right: auto; /* This can help push other items to their defined space */
-    min-width: 0; /* Important for flex items that might otherwise overflow */
+    min-width: 0; /* Allow shrinking */
+    margin-right: 10px; /* Add some space before the date columns */
 } 
 .modal-article-list .article-title { 
-    font-size: 1.05em; color: #C8C8E0; text-decoration: none; display: block;
-    margin-bottom: 2px; transition: color 0.2s ease;
-    white-space: nowrap; /* Prevent title from wrapping if too long and pushing date columns */
-    overflow: hidden;
-    text-overflow: ellipsis; /* Add ... if title is too long */
+    font-size: 1.05em; color: #C8C8E0; 
+    text-decoration: none; 
+    /* display: block; /* CHANGED: Let it be inline or inline-block so it doesn't fill width */
+    display: inline; /* Make link only around the text itself */
+    margin-bottom: 2px; 
+    transition: color 0.2s ease;
+    white-space: normal; /* Allow title to wrap if necessary */
+    /* overflow: hidden; removed */
+    /* text-overflow: ellipsis; removed */
 }
 .modal-article-list .article-title:hover { color: #E8E8FF; }
 
@@ -264,10 +289,10 @@ main.metrics-main-content p { color: #F5F5F5; }
     font-size: 0.8em; 
     color: #8888A0; 
     margin: 0; 
-    text-align: left !important; /* Stronger enforcement */
+    text-align: left !important; 
     flex-basis: 100px; 
-    flex-shrink: 0; /* Prevent these columns from shrinking */
-    padding-left: 0; /* Ensure no accidental padding */
+    flex-shrink: 0; 
+    padding-left: 0; 
     box-sizing: border-box;
 }
 
