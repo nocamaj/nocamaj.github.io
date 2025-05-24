@@ -5,17 +5,14 @@ body, html {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background-color: #0a0a18; 
     color: #F5F5F5;
-    /* overflow: hidden; /* REMOVE this global rule to allow scrolling on pages like blog posts */
 }
 
-body.no-scroll { /* Add this class to body on pages where you want to PREVENT scrolling (index, travel) */
+body.no-scroll { 
     overflow: hidden;
-    /* height: 100vh; /* Optional, use if needed for specific full-viewport no-scroll layouts */
 }
 
-/* Generic main rule - applies to <main> on all pages unless a more specific rule overrides it */
 main {
-    padding-top: 85px; /* Default padding to clear the fixed header. Adjust if your header's height changes. */
+    padding-top: 85px; 
     box-sizing: border-box; 
 }
 
@@ -68,23 +65,21 @@ nav {
 .nav-right { display: flex; margin-left: auto; }
 .nav-left .nav-button, .nav-right .nav-button {
     color: #F5F5F5; text-decoration: none; padding: 8px 15px; margin: 0 8px;
-    border-radius: 5px; transition: all 0.3s ease; white-space: nowrap;
-    letter-spacing: 0.5px; font-weight: 500; position: relative; overflow: hidden; z-index: 1;
+    border-radius: 5px; transition: all .3s ease; white-space: nowrap;
+    letter-spacing: .5px; font-weight: 500; position: relative; overflow: hidden; z-index: 1;
 }
 .nav-left .nav-button::before, .nav-right .nav-button::before {
     content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     background-color: rgba(255, 255, 255, 0.1); transform: translateY(100%);
-    transition: transform 0.3s ease; z-index: -1; border-radius: 5px;
+    transition: transform .3s ease; z-index: -1; border-radius: 5px;
 }
 .nav-left .nav-button:hover, .nav-right .nav-button:hover {
-    color: #ffffff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    color: #fff; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 .nav-left .nav-button:hover::before, .nav-right .nav-button:hover::before { transform: translateY(0); }
 
-/* Main content for index page - specific padding if needed */
 main:not(.travel-main):not(.ideas-main-content):not(.metrics-main-content):not(.blog-post-content) { 
     position: relative; 
-    /* padding-top: 80px; /* Will inherit 85px from generic 'main' unless explicitly different */
     padding-bottom: 80px;
     min-height: calc(100vh - 160px); 
     z-index: 5; 
@@ -105,7 +100,7 @@ footer {
 .search-container input[type="text"] { 
     width: 400px; padding: 12px 20px; border: 1px solid rgba(255,255,255,0.1);
     border-radius: 25px; background-color: rgba(18,18,18,0.5); color: #F5F5F5;
-    font-size: 16px; outline: none; transition: all 0.3s ease; max-width: 90vw;
+    font-size: 16px; outline: 0; transition: all .3s ease; max-width: 90vw;
     box-shadow: 0 2px 10px rgba(0,0,0,0.15); backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
 }
@@ -115,26 +110,25 @@ footer {
     background-color: rgba(26,26,26,0.7); transform: translateY(-2px);
 }
 
-@media (max-width: 768px) { 
+@media (max-width:768px) { 
     nav { padding: 0 5px; }
     .nav-right { justify-content: flex-end; }
     .nav-left .nav-button, .nav-right .nav-button { padding: 6px 10px; margin: 0 3px; }
     .search-container input[type="text"] { width: 80vw; }
 }
 
-/* === Travel Page Specific Styles === */
-body.travel-page-background { /* Still useful for specificity if needed */ } 
+body.travel-page-background {}
 main.travel-main {
-    position: relative; height: 100vh; width: 100vw; padding: 0; /* Overrides generic main padding */ 
+    position: relative; height: 100vh; width: 100vw; padding: 0; 
     box-sizing: border-box; display: flex; align-items: center; justify-content: center; z-index: 2; 
 }
-.map-outer-container { 
+.map-outer-container {
     width: calc(100% - 80px); height: calc(100vh - 60px - 80px); padding: 15px; 
     border: 2px solid rgba(150,150,180,0.5); border-radius: 25px; background-color: #0a0a18;
     box-shadow: 0 0 15px rgba(0,0,0,0.3); box-sizing: border-box; display: flex; 
     margin-top: 60px; position: relative; z-index: 3; 
 }
-.map-legend { 
+.map-legend {
     flex: 0 0 180px; padding-right: 15px; box-sizing: border-box; color: #F5F5F5;
     display: flex; flex-direction: column; justify-content: flex-start; padding-top: 10px; 
     position: relative; z-index: 4; 
@@ -143,97 +137,85 @@ main.travel-main {
 .legend-color-box { width: 20px; height: 20px; margin-right: 10px; border: 1px solid #555; }
 #map { flex-grow: 1; height: 100%; width: 100%; background-color: #121f3a; border-radius: 15px; overflow: hidden; position: relative; z-index: 3; }
 
-
-/* === Ideas Page & Metrics Page Specific Styles for main container === */
-main.ideas-main-content, 
-main.metrics-main-content { 
-    display: flex;
-    flex-direction: column;
-    align-items: center; 
-    padding-top: 100px; /* Specific padding, overrides generic 'main' */
-    padding-bottom: 60px; 
-    min-height: calc(100vh - 160px); 
-    box-sizing: border-box;
-    width: 100%; 
+main.ideas-main-content, main.metrics-main-content {
+    display: flex; flex-direction: column; align-items: center; 
+    padding-top: 100px; padding-bottom: 60px; 
+    min-height: calc(100vh - 160px); box-sizing: border-box; width: 100%;
 }
-main.metrics-main-content h1, 
-main.metrics-main-content p { color: #F5F5F5; }
+main.metrics-main-content h1, main.metrics-main-content p { color: #F5F5F5; }
 
-
-.category-grid { /* ... styles for .category-grid ... */
-    display: grid; grid-template-columns: repeat(3, minmax(180px, 1fr)); gap: 35px; 
-    max-width: 850px; width: 90%; margin: 0 auto; 
+.category-grid {
+    display: grid; grid-template-columns: repeat(3,minmax(180px,1fr)); gap: 35px; 
+    max-width: 850px; width: 90%; margin: 0 auto;
 }
-.category-item { /* ... styles for .category-item ... */
+.category-item {
     display: flex; flex-direction: column; align-items: center; text-align: center;
     text-decoration: none; color: #F5F5F5; padding: 5px; background-color: transparent; 
-    border-radius: 0; border: none; transition: transform 0.2s ease; cursor: pointer; 
+    border-radius: 0; border: none; transition: transform .2s ease; cursor: pointer; 
     position: relative; opacity: 0; transform: translateY(20px); 
-    transition: opacity 0.5s ease-out 0.1s, transform 0.5s ease-out 0.1s;
+    transition: opacity .5s ease-out .1s,transform .5s ease-out .1s;
 }
 .category-item.visible { opacity: 1; transform: translateY(0); }
-.folder-icon { width: 150px; height: 150px; margin-bottom: 8px; object-fit: contain; transition: transform 0.3s ease; }
+.folder-icon { width: 150px; height: 150px; margin-bottom: 8px; object-fit: contain; transition: transform .3s ease; }
 .category-item .title-container { position: relative; padding: 3px 10px; display: inline-block; }
-.category-item p { margin: 0; font-size: 0.9em; font-weight: 500; color: #b0b0b0; transition: color 0.3s ease, opacity 0.3s ease 0.05s; opacity: 1; position: relative; z-index: 1;}
+.category-item p { margin: 0; font-size: .9em; font-weight: 500; color: #b0b0b0; transition: color .3s ease,opacity .3s ease .05s; opacity: 1; position: relative; z-index: 1; }
 .category-item.visible p { opacity: 1; }
-.title-container .corner-line { position: absolute; background-color: #ADD8E6; opacity: 0; transition: opacity 0.2s ease, width 0.2s ease, height 0.2s ease; z-index: 0; }
+.title-container .corner-line { position: absolute; background-color: #add8e6; opacity: 0; transition: opacity .2s ease,width .2s ease,height .2s ease; z-index: 0; }
 .title-container .tl-h, .title-container .tr-h, .title-container .bl-h, .title-container .br-h { height: 2px; width: 0; }
 .title-container .tl-v, .title-container .tr-v, .title-container .bl-v, .title-container .br-v { width: 2px; height: 0; }
-.title-container .tl-h { top: 0; left: -2px; transform-origin: left; } 
-.title-container .tl-v { top: 0; left: -2px; transform-origin: top; }  
-.title-container .tr-h { top: 0; right: -2px; transform-origin: right; }
-.title-container .tr-v { top: 0; right: -2px; transform-origin: top; } 
-.title-container .bl-h { bottom: 0; left: -2px; transform-origin: left; }
-.title-container .bl-v { bottom: 0; left: -2px; transform-origin: bottom; }
-.title-container .br-h { bottom: 0; right: -2px; transform-origin: right; }
-.title-container .br-v { bottom: 0; right: -2px; transform-origin: bottom; }
+.title-container .tl-h { top: 0; left: 0; transform-origin: left; } 
+.title-container .tl-v { top: 0; left: 0; transform-origin: top; }  
+.title-container .tr-h { top: 0; right: 0; transform-origin: right; }
+.title-container .tr-v { top: 0; right: 0; transform-origin: top; } 
+.title-container .bl-h { bottom: 0; left: 0; transform-origin: left; }
+.title-container .bl-v { bottom: 0; left: 0; transform-origin: bottom; }
+.title-container .br-h { bottom: 0; right: 0; transform-origin: right; }
+.title-container .br-v { bottom: 0; right: 0; transform-origin: bottom; }
 .category-item:hover .folder-icon { transform: scale(1.03); }
-.category-item:hover p { color: #ADD8E6; }
+.category-item:hover p { color: #add8e6; }
 .category-item:hover .corner-line { opacity: 1; }
 .category-item:hover .tl-h, .category-item:hover .tr-h, .category-item:hover .bl-h, .category-item:hover .br-h { width: 15px; } 
 .category-item:hover .tl-v, .category-item:hover .tr-v, .category-item:hover .bl-v, .category-item:hover .br-v { height: 10px; } 
 
 /* === Modal Styles === */
-.modal-overlay { /* ... */
+.modal-overlay { 
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.0); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    background-color: rgba(0,0,0,0.0); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
     display: flex; align-items: center; justify-content: center; z-index: 1000; 
-    opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s;
+    opacity: 0; visibility: hidden; transition: opacity .3s ease,visibility 0s linear .3s;
 }
-.modal-overlay.visible { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s linear 0s; }
-.modal-content { /* ... */
+.modal-overlay.visible { opacity: 1; visibility: visible; transition: opacity .3s ease,visibility 0s linear 0s; }
+.modal-content { 
     background-color: #141622; padding: 0; border-radius: 0px; 
     box-shadow: 0 10px 40px rgba(0,0,0,0.5); 
     width: 90%; max-width: 950px; 
     height: 80vh; max-height: 700px; 
     display: flex; flex-direction: column;
-    position: relative; transform: scale(0.5); opacity: 0;
-    transition: transform 0.35s cubic-bezier(0.18,0.89,0.32,1.20), opacity 0.25s ease-out; 
+    position: relative; transform: scale(.5); opacity: 0;
+    transition: transform .35s cubic-bezier(.18,.89,.32,1.2),opacity .25s ease-out; 
     transform-origin: center center; 
 }
 .modal-overlay.visible .modal-content { transform: scale(1); opacity: 1; }
-.modal-header { /* ... */
+.modal-header { 
     display: flex; justify-content: space-between; align-items: center;
     padding: 12px 20px; background-color: #1c1e2c; border-bottom: 1px solid #2a2d3c; 
 }
-.modal-title-bar { /* ... */
-    font-size: 0.9em; color: #b0b0cc; font-weight: 400; 
-}
+.modal-title-bar { font-size: .9em; color: #b0b0cc; font-weight: 400; }
 .modal-title-bar .path-separator { margin: 0 8px; color: #707090; }
 .modal-title-bar .category-name-in-title { color: #E0E0FF; font-weight: 400; }
-.modal-close-button { /* ... */
-    background: none; border: none; font-size: 1.8em; 
-    color: #AAAAAA; cursor: pointer; padding: 0 5px; line-height: 1;
-    transition: color 0.2s ease;
+.modal-close-button { 
+    background: 0 0; border: none; font-size: 1.8em; 
+    color: #AAA; cursor: pointer; padding: 0 5px; line-height: 1;
+    transition: color .2s ease;
 }
-.modal-close-button:hover { color: #FFFFFF; }
+.modal-close-button:hover { color: #fff; }
 
 .modal-column-headers {
     display: flex;
     padding: 10px 20px;
     background-color: #181a28; 
     border-bottom: 1px solid #2a2d3c;
-    font-size: 0.85em; 
+    font-size: .85em; 
     color: #9090b0;    
     font-weight: 500;  
 }
@@ -242,7 +224,6 @@ main.metrics-main-content p { color: #F5F5F5; }
 .modal-column-headers .col-separator { color: #404060; padding: 0 5px; }
 .modal-column-headers .col-date { flex: 0 0 100px; text-align: left; padding-right: 10px;} 
 .modal-column-headers .col-revised { flex: 0 0 100px; text-align: left; } 
-
 
 .modal-body { overflow-y: auto; padding: 0; }
 .modal-article-list { list-style: none; padding: 0; margin: 0; }
@@ -259,28 +240,33 @@ main.metrics-main-content p { color: #F5F5F5; }
 .modal-article-list li:last-child { border-bottom: none; }
 .modal-article-list li.show-item { opacity: 1; transform: translateY(0); }
 
+.modal-article-list .article-icon-container { /* NEW WRAPPER FOR ICON */
+    flex: 0 0 40px; /* Match header icon column width */
+    display: flex;
+    align-items: center;
+    /* justify-content: center; /* If you want icon centered in this 40px box */
+    margin-right: 0; /* Margin will be on the icon itself or handled by padding */
+}
 .modal-article-list .article-icon {
-    width: 20px; height: 20px; margin-right: 12px; 
+    width: 20px; height: 20px; /* Actual icon size */
     object-fit: contain;
     filter: invert(70%) sepia(10%) saturate(100%) hue-rotate(180deg) brightness(100%) contrast(90%); 
+    /* margin-right: 12px; /* REMOVED: Handled by .article-icon-container */
 }
 
 .modal-article-list .article-info { 
     flex-grow: 1; 
     text-align: left; 
-    min-width: 0; /* Allow shrinking */
-    margin-right: 10px; /* Add some space before the date columns */
+    min-width: 0; 
+    padding-right: 10px; /* Add padding to separate from date columns */
 } 
 .modal-article-list .article-title { 
     font-size: 1.05em; color: #C8C8E0; 
     text-decoration: none; 
-    /* display: block; /* CHANGED: Let it be inline or inline-block so it doesn't fill width */
-    display: inline; /* Make link only around the text itself */
+    display: inline; 
     margin-bottom: 2px; 
-    transition: color 0.2s ease;
-    white-space: normal; /* Allow title to wrap if necessary */
-    /* overflow: hidden; removed */
-    /* text-overflow: ellipsis; removed */
+    transition: color .2s ease;
+    white-space: normal; 
 }
 .modal-article-list .article-title:hover { color: #E8E8FF; }
 
