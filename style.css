@@ -224,37 +224,44 @@ main.metrics-main-content p { color: #F5F5F5; }
 
 /* === Blog Post Specific Styles === */
 main.blog-post-content {
-    padding-top: 100px; /* Explicit, higher specificity padding for blog posts */
+    padding-top: 100px; /* THIS IS CRUCIAL: Pushes all blog content below the SITE header. Adjust if needed based on your actual site header height + desired gap. */
     padding-bottom: 60px;
     padding-left: 20px; 
     padding-right: 20px; 
-    max-width: 800px; 
-    margin: 0 auto; 
+    max-width: 800px; /* Readable width for blog content */
+    margin: 0 auto; /* Centers the content block */
     color: #E0E0E0; 
     min-height: auto; 
 }
 
-.blog-post-content article {}
+.blog-post-content article {
+    /* No special positioning that would interfere with normal flow */
+}
 
 .blog-post-content .post-header {
-    margin-top: 0; 
-    margin-bottom: 30px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 0; /* Start of the content within main */
+    margin-bottom: 30px; /* Space between title block and body */
+    padding-bottom: 20px; /* Space below title/meta before border */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Separator line */
+    text-align: left; /* Default, but ensure it's not centered if you only want the H1 centered */
 }
 
 .blog-post-content .post-header h1 {
-    font-size: 2.8em;
+    font-size: 2.8em; /* Large, prominent title */
     color: #F5F5F5; 
     margin-top: 0; 
     margin-bottom: 10px;
     line-height: 1.2;
+    text-align: center; /* Center the title text */
+    font-weight: bold;  /* Ensure it's bold */
+    /* NO backdrop-filter, NO fixed/absolute positioning that would make it act like a header */
 }
 
 .blog-post-content .post-meta {
     font-size: 0.9em;
     color: #AAAAAA;
     margin-top: 0;
+    text-align: center; /* Center the meta text if present */
 }
 
 .blog-post-content .post-body p {
@@ -268,3 +275,8 @@ main.blog-post-content {
 .blog-post-content .post-body figure img { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 .blog-post-content .post-body figcaption { font-size: 0.9em; color: #9999AA; margin-top: 10px; font-style: italic; }
 .blog-post-content blockquote { border-left: 3px solid #FFC04D; padding-left: 20px; margin: 20px 0; font-style: italic; color: #A0A0B0; }
+
+/* Ensure no-scroll is correctly applied where needed on OTHER pages */
+body.no-scroll {
+    overflow: hidden;
+}
