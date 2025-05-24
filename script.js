@@ -24,7 +24,8 @@
         { lang: "Russian", text: "Привет, я Ноа" }, { lang: "Hindi", text: "नमस्ते, मैं नोआ हूँ" }, 
         { lang: "Japanese", text: "こんにちは、ノアです" }, { lang: "Arabic", text: "مرحباً، أنا نوح" }, 
         { lang: "Spanish", text: "Hola, soy Noah" }, { lang: "French", text: "Bonjour, je suis Noah" },
-        { lang: "German", text: "Hallo, ich bin Noah" }, { lang: "Portuguese", text: "Olá, sou Noah" }
+        { lang: "German", text: "Hallo, ich bin Noah" }, { lang: "Portuguese", text: "Olá, sou Noah" },
+        { lang: "Albanian", text: "Përshëndetje, jam Noah"}
     ];
 
     function ready(callback) { if (document.readyState !== 'loading') callback(); else document.addEventListener('DOMContentLoaded', callback); }

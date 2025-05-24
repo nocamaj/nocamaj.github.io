@@ -26,8 +26,10 @@
         <article>
             <section class="post-body">
                 <!-- Paragraphs will be targeted by JS for typing animation -->
-                <h1>Belgrade Bar Story</h1>
-                <p class="post-meta"><time datetime="2024-07-18">July 18, 2024</time></p>
+                <div class="blog-post-body-header">
+                    <h1>Belgrade Bar Story</h1>
+                    <p class="post-meta"><time datetime="2024-07-18">July 18, 2024</time></p>
+                </div>
                 <p>Whenever I go to a new country I like to find cool bars that specialize in making their own drink recipes.</p>
                 <p>I came to a bar called "Riddle." The door was locked, I had to knock. A bouncer comes out, slurring-his-words drunk. He ushers me in enthusiastically and shakes my hand.</p>
                 <p>I get to the bar and ask for a menu. The bartender says, "We don't have a menu, just tell me what flavors you want and I'll make something good."</p>
@@ -41,35 +43,74 @@
     </main>
 
     <script>
-        // Typing animation for blog post paragraphs
         document.addEventListener('DOMContentLoaded', () => {
-            const paragraphs = document.querySelectorAll('.blog-post-content .post-body p');
-            let overallCharIndex = 0;
-            const typingSpeed = 20; // Milliseconds per character
+            const postBody = document.querySelector('.blog-post-content .post-body');
+            if (!postBody) return;
 
-            function typeParagraph(pIndex) {
-                if (pIndex >= paragraphs.length) return; // All paragraphs typed
+            const elementsToType = Array.from(postBody.children); // Get h1, p (meta), and all content p tags
+            let currentElementIndex = 0;
+            let currentCharIndex = 0;
+            let currentTextElement = null;
+            let originalTexts = [];
+            let cursorSpan = null;
 
-                const pElement = paragraphs[pIndex];
-                const originalText = pElement.textContent;
-                pElement.textContent = ''; // Clear current text
-                pElement.style.opacity = '1'; // Make paragraph visible before typing starts
-                let charIndex = 0;
+            const typingSpeed = 10; // Milliseconds per character - Faster
 
-                function typeChar() {
-                    if (charIndex < originalText.length) {
-                        pElement.textContent += originalText.charAt(charIndex);
-                        charIndex++;
-                        overallCharIndex++;
-                        setTimeout(typeChar, typingSpeed);
-                    } else {
-                        // Move to next paragraph
-                        typeParagraph(pIndex + 1);
-                    }
+            elementsToType.forEach(el => {
+                if (el.matches('h1') || el.matches('p')) {
+                    originalTexts.push(el.textContent);
+                    el.textContent = ''; // Clear for typing
+                    el.style.opacity = '1'; // Make element visible
+                } else {
+                    originalTexts.push(null); // Placeholder for non-text elements
                 }
-                typeChar();
+            });
+
+            function createCursor(parentElement) {
+                if (cursorSpan) cursorSpan.remove(); // Remove old cursor
+                cursorSpan = document.createElement('span');
+                cursorSpan.className = 'typing-cursor';
+                parentElement.appendChild(cursorSpan);
             }
-            typeParagraph(0); // Start typing from the first paragraph
+
+            function typeWriter() {
+                if (currentElementIndex >= elementsToType.length) {
+                    if (cursorSpan) cursorSpan.style.animation = 'none'; // Stop blinking
+                    return; // All elements processed
+                }
+
+                currentTextElement = elementsToType[currentElementIndex];
+                const originalText = originalTexts[currentElementIndex];
+
+                if (originalText === null) { // Skip non-text elements like figures
+                    currentElementIndex++;
+                    setTimeout(typeWriter, 0); // Move to next element immediately
+                    return;
+                }
+                
+                if (currentCharIndex === 0) { // Start of a new text element
+                    createCursor(currentTextElement);
+                }
+
+                if (currentCharIndex < originalText.length) {
+                    currentTextElement.textContent += originalText.charAt(currentCharIndex);
+                    currentCharIndex++;
+                    // Move cursor to the end of the current text
+                    if (cursorSpan) currentTextElement.appendChild(cursorSpan);
+                    setTimeout(typeWriter, typingSpeed);
+                } else {
+                    // Finished typing current element
+                    if (cursorSpan) cursorSpan.remove(); // Remove cursor from completed element
+                    cursorSpan = null;
+                    currentElementIndex++;
+                    currentCharIndex = 0;
+                    setTimeout(typeWriter, 200); // Pause slightly before typing next element
+                }
+            }
+
+            if (elementsToType.length > 0) {
+                typeWriter(); // Start typing process
+            }
         });
     </script>
 </body>

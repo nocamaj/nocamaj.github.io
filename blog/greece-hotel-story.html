@@ -28,8 +28,10 @@
             </header>
             
             <section class="post-body">
-                <h1>Greece Hotel Story</h1>
-                <p class="post-meta"><time datetime="2025-02-08">February 8, 2025</time></p>
+                <div class="blog-post-body-header">
+                    <h1>Greece Hotel Story</h1>
+                    <p class="post-meta"><time datetime="2025-02-08">February 8, 2025</time></p>
+                </div>
                 <p>When I bought my apartment in Albania, I took a trip to Greece with some friends to buy some furniture. They have an IKEA and overall better quality goods. We spent the night in a cool small town. We were looking for a hotel online, but knowing that we were booking a hotel same day, I said, "Hey let's just go into places and try to bargain, it's last minute."</p>
                 <p>We go to this old cool mid-century hotel. An old guy at the counter offers €60 for a 3-person room which is actually a killer deal for such a cool hotel, but I counter €40 naturally.</p>
                 <p>Firm no.</p>
@@ -47,34 +49,74 @@
     </main>
 
     <script>
-        // Typing animation for blog post paragraphs
         document.addEventListener('DOMContentLoaded', () => {
-            const paragraphs = document.querySelectorAll('.blog-post-content .post-body p');
-            let overallCharIndex = 0;
-            const typingSpeed = 20; // Milliseconds per character
+            const postBody = document.querySelector('.blog-post-content .post-body');
+            if (!postBody) return;
 
-            function typeParagraph(pIndex) {
-                if (pIndex >= paragraphs.length) return;
+            const elementsToType = Array.from(postBody.children); // Get h1, p (meta), and all content p tags
+            let currentElementIndex = 0;
+            let currentCharIndex = 0;
+            let currentTextElement = null;
+            let originalTexts = [];
+            let cursorSpan = null;
 
-                const pElement = paragraphs[pIndex];
-                const originalText = pElement.textContent;
-                pElement.textContent = ''; 
-                pElement.style.opacity = '1'; 
-                let charIndex = 0;
+            const typingSpeed = 10; // Milliseconds per character - Faster
 
-                function typeChar() {
-                    if (charIndex < originalText.length) {
-                        pElement.textContent += originalText.charAt(charIndex);
-                        charIndex++;
-                        overallCharIndex++;
-                        setTimeout(typeChar, typingSpeed);
-                    } else {
-                        typeParagraph(pIndex + 1);
-                    }
+            elementsToType.forEach(el => {
+                if (el.matches('h1') || el.matches('p')) {
+                    originalTexts.push(el.textContent);
+                    el.textContent = ''; // Clear for typing
+                    el.style.opacity = '1'; // Make element visible
+                } else {
+                    originalTexts.push(null); // Placeholder for non-text elements
                 }
-                typeChar();
+            });
+
+            function createCursor(parentElement) {
+                if (cursorSpan) cursorSpan.remove(); // Remove old cursor
+                cursorSpan = document.createElement('span');
+                cursorSpan.className = 'typing-cursor';
+                parentElement.appendChild(cursorSpan);
             }
-            typeParagraph(0);
+
+            function typeWriter() {
+                if (currentElementIndex >= elementsToType.length) {
+                    if (cursorSpan) cursorSpan.style.animation = 'none'; // Stop blinking
+                    return; // All elements processed
+                }
+
+                currentTextElement = elementsToType[currentElementIndex];
+                const originalText = originalTexts[currentElementIndex];
+
+                if (originalText === null) { // Skip non-text elements like figures
+                    currentElementIndex++;
+                    setTimeout(typeWriter, 0); // Move to next element immediately
+                    return;
+                }
+                
+                if (currentCharIndex === 0) { // Start of a new text element
+                    createCursor(currentTextElement);
+                }
+
+                if (currentCharIndex < originalText.length) {
+                    currentTextElement.textContent += originalText.charAt(currentCharIndex);
+                    currentCharIndex++;
+                    // Move cursor to the end of the current text
+                    if (cursorSpan) currentTextElement.appendChild(cursorSpan);
+                    setTimeout(typeWriter, typingSpeed);
+                } else {
+                    // Finished typing current element
+                    if (cursorSpan) cursorSpan.remove(); // Remove cursor from completed element
+                    cursorSpan = null;
+                    currentElementIndex++;
+                    currentCharIndex = 0;
+                    setTimeout(typeWriter, 200); // Pause slightly before typing next element
+                }
+            }
+
+            if (elementsToType.length > 0) {
+                typeWriter(); // Start typing process
+            }
         });
     </script>
 </body>
