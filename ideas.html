@@ -117,7 +117,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             // ... (modal and category item selections as before) ...
             const categoryGrid = document.querySelector('.category-grid');
-            const categoryItems = Array.from(categoryGrid.querySelectorAll('.category-item')); 
+            const categoryItems = Array.from(document.querySelectorAll('.category-item')); 
             const folderIcons = Array.from(document.querySelectorAll('.category-item .folder-icon'));
             
             const modalOverlay = document.getElementById('categoryModal');
