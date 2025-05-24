@@ -237,11 +237,35 @@ main.metrics-main-content p { color: #F5F5F5; }
     color: #9090b0;    
     font-weight: 500;  
 }
-.modal-column-headers .col-icon { flex: 0 0 40px; text-align: left; } 
-.modal-column-headers .col-name { flex-grow: 1; padding-right: 10px; text-align: left; }
-.modal-column-headers .col-separator { color: #404060; padding: 0 5px; }
-.modal-column-headers .col-date { flex: 0 0 100px; text-align: left; padding-right: 10px;} 
-.modal-column-headers .col-revised { flex: 0 0 100px; text-align: left; } 
+.modal-column-headers .col-icon { 
+    flex: 0 0 40px; 
+    text-align: left; 
+    /* No separator needed before the first item */
+} 
+.modal-column-headers .col-name { 
+    flex-grow: 1; 
+    padding-right: 10px; 
+    text-align: left; 
+    position: relative; /* For pseudo-element separator */
+}
+/* Removed .col-separator class as it's not needed for HTML structure */
+.modal-column-headers .col-date,
+.modal-column-headers .col-revised { 
+    flex: 0 0 100px; 
+    text-align: left; 
+    padding-right: 10px; /* Keep some padding */
+    position: relative; /* For pseudo-element separator */
+}
+/* Add separator using ::before pseudo-element on Date and Revised headers */
+.modal-column-headers .col-date::before,
+.modal-column-headers .col-revised::before {
+    content: "|";
+    color: #404060;
+    position: absolute;
+    left: -8px; /* Adjust to position correctly relative to padding/margin */
+    top: 0; /* Align with top of header text */
+    /* Alternatively, use padding on the element and border-left */
+}
 
 
 .modal-body { overflow-y: auto; padding: 0; }
@@ -259,8 +283,14 @@ main.metrics-main-content p { color: #F5F5F5; }
 .modal-article-list li:last-child { border-bottom: none; }
 .modal-article-list li.show-item { opacity: 1; transform: translateY(0); }
 
+.modal-article-list .article-icon-container {
+    flex: 0 0 40px; 
+    display: flex;
+    align-items: center;
+    margin-right: 0; 
+}
 .modal-article-list .article-icon {
-    width: 20px; height: 20px; margin-right: 12px; 
+    width: 20px; height: 20px; 
     object-fit: contain;
     filter: invert(70%) sepia(10%) saturate(100%) hue-rotate(180deg) brightness(100%) contrast(90%); 
 }
@@ -268,19 +298,16 @@ main.metrics-main-content p { color: #F5F5F5; }
 .modal-article-list .article-info { 
     flex-grow: 1; 
     text-align: left; 
-    min-width: 0; /* Allow shrinking */
-    margin-right: 10px; /* Add some space before the date columns */
+    min-width: 0; 
+    padding-right: 10px; 
 } 
 .modal-article-list .article-title { 
     font-size: 1.05em; color: #C8C8E0; 
     text-decoration: none; 
-    /* display: block; /* CHANGED: Let it be inline or inline-block so it doesn't fill width */
-    display: inline; /* Make link only around the text itself */
+    display: inline; 
     margin-bottom: 2px; 
-    transition: color 0.2s ease;
-    white-space: normal; /* Allow title to wrap if necessary */
-    /* overflow: hidden; removed */
-    /* text-overflow: ellipsis; removed */
+    transition: color .2s ease;
+    white-space: normal; 
 }
 .modal-article-list .article-title:hover { color: #E8E8FF; }
 
