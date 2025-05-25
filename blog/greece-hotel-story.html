@@ -47,30 +47,42 @@
             const postBody = document.querySelector('.blog-post-content .post-body');
             if (!postBody) return;
 
-            // Select all direct children of post-body for the typing sequence
             const elementsToType = Array.from(postBody.children);
-            const typingSpeed = 5; // Milliseconds per character - twice as fast (was 10)
-            const initialBlinkCount = 3; // How many times cursor blinks before typing
-            const finalBlinkCount = 3;   // How many times cursor blinks after typing
-            const blinkInterval = 350; // Half of the CSS blink animation duration for on/off cycle
+            const typingSpeed = 5; // Milliseconds per character (FASTER)
+            const preTypingBlinkDuration = 2000; // 2 seconds
+            const postTypingBlinkDuration = 2000; // 2 seconds
+            
             let globalCursor = null;
+            let typingEffectActive = false; // Flag to control cursor blinking during typing
 
-            function createCursor(parentElement) {
-                if (globalCursor) removeCursor(); // Ensure only one cursor
-                const cursor = document.createElement('span');
-                cursor.className = 'typing-cursor';
-                // Find the last text node or create one if empty
-                if (parentElement.lastChild && parentElement.lastChild.nodeType === Node.TEXT_NODE) {
-                    parentElement.appendChild(cursor);
-                } else {
-                    // If the last child isn't text (e.g. another element, or empty), or if p is empty
-                    // we need to append to the paragraph itself.
-                    // To ensure it's after any existing inline content, we might need to be more specific
-                    // For simplicity now, just append. If inline elements exist, might need refinement.
-                    parentElement.appendChild(cursor);
+            function createAndShowCursor(parentElement) {
+                if (globalCursor) removeCursor();
+                globalCursor = document.createElement('span');
+                globalCursor.className = 'typing-cursor';
+                globalCursor.style.opacity = '1'; // Make sure it's initially visible for CSS animation
+                
+                // Append cursor intelligently
+                if (parentElement.childNodes.length > 0 && parentElement.lastChild.nodeType === Node.TEXT_NODE && parentElement.lastChild.textContent.length > 0) {
+                    parentElement.appendChild(globalCursor); // Append after existing text
+                } else if (parentElement.childNodes.length > 0) {
+                     // If last child is an element, or text node is empty, find a good spot or append
+                    let lastTextNode = null;
+                    for(let i = parentElement.childNodes.length -1; i >=0; i--){
+                        if(parentElement.childNodes[i].nodeType === Node.TEXT_NODE && parentElement.childNodes[i].textContent.trim().length > 0){
+                            lastTextNode = parentElement.childNodes[i];
+                            break;
+                        }
+                    }
+                    if(lastTextNode && lastTextNode.nextSibling){
+                        parentElement.insertBefore(globalCursor, lastTextNode.nextSibling);
+                    } else {
+                        parentElement.appendChild(globalCursor);
+                    }
                 }
-                cursor.style.opacity = '1'; // Make it visible for blinking
-                return cursor;
+                 else {
+                    parentElement.appendChild(globalCursor); // Append to empty element
+                }
+                return globalCursor;
             }
 
             function removeCursor() {
@@ -79,55 +91,24 @@
                 }
                 globalCursor = null;
             }
-
-            function blinkCursor(elementForCursor, count, callback) {
-                if (!elementForCursor) { // Safety check
-                    if(callback) callback();
-                    return;
-                }
-                removeCursor(); // Remove any existing cursor
-                globalCursor = createCursor(elementForCursor);
-                let blinks = 0;
-                const blinker = setInterval(() => {
-                    if (!globalCursor) { // If cursor was removed by another process
-                        clearInterval(blinker);
-                        if(callback) callback();
-                        return;
-                    }
-                    globalCursor.style.opacity = globalCursor.style.opacity === '0' ? '1' : '0';
-                    blinks++;
-                    if (blinks >= count * 2) { // *2 because one blink is on and off
-                        clearInterval(blinker);
-                        if (!isTypingInProgress) { // Only remove if typing isn't about to start/resume
-                           removeCursor();
-                        }
-                        if (callback) callback();
-                    }
-                }, blinkInterval);
-            }
             
-            let isTypingInProgress = false;
-
-            async function typeElement(element, isLastElementInSequence) {
+            async function typeElement(element) {
                 return new Promise(async (resolve) => {
-                    isTypingInProgress = true;
                     const isParagraph = element.nodeName === 'P' && !element.classList.contains('blog-meta');
                     
                     if (element.nodeName === 'H1' || element.classList.contains('blog-meta')) {
                         element.style.opacity = '0';
                         requestAnimationFrame(() => {
-                           element.style.transition = 'opacity 0.3s ease-in 0.2s'; // Slight delay for effect
+                           element.style.transition = 'opacity 0.3s ease-in';
                            element.style.opacity = '1';
                         });
-                        await new Promise(r => setTimeout(r, 300 + 200)); // Wait for fade + a bit more
-                        isTypingInProgress = false;
+                        await new Promise(r => setTimeout(r, 300)); 
                         resolve();
                         return;
                     }
                     
                     if (!isParagraph) {
                         element.style.opacity = '1'; 
-                        isTypingInProgress = false;
                         resolve(); 
                         return;
                     }
@@ -137,61 +118,79 @@
                     element.textContent = ''; 
                     element.style.opacity = '1'; 
 
-                    removeCursor(); // Ensure clean slate
-                    globalCursor = createCursor(element); // Create cursor for this paragraph
+                    createAndShowCursor(element);
 
                     for (let i = 0; i < originalText.length; i++) {
-                        if (!globalCursor || !globalCursor.parentNode) { // Safety check if cursor got removed
-                            globalCursor = createCursor(element);
+                        if (!globalCursor || !globalCursor.parentNode) { // Cursor safety
+                            createAndShowCursor(element);
                         }
+                        // Insert text node before the cursor span
                         element.insertBefore(document.createTextNode(originalText.charAt(i)), globalCursor);
                         await new Promise(r => setTimeout(r, typingSpeed));
-                    }
-                    
-                    isTypingInProgress = false;
-                    if (isLastElementInSequence) {
-                        blinkCursor(element, finalBlinkCount, () => {
-                           // console.log("Final blinks done.");
-                        });
-                    } else {
-                        removeCursor();
                     }
                     resolve();
                 });
             }
 
-            async function typeAllElements() {
-                // Hide all paragraphs initially that are part of the story
+            async function runTypingSequence() {
+                // Hide all actual story paragraphs initially
                 elementsToType.forEach(el => {
                     if (el.nodeName === 'P' && !el.classList.contains('blog-meta')) {
-                        el.style.opacity = '0';
+                        el.style.opacity = '0'; 
                     } else if (el.nodeName === 'H1' || el.classList.contains('blog-meta')) {
-                        el.style.opacity = '0'; // Also hide title/meta initially for staggered reveal
+                         el.style.opacity = '0'; // Hide title/meta initially too
                     }
                 });
 
-                // Initial blink on the first paragraph (or title if you prefer)
-                const firstContentElement = elementsToType.find(el => el.nodeName === 'P' && !el.classList.contains('blog-meta')) || elementsToType[0];
-                if (firstContentElement) {
-                     blinkCursor(firstContentElement, initialBlinkCount, async () => {
-                        removeCursor(); // Remove after initial blinks, before typing starts
-                        for (let i = 0; i < elementsToType.length; i++) {
-                            const isLast = i === elementsToType.length - 1;
-                             // Ensure current element to type into is visible before typing
-                            if (elementsToType[i].nodeName === 'P' && !elementsToType[i].classList.contains('blog-meta')) {
-                                elementsToType[i].style.opacity = '1';
+                // Initial phase: Show title and meta quickly
+                const titleEl = elementsToType.find(el => el.nodeName === 'H1');
+                const metaEl = elementsToType.find(el => el.classList.contains('blog-meta'));
+
+                if (titleEl) await typeElement(titleEl); // This will fade it in
+                if (metaEl) await typeElement(metaEl);   // This will fade it in
+
+                // Find first actual paragraph for initial cursor blinking
+                const firstStoryParagraph = elementsToType.find(el => el.nodeName === 'P' && !el.classList.contains('blog-meta'));
+
+                if (firstStoryParagraph) {
+                    firstStoryParagraph.style.opacity = '1'; // Make the paragraph itself visible for the cursor
+                    createAndShowCursor(firstStoryParagraph); // Show cursor
+                    typingEffectActive = true; // To keep cursor blinking via CSS
+
+                    await new Promise(r => setTimeout(r, preTypingBlinkDuration)); // Wait for pre-blinks
+                    
+                    typingEffectActive = false; // Stop forced CSS blink if JS controls cursor now
+                    removeCursor(); // Remove pre-typing cursor
+
+                    // Start typing actual story paragraphs
+                    for (let i = 0; i < elementsToType.length; i++) {
+                        const el = elementsToType[i];
+                        if (el.nodeName === 'P' && !el.classList.contains('blog-meta')) {
+                            typingEffectActive = true; // Allow CSS blink during typing
+                            await typeElement(el); // This function now handles cursor per paragraph
+                            typingEffectActive = false; // Typing for this p done
+                            if (i < elementsToType.length -1 && elementsToType[i+1].nodeName === 'P' && !elementsToType[i+1].classList.contains('blog-meta')) {
+                                // If next is also a story paragraph, remove cursor before it gets recreated
+                                removeCursor();
                             }
-                            await typeElement(elementsToType[i], isLast);
                         }
-                        // console.log("All typing done sequence.");
-                    });
-                } else {
-                     // console.log("No elements to type.");
+                    }
+                    
+                    // Final blinks after all paragraphs are typed
+                    const lastStoryParagraph = [...elementsToType].reverse().find(el => el.nodeName === 'P' && !el.classList.contains('blog-meta'));
+                    if (lastStoryParagraph) {
+                        createAndShowCursor(lastStoryParagraph);
+                        typingEffectActive = true;
+                        await new Promise(r => setTimeout(r, postTypingBlinkDuration));
+                    }
                 }
+                typingEffectActive = false;
+                removeCursor(); // Final cleanup
+                // console.log("All typing and blinking sequences done.");
             }
 
             if (postBody && elementsToType.length > 0) {
-                typeAllElements();
+                runTypingSequence();
             }
         });
     </script>

@@ -287,67 +287,36 @@ main.metrics-main-content p { color: #F5F5F5; }
 }
 
 /* === Blog Post Specific Styles === */
-main.blog-post-content {
-    padding-top: 100px; 
-    padding-bottom: 60px;
-    padding-left: 20px; 
-    padding-right: 20px; 
-    max-width: 800px; 
-    margin: 0 auto; 
-    color: #E0E0E0; 
-    min-height: auto; 
-}
-
-.blog-post-content .blog-title { 
-    font-size: 1.3em; /* Half of 2.6em */
-    color: #F5F5F5; 
-    margin-top: 0; 
-    margin-bottom: 5px; /* Reduced margin to bring date closer */
-    line-height: 1.3; /* Adjusted line height */
-    text-align: left;  /* Left-aligned */
-    font-weight: bold;  
-    padding-bottom: 10px; /* Space before meta/border if meta is removed */
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Border moved here if meta is always present */
-}
-
-.blog-post-content .blog-meta { 
-    font-size: 0.8em; /* Slightly smaller */
-    color: #AAAAAA;
-    margin-top: 0;
-    margin-bottom: 25px; 
-    text-align: left;  /* Left-aligned */
-    /* border-bottom: 1px solid rgba(255, 255, 255, 0.1); /* Moved to blog-title if meta is optional */
-    /* padding-bottom: 15px; */ /* No padding if border is on title */
-}
+main.blog-post-content { padding-top: 100px; padding-bottom: 60px; padding-left: 20px; padding-right: 20px; max-width: 800px; margin: 0 auto; color: #E0E0E0; min-height: auto; }
+.blog-post-content article {}
+.blog-post-content .blog-title { font-size: 1.3em; color: #F5F5F5; margin-top: 0; margin-bottom: 5px; line-height: 1.3; text-align: left; font-weight: bold; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+.blog-post-content .blog-meta { font-size: 0.8em; color: #AAAAAA; margin-top: 0; margin-bottom: 25px; text-align: left; }
 .blog-post-content .blog-meta time {}
-
-.blog-post-content .post-body {
-    /* Paragraphs are direct children now */
-}
-
-.blog-post-content .post-body p {
-    font-size: 1.1em;
-    line-height: 1.7;
-    margin-bottom: 1.5em;
-    color: #C0C0C0; 
-    opacity: 1; /* JS will set to 0 initially for typing if element is a paragraph */
-}
+.blog-post-content .post-body {}
+.blog-post-content .post-body p { font-size: 1.1em; line-height: 1.7; margin-bottom: 1.5em; color: #C0C0C0; opacity: 1; }
 
 .typing-cursor {
-    display: inline-block;
+    display: inline-block; /* Ensures it flows with text */
     background-color: #F5F5F5; 
-    width: 6px; /* 200% thicker (was 2px) */
+    width: 6px; /* Thicker cursor */
     height: 1.1em; 
-    animation: blink 0.7s step-end infinite; /* Slightly faster blink */
-    vertical-align: text-bottom; /* Better alignment with text */
+    animation: blink-cursor 0.5s infinite; /* Faster, more visible blink */
+    vertical-align: text-bottom; 
     margin-left: 2px;
-    opacity: 0; /* Initially hidden, JS will show it */
+    opacity: 0; /* Initially hidden by default, JS controls visibility states */
 }
 
-@keyframes blink {
-    from, to { background-color: transparent; }
-    50% { background-color: #F5F5F5; }
+@keyframes blink-cursor { /* Renamed to avoid conflict if 'blink' is used elsewhere */
+    0%, 49% { background-color: #F5F5F5; } /* Visible for ~half the cycle */
+    50%, 100% { background-color: transparent; } /* Invisible for ~half */
 }
+/* If you want it mostly visible: */
+/*
+@keyframes blink-cursor {
+    0%, 80% { background-color: #F5F5F5; } // Visible for 80%
+    81%, 100% { background-color: transparent; } // Invisible for 20%
+}
+*/
 
 .blog-post-content .post-body figure { margin: 30px 0; text-align: center; }
 .blog-post-content .post-body figure img { max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
