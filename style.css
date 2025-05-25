@@ -194,14 +194,14 @@ main.metrics-main-content p { color: #F5F5F5; }
 .category-item:hover .tl-v, .category-item:hover .tr-v, .category-item:hover .bl-v, .category-item:hover .br-v { height: 10px; } 
 
 /* === Modal Styles === */
-.modal-overlay { /* ... */
+.modal-overlay { /* ... existing overlay styles ... */
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background-color: rgba(0, 0, 0, 0.0); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
     display: flex; align-items: center; justify-content: center; z-index: 1000; 
     opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s;
 }
 .modal-overlay.visible { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s linear 0s; }
-.modal-content { /* ... */
+.modal-content { /* ... existing modal content styles ... */
     background-color: #141622; padding: 0; border-radius: 0px; 
     box-shadow: 0 10px 40px rgba(0,0,0,0.5); 
     width: 90%; max-width: 950px; 
@@ -212,16 +212,16 @@ main.metrics-main-content p { color: #F5F5F5; }
     transform-origin: center center; 
 }
 .modal-overlay.visible .modal-content { transform: scale(1); opacity: 1; }
-.modal-header { /* ... */
+.modal-header { /* ... existing modal header styles ... */
     display: flex; justify-content: space-between; align-items: center;
     padding: 12px 20px; background-color: #1c1e2c; border-bottom: 1px solid #2a2d3c; 
 }
-.modal-title-bar { /* ... */
+.modal-title-bar { /* ... existing title bar styles ... */
     font-size: 0.9em; color: #b0b0cc; font-weight: 400; 
 }
 .modal-title-bar .path-separator { margin: 0 8px; color: #707090; }
 .modal-title-bar .category-name-in-title { color: #E0E0FF; font-weight: 400; }
-.modal-close-button { /* ... */
+.modal-close-button { /* ... existing close button styles ... */
     background: none; border: none; font-size: 1.8em; 
     color: #AAAAAA; cursor: pointer; padding: 0 5px; line-height: 1;
     transition: color 0.2s ease;
@@ -229,7 +229,9 @@ main.metrics-main-content p { color: #F5F5F5; }
 .modal-close-button:hover { color: #FFFFFF; }
 
 .modal-column-headers {
-    display: flex;
+    display: grid; /* CHANGED to Grid */
+    grid-template-columns: 40px 1fr auto 100px auto 100px; /* Icon | Name (flex) | Sep | Date | Sep | Revised */
+    align-items: center;
     padding: 10px 20px;
     background-color: #181a28; 
     border-bottom: 1px solid #2a2d3c;
@@ -237,18 +239,22 @@ main.metrics-main-content p { color: #F5F5F5; }
     color: #9090b0;    
     font-weight: 500;  
 }
-.modal-column-headers .col-icon { flex: 0 0 40px; text-align: left; } 
-.modal-column-headers .col-name { flex-grow: 1; padding-right: 10px; text-align: left; }
-.modal-column-headers .col-separator { color: #404060; padding: 0 5px; }
-.modal-column-headers .col-date { flex: 0 0 100px; text-align: left; padding-right: 10px;} 
-.modal-column-headers .col-revised { flex: 0 0 100px; text-align: left; } 
+.modal-column-headers > div { /* Direct children divs are the column titles */
+    text-align: left;
+}
+.modal-column-headers .col-separator { 
+    color: #404060; 
+    text-align: center; /* Center the separator */
+    padding: 0; /* No extra padding for separator itself */
+}
 
 
 .modal-body { overflow-y: auto; padding: 0; }
 .modal-article-list { list-style: none; padding: 0; margin: 0; }
 
 .modal-article-list li {
-    display: flex; 
+    display: grid; /* CHANGED to Grid */
+    grid-template-columns: 40px 1fr auto 100px auto 100px; /* Match header columns */
     align-items: center; 
     padding: 12px 20px; 
     border-bottom: 1px solid rgba(255,255,255,0.05); 
@@ -259,39 +265,47 @@ main.metrics-main-content p { color: #F5F5F5; }
 .modal-article-list li:last-child { border-bottom: none; }
 .modal-article-list li.show-item { opacity: 1; transform: translateY(0); }
 
+.modal-article-list .article-icon-container { 
+    /* grid-column: 1; Already implicit by order */
+    display: flex; /* To center icon within its 40px cell if needed */
+    align-items: center;
+    /* justify-content: center; */ /* If icon is smaller than 40px and needs centering */
+}
 .modal-article-list .article-icon {
-    width: 20px; height: 20px; margin-right: 12px; 
+    width: 20px; height: 20px; 
     object-fit: contain;
     filter: invert(70%) sepia(10%) saturate(100%) hue-rotate(180deg) brightness(100%) contrast(90%); 
 }
 
 .modal-article-list .article-info { 
-    flex-grow: 1; 
+    /* grid-column: 2; Already implicit */
     text-align: left; 
-    min-width: 0; /* Allow shrinking */
-    margin-right: 10px; /* Add some space before the date columns */
+    min-width: 0; 
+    padding-right: 10px; /* Space before next column's separator */
 } 
+.modal-article-list .list-col-separator { /* Class for separator spans in list items */
+    /* grid-column: 3 / 5; Already implicit */
+    color: #404060;
+    text-align: center;
+}
+
 .modal-article-list .article-title { 
     font-size: 1.05em; color: #C8C8E0; 
     text-decoration: none; 
-    /* display: block; /* CHANGED: Let it be inline or inline-block so it doesn't fill width */
-    display: inline; /* Make link only around the text itself */
+    display: inline; 
     margin-bottom: 2px; 
-    transition: color 0.2s ease;
-    white-space: normal; /* Allow title to wrap if necessary */
-    /* overflow: hidden; removed */
-    /* text-overflow: ellipsis; removed */
+    transition: color .2s ease;
+    white-space: normal; 
 }
 .modal-article-list .article-title:hover { color: #E8E8FF; }
 
 .modal-article-list .article-date,
 .modal-article-list .article-revised { 
+    /* grid-column: 4 / 6; Already implicit by order and template columns */
     font-size: 0.8em; 
     color: #8888A0; 
     margin: 0; 
     text-align: left !important; 
-    flex-basis: 100px; 
-    flex-shrink: 0; 
     padding-left: 0; 
     box-sizing: border-box;
 }
