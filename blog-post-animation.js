@@ -8,9 +8,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Select only P tags that are NOT .blog-meta for typing
     const storyParagraphs = Array.from(postBody.querySelectorAll('p:not(.blog-meta)'));
 
-    const typingSpeed = 6; // Milliseconds per character
+    const typingSpeed = 5; // Milliseconds per character
     const preTypingBlinkDuration = 1250; 
-    const postTypingBlinkDuration = 2000; 
+    const postTypingBlinkDuration = 2500; 
     const blinkInterval = 250; // For ~2 blinks per second (0.5s total cycle / 2 for half)
     
     let globalCursor = null;
