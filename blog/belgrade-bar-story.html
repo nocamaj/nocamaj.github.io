@@ -45,14 +45,29 @@
             const postBody = document.querySelector('.blog-post-content .post-body');
             if (!postBody) return;
 
-            const elementsToType = Array.from(postBody.children); // Get H1, P (meta), and all story P tags
-            const typingSpeed = 10; // Milliseconds per character - faster
+            // Select all direct children of post-body for the typing sequence
+            const elementsToType = Array.from(postBody.children);
+            const typingSpeed = 5; // Milliseconds per character - twice as fast (was 10)
+            const initialBlinkCount = 3; // How many times cursor blinks before typing
+            const finalBlinkCount = 3;   // How many times cursor blinks after typing
+            const blinkInterval = 350; // Half of the CSS blink animation duration for on/off cycle
             let globalCursor = null;
 
             function createCursor(parentElement) {
+                if (globalCursor) removeCursor(); // Ensure only one cursor
                 const cursor = document.createElement('span');
                 cursor.className = 'typing-cursor';
-                parentElement.appendChild(cursor);
+                // Find the last text node or create one if empty
+                if (parentElement.lastChild && parentElement.lastChild.nodeType === Node.TEXT_NODE) {
+                    parentElement.appendChild(cursor);
+                } else {
+                    // If the last child isn't text (e.g. another element, or empty), or if p is empty
+                    // we need to append to the paragraph itself.
+                    // To ensure it's after any existing inline content, we might need to be more specific
+                    // For simplicity now, just append. If inline elements exist, might need refinement.
+                    parentElement.appendChild(cursor);
+                }
+                cursor.style.opacity = '1'; // Make it visible for blinking
                 return cursor;
             }
 
@@ -63,69 +78,119 @@
                 globalCursor = null;
             }
 
+            function blinkCursor(elementForCursor, count, callback) {
+                if (!elementForCursor) { // Safety check
+                    if(callback) callback();
+                    return;
+                }
+                removeCursor(); // Remove any existing cursor
+                globalCursor = createCursor(elementForCursor);
+                let blinks = 0;
+                const blinker = setInterval(() => {
+                    if (!globalCursor) { // If cursor was removed by another process
+                        clearInterval(blinker);
+                        if(callback) callback();
+                        return;
+                    }
+                    globalCursor.style.opacity = globalCursor.style.opacity === '0' ? '1' : '0';
+                    blinks++;
+                    if (blinks >= count * 2) { // *2 because one blink is on and off
+                        clearInterval(blinker);
+                        if (!isTypingInProgress) { // Only remove if typing isn't about to start/resume
+                           removeCursor();
+                        }
+                        if (callback) callback();
+                    }
+                }, blinkInterval);
+            }
+            
+            let isTypingInProgress = false;
+
             async function typeElement(element, isLastElementInSequence) {
                 return new Promise(async (resolve) => {
+                    isTypingInProgress = true;
+                    const isParagraph = element.nodeName === 'P' && !element.classList.contains('blog-meta');
+                    
                     if (element.nodeName === 'H1' || element.classList.contains('blog-meta')) {
-                        // For H1 and meta, reveal instantly or with a quick fade (optional)
                         element.style.opacity = '0';
                         requestAnimationFrame(() => {
-                           element.style.transition = 'opacity 0.3s ease-in';
+                           element.style.transition = 'opacity 0.3s ease-in 0.2s'; // Slight delay for effect
                            element.style.opacity = '1';
                         });
-                        setTimeout(resolve, 100); // Short delay for visual separation
+                        await new Promise(r => setTimeout(r, 300 + 200)); // Wait for fade + a bit more
+                        isTypingInProgress = false;
+                        resolve();
                         return;
                     }
                     
-                    // Only P tags that are direct children of post-body and not blog-meta for typing
-                    if (element.nodeName !== 'P' || element.classList.contains('blog-meta')) {
-                        element.style.opacity = '1'; // Ensure other elements are visible
-                        resolve();
+                    if (!isParagraph) {
+                        element.style.opacity = '1'; 
+                        isTypingInProgress = false;
+                        resolve(); 
                         return;
                     }
 
                     const originalText = element.getAttribute('data-original-text') || element.textContent;
-                    element.setAttribute('data-original-text', originalText); // Store it if not already
-                    element.textContent = '';
-                    element.style.opacity = '1'; // Make p visible for typing
+                    element.setAttribute('data-original-text', originalText); 
+                    element.textContent = ''; 
+                    element.style.opacity = '1'; 
 
-                    removeCursor(); // Remove previous cursor
-                    globalCursor = createCursor(element); // Add cursor to current paragraph
+                    removeCursor(); // Ensure clean slate
+                    globalCursor = createCursor(element); // Create cursor for this paragraph
 
                     for (let i = 0; i < originalText.length; i++) {
-                        element.insertBefore(document.createTextNode(originalText[i]), globalCursor);
+                        if (!globalCursor || !globalCursor.parentNode) { // Safety check if cursor got removed
+                            globalCursor = createCursor(element);
+                        }
+                        element.insertBefore(document.createTextNode(originalText.charAt(i)), globalCursor);
                         await new Promise(r => setTimeout(r, typingSpeed));
                     }
                     
-                    if (!isLastElementInSequence) { // Keep cursor for last paragraph until all done
-                       removeCursor();
+                    isTypingInProgress = false;
+                    if (isLastElementInSequence) {
+                        blinkCursor(element, finalBlinkCount, () => {
+                           // console.log("Final blinks done.");
+                        });
+                    } else {
+                        removeCursor();
                     }
                     resolve();
                 });
             }
 
             async function typeAllElements() {
-                for (let i = 0; i < elementsToType.length; i++) {
-                    // Check if it's a P tag intended for story content
-                    if (elementsToType[i].nodeName === 'P' && !elementsToType[i].classList.contains('blog-meta')) {
-                         elementsToType[i].style.opacity = '0'; // Keep story paragraphs initially hidden
-                    } else {
-                         elementsToType[i].style.opacity = '1'; // H1 and meta are visible by default (or faded by typeElement)
+                // Hide all paragraphs initially that are part of the story
+                elementsToType.forEach(el => {
+                    if (el.nodeName === 'P' && !el.classList.contains('blog-meta')) {
+                        el.style.opacity = '0';
+                    } else if (el.nodeName === 'H1' || el.classList.contains('blog-meta')) {
+                        el.style.opacity = '0'; // Also hide title/meta initially for staggered reveal
                     }
-                }
+                });
 
-                for (let i = 0; i < elementsToType.length; i++) {
-                    const isLast = i === elementsToType.length - 1;
-                    // For story paragraphs, make them visible one by one before typing
-                    if (elementsToType[i].nodeName === 'P' && !elementsToType[i].classList.contains('blog-meta')) {
-                         elementsToType[i].style.opacity = '1'; // Make current P visible
-                    }
-                    await typeElement(elementsToType[i], isLast && elementsToType[i].nodeName === 'P');
+                // Initial blink on the first paragraph (or title if you prefer)
+                const firstContentElement = elementsToType.find(el => el.nodeName === 'P' && !el.classList.contains('blog-meta')) || elementsToType[0];
+                if (firstContentElement) {
+                     blinkCursor(firstContentElement, initialBlinkCount, async () => {
+                        removeCursor(); // Remove after initial blinks, before typing starts
+                        for (let i = 0; i < elementsToType.length; i++) {
+                            const isLast = i === elementsToType.length - 1;
+                             // Ensure current element to type into is visible before typing
+                            if (elementsToType[i].nodeName === 'P' && !elementsToType[i].classList.contains('blog-meta')) {
+                                elementsToType[i].style.opacity = '1';
+                            }
+                            await typeElement(elementsToType[i], isLast);
+                        }
+                        // console.log("All typing done sequence.");
+                    });
+                } else {
+                     // console.log("No elements to type.");
                 }
-                removeCursor(); // Final cursor removal
-                // console.log("All typing done.");
             }
 
-            typeAllElements();
+            if (postBody && elementsToType.length > 0) {
+                typeAllElements();
+            }
         });
     </script>
 </body>
