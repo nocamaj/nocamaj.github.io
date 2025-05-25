@@ -238,7 +238,7 @@ main.metrics-main-content p { color: #F5F5F5; }
     font-size: 0.85em; 
     color: #9090b0;    
     font-weight: 500;  
-    gap: 10px; 
+    gap: 15px; 
 }
 .modal-column-headers > div { 
     text-align: left;
@@ -278,7 +278,7 @@ main.metrics-main-content p { color: #F5F5F5; }
     opacity: 0; 
     transform: translateY(20px); 
     transition: opacity 0.4s ease-out, transform 0.4s ease-out;
-    gap: 10px; 
+    gap: 15px; 
 }
 /* ... (li:last-child, li.show-item, .article-icon-container, .article-icon, .article-info, .article-title styles unchanged) ... */
 .modal-article-list li:last-child { border-bottom: none; }
