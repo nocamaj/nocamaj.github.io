@@ -245,19 +245,6 @@ main.metrics-main-content p { color: #F5F5F5; }
     position: relative; 
 }
 
-/* REMOVE or comment out the ::before rules for separators in the headers */
-/*
-.modal-column-headers .col-date::before,
-.modal-column-headers .col-revised::before {
-    content: "|"; // REMOVE THIS LINE or the whole rule block
-    color: #404060;
-    position: absolute;
-    left: -12px; 
-    top: 50%;
-    transform: translateY(-50%);
-}
-*/
-
 /* Ensure there's still padding if separators are removed, or rely on grid gap */
 .modal-column-headers .col-date,
 .modal-column-headers .col-revised { 
@@ -288,21 +275,6 @@ main.metrics-main-content p { color: #F5F5F5; }
 .modal-article-list .article-info { text-align: left; min-width: 0; } 
 .modal-article-list .article-title { font-size: 1.05em; color: #C8C8E0; text-decoration: none; display: inline; margin-bottom: 2px; transition: color .2s ease; white-space: normal; }
 .modal-article-list .article-title:hover { color: #E8E8FF; }
-
-
-/* REMOVE or comment out the ::before rules for separators in the list items */
-/*
-.modal-article-list .article-date::before,
-.modal-article-list .article-revised::before {
-    content: "|"; // REMOVE THIS LINE or the whole rule block
-    color: #404060; 
-    position: absolute;
-    left: -12px; 
-    top: 50%;
-    transform: translateY(-50%);
-}
-*/
-
 .modal-article-list .article-date,
 .modal-article-list .article-revised { 
     font-size: 0.8em; 
