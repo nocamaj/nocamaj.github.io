@@ -63,7 +63,7 @@
                 canvasClearColor: 'rgba(10, 10, 25, 0)', // Make ASCII canvas clear for page bg to show
                 noiseScale: 0.08, timeScale: 0.08, activationThreshold: 0.3, highlightThreshold: 0.65, 
                 fadeSpeed: 0.15, charChangeProbability: 0.03,
-                phraseStableDisplayDuration: 7000, textTransitionDuration: 300,    
+                phraseStableDisplayDuration: 5500, textTransitionDuration: 300,    
                 textAreaWidthRatio: 0.375, textAreaHeightRatio: 0.15, textPaddingRatio: 0.1,
                 cursorInteractionRadius: 70, cursorVanishStrength: 1.0, cursorVanishFalloff: 1.5,  
             };
