@@ -101,7 +101,6 @@
                         articles.forEach((article, index) => {
                             const li = document.createElement('li'); 
                             const revisedDate = article.revised ? article.revised : 'X'; 
-                            // UPDATED innerHTML for <li> to match CSS Grid columns
                             li.innerHTML = `
                                 <div class="article-icon-container">
                                     <img src="images/folder-icon.svg" alt="Article" class="article-icon">
@@ -109,9 +108,7 @@
                                 <div class="article-info">
                                     <a href="${article.url}" class="article-title">${article.title}</a>
                                 </div>
-                                <span class="list-col-separator"></span> <!-- Separator for grid -->
                                 <p class="article-date">${article.date}</p>
-                                <span class="list-col-separator"></span> <!-- Separator for grid -->
                                 <p class="article-revised">${revisedDate}</p> 
                             `; 
                             modalArticleList.appendChild(li); 
