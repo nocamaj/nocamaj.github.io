@@ -137,8 +137,12 @@
                 elementsToType.forEach(el => {
                     if (el.nodeName === 'P' && !el.classList.contains('blog-meta')) {
                         el.style.opacity = '0'; 
+                        if (!el.hasAttribute('data-original-text')) { // Store original text
+                            el.setAttribute('data-original-text', el.textContent);
+                        }
+                        el.textContent = ''; // <-- CLEAR TEXT CONTENT HERE
                     } else if (el.nodeName === 'H1' || el.classList.contains('blog-meta')) {
-                         el.style.opacity = '0'; // Hide title/meta initially too
+                        el.style.opacity = '0'; 
                     }
                 });
 
