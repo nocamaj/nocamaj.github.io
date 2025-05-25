@@ -194,109 +194,87 @@ main.metrics-main-content p { color: #F5F5F5; }
 .category-item:hover .tl-v, .category-item:hover .tr-v, .category-item:hover .bl-v, .category-item:hover .br-v { height: 10px; } 
 
 /* === Modal Styles === */
-.modal-overlay { 
+.modal-overlay { /* ... */
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background-color: rgba(0, 0, 0, 0.0); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
     display: flex; align-items: center; justify-content: center; z-index: 1000; 
     opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0s linear 0.3s;
 }
 .modal-overlay.visible { opacity: 1; visibility: visible; transition: opacity 0.3s ease, visibility 0s linear 0s; }
-.modal-content { 
+.modal-content { /* ... */
     background-color: #141622; padding: 0; border-radius: 0px; 
     box-shadow: 0 10px 40px rgba(0,0,0,0.5); 
     width: 90%; max-width: 950px; 
     height: 80vh; max-height: 700px; 
     display: flex; flex-direction: column;
-    position: relative; transform: scale(.5); opacity: 0;
-    transition: transform .35s cubic-bezier(.18,.89,.32,1.2),opacity .25s ease-out; 
+    position: relative; transform: scale(0.5); opacity: 0;
+    transition: transform 0.35s cubic-bezier(0.18,0.89,0.32,1.20), opacity 0.25s ease-out; 
     transform-origin: center center; 
 }
 .modal-overlay.visible .modal-content { transform: scale(1); opacity: 1; }
-.modal-header { 
+.modal-header { /* ... */
     display: flex; justify-content: space-between; align-items: center;
     padding: 12px 20px; background-color: #1c1e2c; border-bottom: 1px solid #2a2d3c; 
 }
-.modal-title-bar { font-size: .9em; color: #b0b0cc; font-weight: 400; }
+.modal-title-bar { /* ... */
+    font-size: 0.9em; color: #b0b0cc; font-weight: 400; 
+}
 .modal-title-bar .path-separator { margin: 0 8px; color: #707090; }
 .modal-title-bar .category-name-in-title { color: #E0E0FF; font-weight: 400; }
-.modal-close-button { 
-    background: 0 0; border: none; font-size: 1.8em; 
-    color: #AAA; cursor: pointer; padding: 0 5px; line-height: 1;
-    transition: color .2s ease;
+.modal-close-button { /* ... */
+    background: none; border: none; font-size: 1.8em; 
+    color: #AAAAAA; cursor: pointer; padding: 0 5px; line-height: 1;
+    transition: color 0.2s ease;
 }
-.modal-close-button:hover { color: #fff; }
+.modal-close-button:hover { color: #FFFFFF; }
 
 .modal-column-headers {
     display: grid;
-    /* Icon | Name (flexible) | Date | Revised */
-    /* Adjusted column widths and removed explicit separators from template */
-    grid-template-columns: 40px 1fr minmax(110px, auto) minmax(110px, auto); 
+    grid-template-columns: 40px 1fr minmax(80px, 120px) minmax(80px, 120px); 
     align-items: center;
-    padding: 10px 20px; /* Overall padding for the header row */
+    padding: 10px 20px;
     background-color: #181a28; 
     border-bottom: 1px solid #2a2d3c;
     font-size: 0.85em; 
     color: #9090b0;    
     font-weight: 500;  
-    gap: 15px; /* Consistent gap between all columns */
+    gap: 15px; 
 }
-.modal-column-headers > div { /* Direct children divs are the column titles */
+.modal-column-headers > div { 
     text-align: left;
     position: relative; 
-    box-sizing: border-box; /* Ensure padding is included in width */
 }
-/* Add padding to create space where separators were, if desired */
-.modal-column-headers .col-date { 
-    padding-left: 15px; /* Space to the left of "Date" title */
-}
+
+/* Ensure there's still padding if separators are removed, or rely on grid gap */
+.modal-column-headers .col-date,
 .modal-column-headers .col-revised { 
-    padding-left: 15px; /* Space to the left of "Revised" title */
-}
-/* No explicit ::before separators */
+    padding-left: 0px; /* Or a small value like 5px if grid 'gap' isn't enough visually */
+} 
 
-
+/* ... (modal-body, .modal-article-list styles) ... */
 .modal-body { overflow-y: auto; padding: 0; }
 .modal-article-list { list-style: none; padding: 0; margin: 0; }
 
+
 .modal-article-list li {
     display: grid; 
-    grid-template-columns: 40px 1fr minmax(110px, auto) minmax(110px, auto); /* Match header */
+    grid-template-columns: 40px 1fr minmax(80px, 120px) minmax(80px, 120px); 
     align-items: center; 
     padding: 12px 20px; 
     border-bottom: 1px solid rgba(255,255,255,0.05); 
     opacity: 0; 
     transform: translateY(20px); 
     transition: opacity 0.4s ease-out, transform 0.4s ease-out;
-    gap: 15px; /* Consistent gap between all columns */
+    gap: 15px; 
 }
+/* ... (li:last-child, li.show-item, .article-icon-container, .article-icon, .article-info, .article-title styles unchanged) ... */
 .modal-article-list li:last-child { border-bottom: none; }
 .modal-article-list li.show-item { opacity: 1; transform: translateY(0); }
-
-.modal-article-list .article-icon-container { 
-    display: flex; 
-    align-items: center;
-}
-.modal-article-list .article-icon {
-    width: 20px; height: 20px; 
-    object-fit: contain;
-    filter: invert(70%) sepia(10%) saturate(100%) hue-rotate(180deg) brightness(100%) contrast(90%); 
-}
-
-.modal-article-list .article-info { 
-    text-align: left; 
-    min-width: 0; 
-    /* No padding-right needed, grid gap handles it */
-} 
-.modal-article-list .article-title { 
-    font-size: 1.05em; color: #C8C8E0; 
-    text-decoration: none; 
-    display: inline; 
-    margin-bottom: 2px; 
-    transition: color .2s ease;
-    white-space: normal; 
-}
+.modal-article-list .article-icon-container { display: flex; align-items: center;}
+.modal-article-list .article-icon { width: 20px; height: 20px; object-fit: contain; filter: invert(70%) sepia(10%) saturate(100%) hue-rotate(180deg) brightness(100%) contrast(90%); }
+.modal-article-list .article-info { text-align: left; min-width: 0; } 
+.modal-article-list .article-title { font-size: 1.05em; color: #C8C8E0; text-decoration: none; display: inline; margin-bottom: 2px; transition: color .2s ease; white-space: normal; }
 .modal-article-list .article-title:hover { color: #E8E8FF; }
-
 .modal-article-list .article-date,
 .modal-article-list .article-revised { 
     font-size: 0.8em; 
@@ -304,7 +282,7 @@ main.metrics-main-content p { color: #F5F5F5; }
     margin: 0; 
     text-align: left !important; 
     position: relative; 
-    padding-left: 15px; /* Space to the left of the date text */
+    padding-left: 0px; /* Or a small value like 5px if grid 'gap' isn't enough visually */
     box-sizing: border-box;
 }
 
