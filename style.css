@@ -230,8 +230,7 @@ main.metrics-main-content p { color: #F5F5F5; }
 
 .modal-column-headers {
     display: grid;
-    /* Icon | Name (flexible) | Date | Revised */
-    grid-template-columns: 40px 1fr 120px 120px; /* Increased base for Date/Revised, no auto for separators */
+    grid-template-columns: 40px 1fr minmax(80px, 120px) minmax(80px, 120px); 
     align-items: center;
     padding: 10px 20px;
     background-color: #181a28; 
@@ -239,76 +238,70 @@ main.metrics-main-content p { color: #F5F5F5; }
     font-size: 0.85em; 
     color: #9090b0;    
     font-weight: 500;  
-    gap: 15px; /* Increased gap between all columns */
+    gap: 15px; 
 }
 .modal-column-headers > div { 
     text-align: left;
     position: relative; 
 }
-/* Use ::before for separators on the text columns themselves */
+
+/* REMOVE or comment out the ::before rules for separators in the headers */
+/*
 .modal-column-headers .col-date::before,
 .modal-column-headers .col-revised::before {
-    content: "|";
+    content: "|"; // REMOVE THIS LINE or the whole rule block
     color: #404060;
     position: absolute;
-    left: -12px; /* Adjust to position separator correctly with new gap/padding */
+    left: -12px; 
     top: 50%;
     transform: translateY(-50%);
 }
-/* No padding needed on headers if gap is used, text-align handles it */
+*/
 
+/* Ensure there's still padding if separators are removed, or rely on grid gap */
+.modal-column-headers .col-date,
+.modal-column-headers .col-revised { 
+    padding-left: 0px; /* Or a small value like 5px if grid 'gap' isn't enough visually */
+} 
+
+/* ... (modal-body, .modal-article-list styles) ... */
 .modal-body { overflow-y: auto; padding: 0; }
 .modal-article-list { list-style: none; padding: 0; margin: 0; }
 
+
 .modal-article-list li {
     display: grid; 
-    grid-template-columns: 40px 1fr 120px 120px; /* Match header */
+    grid-template-columns: 40px 1fr minmax(80px, 120px) minmax(80px, 120px); 
     align-items: center; 
     padding: 12px 20px; 
     border-bottom: 1px solid rgba(255,255,255,0.05); 
     opacity: 0; 
     transform: translateY(20px); 
     transition: opacity 0.4s ease-out, transform 0.4s ease-out;
-    gap: 15px; /* Gap between list item columns */
+    gap: 15px; 
 }
+/* ... (li:last-child, li.show-item, .article-icon-container, .article-icon, .article-info, .article-title styles unchanged) ... */
 .modal-article-list li:last-child { border-bottom: none; }
 .modal-article-list li.show-item { opacity: 1; transform: translateY(0); }
-
-.modal-article-list .article-icon-container { 
-    display: flex; 
-    align-items: center;
-}
-.modal-article-list .article-icon {
-    width: 20px; height: 20px; 
-    object-fit: contain;
-    filter: invert(70%) sepia(10%) saturate(100%) hue-rotate(180deg) brightness(100%) contrast(90%); 
-}
-
-.modal-article-list .article-info { 
-    text-align: left; 
-    min-width: 0; 
-    /* padding-right: 0; /* Let grid gap handle spacing */
-} 
-.modal-article-list .article-title { 
-    font-size: 1.05em; color: #C8C8E0; 
-    text-decoration: none; 
-    display: inline; 
-    margin-bottom: 2px; 
-    transition: color .2s ease;
-    white-space: normal; 
-}
+.modal-article-list .article-icon-container { display: flex; align-items: center;}
+.modal-article-list .article-icon { width: 20px; height: 20px; object-fit: contain; filter: invert(70%) sepia(10%) saturate(100%) hue-rotate(180deg) brightness(100%) contrast(90%); }
+.modal-article-list .article-info { text-align: left; min-width: 0; } 
+.modal-article-list .article-title { font-size: 1.05em; color: #C8C8E0; text-decoration: none; display: inline; margin-bottom: 2px; transition: color .2s ease; white-space: normal; }
 .modal-article-list .article-title:hover { color: #E8E8FF; }
 
-/* Use ::before for separators on the data cells as well */
+
+/* REMOVE or comment out the ::before rules for separators in the list items */
+/*
 .modal-article-list .article-date::before,
 .modal-article-list .article-revised::before {
-    content: "|";
+    content: "|"; // REMOVE THIS LINE or the whole rule block
     color: #404060; 
     position: absolute;
-    left: -12px; /* Align with header separator */
+    left: -12px; 
     top: 50%;
     transform: translateY(-50%);
 }
+*/
 
 .modal-article-list .article-date,
 .modal-article-list .article-revised { 
@@ -316,8 +309,8 @@ main.metrics-main-content p { color: #F5F5F5; }
     color: #8888A0; 
     margin: 0; 
     text-align: left !important; 
-    position: relative; /* For ::before positioning */
-    /* padding-left: 0; /* Let grid gap and ::before positioning handle spacing */
+    position: relative; 
+    padding-left: 0px; /* Or a small value like 5px if grid 'gap' isn't enough visually */
     box-sizing: border-box;
 }
 
