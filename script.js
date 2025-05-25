@@ -21,11 +21,11 @@
 
     const phrases = [ /* ... same phrases ... */
         { lang: "English", text: "Hello, I'm Noah" }, { lang: "Chinese", text: "你好，我是诺亚" }, 
-        { lang: "Russian", text: "Привет, я Ноа" }, { lang: "Hindi", text: "नमस्ते, मैं नोआ हूँ" }, 
+        { lang: "Russian", text: "Привет, я Ноа" }, {lang: "Albanian", text: "Ç'kemi, jam Noah"},
         { lang: "Japanese", text: "こんにちは、ノアです" }, { lang: "Arabic", text: "مرحباً، أنا نوح" }, 
-        { lang: "Spanish", text: "Hola, soy Noah" }, { lang: "French", text: "Bonjour, je suis Noah" },
-        { lang: "German", text: "Hallo, ich bin Noah" }, { lang: "Portuguese", text: "Olá, sou Noah" },
-        { lang: "Albanian", text: "Ç'kemi, jam Noah"}
+        { lang: "Spanish", text: "Hola, soy Noah" }, { lang: "Hindi", text: "नमस्ते, मैं नोआ हूँ" }, 
+        { lang: "French", text: "Bonjour, je suis Noah" }, { lang: "German", text: "Hallo, ich bin Noah" },
+        { lang: "Portuguese", text: "Olá, sou Noah" }, { lang: "Korean", text: "안녕하세요, 저는 노아입니다."},
     ];
 
     function ready(callback) { if (document.readyState !== 'loading') callback(); else document.addEventListener('DOMContentLoaded', callback); }
