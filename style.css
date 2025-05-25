@@ -321,7 +321,7 @@ main.metrics-main-content p { color: #F5F5F5; }
     box-sizing: border-box;
 }
 
-/* === Blog Post Specific Styles === */
+/* === Blog Post Specific Styles ===- */
 main.blog-post-content { padding-top: 100px; padding-bottom: 60px; padding-left: 20px; padding-right: 20px; max-width: 800px; margin: 0 auto; color: #E0E0E0; min-height: auto; }
 .blog-post-content article {}
 .blog-post-content .blog-title { font-size: 2.6em; color: #F5F5F5; margin-top: 0; margin-bottom: 8px; line-height: 1.2; text-align: center; font-weight: bold;  }
