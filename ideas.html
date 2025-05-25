@@ -9,7 +9,7 @@
 <body class="page-background"> 
     
     <header>
-        <!-- ... header nav ... -->
+        <!-- ... header nav unchanged ... -->
         <nav>
             <div class="nav-left">
                 <a href="index.html" class="nav-button">Home</a> 
@@ -45,9 +45,8 @@
             <div class="modal-column-headers">
                 <div class="col-icon"> <!-- Icon column header --> </div>
                 <div class="col-name">Name</div>
-                <span class="col-separator">|</span>
+                <!-- Separators removed from HTML here -->
                 <div class="col-date">Date</div>
-                <span class="col-separator">|</span>
                 <div class="col-revised">Revised</div>
             </div>
             <div class="modal-body">
@@ -64,7 +63,6 @@
             const categoryGrid = document.querySelector('.category-grid');
             const categoryItems = Array.from(categoryGrid.querySelectorAll('.category-item')); 
             const folderIcons = Array.from(document.querySelectorAll('.category-item .folder-icon'));
-            
             const modalOverlay = document.getElementById('categoryModal');
             const modalContent = modalOverlay.querySelector('.modal-content');
             const modalCloseButton = document.getElementById('modalCloseButton');
@@ -101,6 +99,7 @@
                         articles.forEach((article, index) => {
                             const li = document.createElement('li'); 
                             const revisedDate = article.revised ? article.revised : 'X'; 
+                            // REMOVED explicit span separators from here
                             li.innerHTML = `
                                 <div class="article-icon-container">
                                     <img src="images/folder-icon.svg" alt="Article" class="article-icon">
