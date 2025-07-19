@@ -102,79 +102,18 @@ footer {
     box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.search-container {
-    position: relative; /* For positioning the animated border */
-}
-
 .search-container input[type="text"] { 
-    width: 400px; padding: 12px 20px; 
-    border: 1px solid rgba(255,255,255,0.1); /* This will be hidden by the animation */
-    border-radius: 25px; 
-    background-color: rgba(18,18,18,0.5); 
-    color: #F5F5F5;
-    font-size: 16px; 
-    outline: none; 
-    transition: all 0.3s ease; 
-    max-width: 90vw;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.15); 
-    backdrop-filter: blur(5px);
+    width: 400px; padding: 12px 20px; border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 25px; background-color: rgba(18,18,18,0.5); color: #F5F5F5;
+    font-size: 16px; outline: none; transition: all 0.3s ease; max-width: 90vw;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15); backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
-    position: relative; /* Ensure input is on top of animation pseudo-elements */
-    z-index: 2;
 }
 .search-container input[type="text"]::placeholder { color: rgba(255,255,255,0.6); }
-
-/* Animated Border for Search Bar */
-.search-container::before,
-.search-container::after {
-    content: "";
-    position: absolute;
-    left: -2px; top: -2px; /* Offset to sit just outside the input */
-    width: calc(100% + 4px);
-    height: calc(100% + 4px);
-    border-radius: 27px; /* Slightly larger than input's border-radius */
-    z-index: 1; /* Behind the input, on top of footer */
-    transition: opacity 0.5s ease-in-out;
-}
-
-.search-container::before {
-    /* The animated gradient */
-    background: conic-gradient(
-        from var(--angle),
-        rgba(255, 255, 255, 0),
-        rgba(255, 255, 255, 0.5) 20%,
-        rgba(255, 255, 255, 0) 40%
-    );
-    animation: rotate 6s linear infinite;
-    --angle: 0deg; /* Custom property for animation */
-}
-
-.search-container::after {
-    /* The static border underneath */
-    background: rgba(255, 255, 255, 0.1);
-}
-
-@keyframes rotate {
-    to { --angle: 360deg; }
-}
-@property --angle {
-    syntax: '<angle>';
-    initial-value: 0deg;
-    inherits: false;
-}
-
-/* On focus, fade out the animation and show the standard focus ring */
 .search-container input[type="text"]:focus {
-    border-color: rgba(255, 255, 255, 0.3);
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-    background-color: rgba(26, 26, 26, 0.7);
-    transform: translateY(-2px);
+    border-color: rgba(255,255,255,0.3); box-shadow: 0 0 15px rgba(255,255,255,0.1);
+    background-color: rgba(26,26,26,0.7); transform: translateY(-2px);
 }
-.search-container input[type="text"]:focus + .search-container::before,
-.search-container:has(input[type="text"]:focus)::before { /* :has() provides better browser support */
-    opacity: 0;
-}
-
 
 @media (max-width: 768px) { 
     nav { padding: 0 5px; }
