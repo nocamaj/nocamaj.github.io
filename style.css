@@ -120,7 +120,14 @@ footer {
     border-radius: 27px;
     background: conic-gradient(
         from var(--glow-angle),
-        #4a9eff, #7c5cf6, #22d3ee, #60a5fa, #7c5cf6, #4a9eff
+        #1a2540,
+        #3d5278,
+        #8aa3d4,
+        #e6f0ff,
+        #f5f5f5,
+        #b4c8ff,
+        #2a3d5c,
+        #1a2540
     );
     animation: glow-rotate 3s linear infinite;
     pointer-events: none;
