@@ -31,13 +31,29 @@
                     <span class="legend-color-box" style="background-color: #8FBC8F;"></span> - Lived
                 </div>
             </div>
-            <div id="map"></div>
+            <div id="map">
+                <div id="globe-loader">
+                    <div class="loader-label"><span>LOADING</span><span id="loader-pct">0%</span></div>
+                    <div class="loader-track"><div class="loader-fill" id="loader-fill"></div></div>
+                </div>
+            </div>
         </div>
     </main>
 
     <script src="//unpkg.com/globe.gl"></script>
 
     <script>
+        const loaderEl = document.getElementById('globe-loader');
+        const fillEl = document.getElementById('loader-fill');
+        const pctEl = document.getElementById('loader-pct');
+        let loadProgress = 0;
+
+        function setProgress(pct) {
+            loadProgress = Math.min(100, Math.round(pct));
+            fillEl.style.width = loadProgress + '%';
+            pctEl.textContent = loadProgress + '%';
+        }
+
         const visitedCountriesISO_A2 = [
             "AT", "BZ", "BA", "CA", "CN", "HR", "GR", "HU", "IT", "MK", 
             "MX", "ME", "NL", "PE", "PL", "LC", "VC", "RS", "SK", "ES", "CH", 
@@ -58,11 +74,13 @@
         const capColors = { lived: '#8FBC8F', visited: '#FFC04D', default: '#585858' };
         const sideColors = { lived: 'rgba(143,188,143,0.3)', visited: 'rgba(255,192,77,0.3)', default: 'rgba(40,40,40,0.2)' };
 
+        setProgress(20);
+
         const mapEl = document.getElementById('map');
 
         const globe = Globe()(mapEl)
             .backgroundColor('#0a0a18')
-            .globeImageUrl('//cdn.jsdelivr.net/npm/three-globe/example/img/earth-night.jpg')
+            .showGlobe(true)
             .showAtmosphere(true)
             .atmosphereColor('#4a6a9f')
             .atmosphereAltitude(0.18)
@@ -89,6 +107,8 @@
             )
             .polygonsTransitionDuration(250);
 
+        setProgress(50);
+
         globe.pointOfView({ lat: 30, lng: 10, altitude: 2.2 });
 
         const controls = globe.controls();
@@ -104,16 +124,23 @@
         sizeGlobe();
         new ResizeObserver(sizeGlobe).observe(mapEl);
 
+        setProgress(60);
+
         fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson') 
             .then(r => { if (!r.ok) throw new Error('GeoJSON fetch failed'); return r.json(); })
             .then(data => {
+                setProgress(90);
                 globe.polygonsData(data.features.filter(d => {
                     const iso = d.properties["ISO3166-1-Alpha-2"];
                     return iso !== "AQ";
                 }));
+                setProgress(100);
+                setTimeout(() => { loaderEl.classList.add('fade-out'); }, 200);
+                setTimeout(() => { loaderEl.remove(); }, 900);
             })
             .catch(err => {
                 console.error('Error loading GeoJSON:', err);
+                loaderEl.remove();
                 mapEl.innerHTML = `<p style="text-align:center;padding-top:50px;color:white;">Could not load map data.</p>`;
             });
     </script>
