@@ -199,7 +199,9 @@ main.travel-main {
 }
 .legend-item { display: flex; align-items: center; margin-bottom: 8px; }
 .legend-color-box { width: 20px; height: 20px; margin-right: 10px; border: 1px solid #555; }
-#map { flex-grow: 1; height: 100%; width: 100%; background-color: #121f3a; border-radius: 15px; overflow: hidden; position: relative; z-index: 3; }
+#map { flex-grow: 1; height: 100%; width: 100%; background-color: #0a0a18; border-radius: 15px; overflow: hidden; position: relative; z-index: 3; }
+#map canvas { border-radius: 15px; }
+.scene-tooltip { background: rgba(15,15,30,0.85) !important; color: #eee !important; padding: 6px 12px !important; border-radius: 8px !important; font-size: 14px !important; line-height: 1.5 !important; border: 1px solid rgba(255,255,255,0.1) !important; backdrop-filter: blur(6px); pointer-events: none; }
 
 
 /* === Ideas Page & Metrics Page Specific Styles for main container === */
