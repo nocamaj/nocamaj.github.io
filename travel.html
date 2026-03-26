@@ -48,8 +48,6 @@
         let globeReady = false;
         let geoData = null;
 
-        requestAnimationFrame(() => loaderEl.classList.add('visible'));
-
         function animateBar() {
             let step;
             if (globeReady) {
@@ -79,17 +77,27 @@
             }
             requestAnimationFrame(animateBar);
         }
-        requestAnimationFrame(animateBar);
 
-        targetPct = 15;
+        function startLoading() {
+            targetPct = 15;
+            requestAnimationFrame(animateBar);
 
-        fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
-            .then(r => { if (!r.ok) throw new Error('GeoJSON fetch failed'); targetPct = 40; return r.json(); })
-            .then(data => { geoData = data; targetPct = 70; loadGlobeScript(); })
-            .catch(err => {
-                console.error('Error loading GeoJSON:', err);
-                loaderEl.innerHTML = '<p style="text-align:center;color:#ddd;font-style:italic;">Could not load map data.</p>';
-            });
+            fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
+                .then(r => { if (!r.ok) throw new Error('GeoJSON fetch failed'); targetPct = 40; return r.json(); })
+                .then(data => { geoData = data; targetPct = 70; loadGlobeScript(); })
+                .catch(err => {
+                    console.error('Error loading GeoJSON:', err);
+                    loaderEl.innerHTML = '<p style="text-align:center;color:#ddd;font-style:italic;">Could not load map data.</p>';
+                });
+        }
+
+        loaderEl.addEventListener('transitionend', function onFadeIn(e) {
+            if (e.propertyName === 'opacity' && loaderEl.classList.contains('visible')) {
+                loaderEl.removeEventListener('transitionend', onFadeIn);
+                startLoading();
+            }
+        });
+        requestAnimationFrame(() => loaderEl.classList.add('visible'));
 
         function loadGlobeScript() {
             const s = document.createElement('script');
