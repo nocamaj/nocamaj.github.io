@@ -31,36 +31,57 @@
                     <span class="legend-color-box" style="background-color: #8FBC8F;"></span> - Lived
                 </div>
             </div>
-            <div id="map">
-                <div id="globe-loader">
-                    <div class="loader-label"><span>LOADING</span><span id="loader-pct">0%</span></div>
-                    <div class="loader-track"><div class="loader-fill" id="loader-fill"></div></div>
-                </div>
+            <div id="map"></div>
+            <div id="globe-loader">
+                <div class="loader-label"><span>LOADING</span><span id="loader-pct">0%</span></div>
+                <div class="loader-track"><div class="loader-fill" id="loader-fill"></div></div>
             </div>
         </div>
     </main>
-
-    <script src="//unpkg.com/globe.gl"></script>
 
     <script>
         const loaderEl = document.getElementById('globe-loader');
         const fillEl = document.getElementById('loader-fill');
         const pctEl = document.getElementById('loader-pct');
-        let loadProgress = 0;
+        let displayPct = 0;
+        let targetPct = 0;
+        let dataReady = false;
+        let geoData = null;
 
-        function setProgress(pct) {
-            loadProgress = Math.min(100, Math.round(pct));
-            fillEl.style.width = loadProgress + '%';
-            pctEl.textContent = loadProgress + '%';
+        function animateBar() {
+            if (displayPct < targetPct) {
+                displayPct = Math.min(targetPct, displayPct + 0.6);
+                fillEl.style.width = Math.round(displayPct) + '%';
+                pctEl.textContent = Math.round(displayPct) + '%';
+            }
+            if (!dataReady || displayPct < 100) requestAnimationFrame(animateBar);
+        }
+        requestAnimationFrame(animateBar);
+
+        targetPct = 15;
+
+        fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson')
+            .then(r => { if (!r.ok) throw new Error('GeoJSON fetch failed'); targetPct = 40; return r.json(); })
+            .then(data => { geoData = data; targetPct = 70; loadGlobeScript(); })
+            .catch(err => {
+                console.error('Error loading GeoJSON:', err);
+                loaderEl.innerHTML = '<p style="text-align:center;color:#ddd;font-style:italic;">Could not load map data.</p>';
+            });
+
+        function loadGlobeScript() {
+            const s = document.createElement('script');
+            s.src = '//unpkg.com/globe.gl';
+            s.onload = () => { targetPct = 85; initGlobe(); };
+            document.head.appendChild(s);
         }
 
         const visitedCountriesISO_A2 = [
-            "AT", "BZ", "BA", "CA", "CN", "HR", "GR", "HU", "IT", "MK", 
-            "MX", "ME", "NL", "PE", "PL", "LC", "VC", "RS", "SK", "ES", "CH", 
+            "AT", "BZ", "BA", "CA", "CN", "HR", "GR", "HU", "IT", "MK",
+            "MX", "ME", "NL", "PE", "PL", "LC", "VC", "RS", "SK", "ES", "CH",
             "TR", "AE", "GB"
-        ]; 
+        ];
         const visitedCountriesByName = ["FRANCE", "KOSOVO"];
-        const livedCountriesISO_A2 = ["US", "AL"]; 
+        const livedCountriesISO_A2 = ["US", "AL"];
         const livedCountriesByName = [];
 
         function getCategory(feat) {
@@ -74,75 +95,66 @@
         const capColors = { lived: '#8FBC8F', visited: '#FFC04D', default: '#585858' };
         const sideColors = { lived: 'rgba(143,188,143,0.3)', visited: 'rgba(255,192,77,0.3)', default: 'rgba(40,40,40,0.2)' };
 
-        setProgress(20);
+        function initGlobe() {
+            const mapEl = document.getElementById('map');
 
-        const mapEl = document.getElementById('map');
-
-        const globe = Globe()(mapEl)
-            .backgroundColor('#0a0a18')
-            .showGlobe(true)
-            .showAtmosphere(true)
-            .atmosphereColor('#4a6a9f')
-            .atmosphereAltitude(0.18)
-            .polygonAltitude(feat => getCategory(feat) === 'default' ? 0.005 : 0.012)
-            .polygonCapColor(feat => capColors[getCategory(feat)])
-            .polygonSideColor(feat => sideColors[getCategory(feat)])
-            .polygonStrokeColor(() => '#111')
-            .polygonLabel(feat => {
-                const cat = getCategory(feat);
-                const name = feat.properties.name || feat.properties.ADMIN || '';
-                if (cat === 'lived') return `<span style="color:#8FBC8F;font-weight:600">${name}</span><br><span style="font-size:0.85em;color:#aaa">Lived</span>`;
-                if (cat === 'visited') return `<span style="color:#FFC04D;font-weight:600">${name}</span><br><span style="font-size:0.85em;color:#aaa">Visited</span>`;
-                return `<span style="color:#ccc">${name}</span>`;
-            })
-            .onPolygonHover(hoverD => globe
-                .polygonAltitude(d => {
-                    if (d === hoverD) return 0.04;
-                    return getCategory(d) === 'default' ? 0.005 : 0.012;
+            const globe = Globe()(mapEl)
+                .backgroundColor('#0a0a18')
+                .showGlobe(true)
+                .showAtmosphere(true)
+                .atmosphereColor('#4a6a9f')
+                .atmosphereAltitude(0.18)
+                .polygonAltitude(feat => getCategory(feat) === 'default' ? 0.005 : 0.012)
+                .polygonCapColor(feat => capColors[getCategory(feat)])
+                .polygonSideColor(feat => sideColors[getCategory(feat)])
+                .polygonStrokeColor(() => '#111')
+                .polygonLabel(feat => {
+                    const cat = getCategory(feat);
+                    const name = feat.properties.name || feat.properties.ADMIN || '';
+                    if (cat === 'lived') return `<span style="color:#8FBC8F;font-weight:600">${name}</span><br><span style="font-size:0.85em;color:#aaa">Lived</span>`;
+                    if (cat === 'visited') return `<span style="color:#FFC04D;font-weight:600">${name}</span><br><span style="font-size:0.85em;color:#aaa">Visited</span>`;
+                    return `<span style="color:#ccc">${name}</span>`;
                 })
-                .polygonCapColor(d => {
-                    if (d === hoverD) { const c = getCategory(d); return c === 'lived' ? '#a8dca8' : c === 'visited' ? '#ffd580' : '#888'; }
-                    return capColors[getCategory(d)];
-                })
-            )
-            .polygonsTransitionDuration(250);
+                .onPolygonHover(hoverD => globe
+                    .polygonAltitude(d => {
+                        if (d === hoverD) return 0.04;
+                        return getCategory(d) === 'default' ? 0.005 : 0.012;
+                    })
+                    .polygonCapColor(d => {
+                        if (d === hoverD) { const c = getCategory(d); return c === 'lived' ? '#a8dca8' : c === 'visited' ? '#ffd580' : '#888'; }
+                        return capColors[getCategory(d)];
+                    })
+                )
+                .polygonsTransitionDuration(250);
 
-        setProgress(50);
+            globe.polygonsData(geoData.features.filter(d => {
+                const iso = d.properties["ISO3166-1-Alpha-2"];
+                return iso !== "AQ";
+            }));
 
-        globe.pointOfView({ lat: 30, lng: 10, altitude: 2.2 });
+            globe.pointOfView({ lat: 30, lng: 10, altitude: 2.2 });
 
-        const controls = globe.controls();
-        controls.autoRotate = true;
-        controls.autoRotateSpeed = 0.4;
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.1;
+            const controls = globe.controls();
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 0.4;
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.1;
 
-        function sizeGlobe() {
-            globe.width(mapEl.clientWidth);
-            globe.height(mapEl.clientHeight);
+            function sizeGlobe() {
+                globe.width(mapEl.clientWidth);
+                globe.height(mapEl.clientHeight);
+            }
+            sizeGlobe();
+            new ResizeObserver(sizeGlobe).observe(mapEl);
+
+            targetPct = 100;
+
+            setTimeout(() => {
+                dataReady = true;
+                loaderEl.classList.add('fade-out');
+                setTimeout(() => loaderEl.remove(), 800);
+            }, 600);
         }
-        sizeGlobe();
-        new ResizeObserver(sizeGlobe).observe(mapEl);
-
-        setProgress(60);
-
-        fetch('https://raw.githubusercontent.com/datasets/geo-countries/master/data/countries.geojson') 
-            .then(r => { if (!r.ok) throw new Error('GeoJSON fetch failed'); return r.json(); })
-            .then(data => {
-                setProgress(90);
-                globe.polygonsData(data.features.filter(d => {
-                    const iso = d.properties["ISO3166-1-Alpha-2"];
-                    return iso !== "AQ";
-                }));
-                setProgress(100);
-                setTimeout(() => { loaderEl.classList.add('fade-out'); }, 200);
-                setTimeout(() => { loaderEl.remove(); }, 900);
-            })
-            .catch(err => {
-                console.error('Error loading GeoJSON:', err);
-                loaderEl.remove();
-                mapEl.innerHTML = `<p style="text-align:center;padding-top:50px;color:white;">Could not load map data.</p>`;
-            });
     </script>
 
 </body>
