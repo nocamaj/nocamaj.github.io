@@ -45,16 +45,39 @@
         const pctEl = document.getElementById('loader-pct');
         let displayPct = 0;
         let targetPct = 0;
-        let dataReady = false;
+        let globeReady = false;
         let geoData = null;
 
+        requestAnimationFrame(() => loaderEl.classList.add('visible'));
+
         function animateBar() {
-            if (displayPct < targetPct) {
-                displayPct = Math.min(targetPct, displayPct + 0.6);
-                fillEl.style.width = Math.round(displayPct) + '%';
-                pctEl.textContent = Math.round(displayPct) + '%';
+            let step;
+            if (globeReady) {
+                step = Math.max(1.5, (100 - displayPct) * 0.12);
+            } else if (displayPct < targetPct) {
+                step = Math.max(0.25, (targetPct - displayPct) * 0.05);
+            } else {
+                step = 0.03;
             }
-            if (!dataReady || displayPct < 100) requestAnimationFrame(animateBar);
+
+            displayPct = globeReady
+                ? Math.min(100, displayPct + step)
+                : Math.min(98, displayPct + step);
+
+            const shown = Math.round(displayPct);
+            fillEl.style.width = shown + '%';
+            pctEl.textContent = shown + '%';
+
+            if (globeReady && shown >= 100) {
+                fillEl.style.width = '100%';
+                pctEl.textContent = '100%';
+                setTimeout(() => {
+                    loaderEl.classList.add('fade-out');
+                    setTimeout(() => loaderEl.remove(), 800);
+                }, 400);
+                return;
+            }
+            requestAnimationFrame(animateBar);
         }
         requestAnimationFrame(animateBar);
 
@@ -147,13 +170,7 @@
             sizeGlobe();
             new ResizeObserver(sizeGlobe).observe(mapEl);
 
-            targetPct = 100;
-
-            setTimeout(() => {
-                dataReady = true;
-                loaderEl.classList.add('fade-out');
-                setTimeout(() => loaderEl.remove(), 800);
-            }, 600);
+            globeReady = true;
         }
     </script>
 

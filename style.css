@@ -206,8 +206,9 @@ main.travel-main {
     position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 20;
     background: #0a0a18; border-radius: 25px;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 10px; transition: opacity 0.7s ease-out;
+    gap: 10px; opacity: 0; transition: opacity 0.7s ease;
 }
+#globe-loader.visible { opacity: 1; }
 #globe-loader.fade-out { opacity: 0; pointer-events: none; }
 .loader-label {
     display: flex; justify-content: space-between; width: 340px; max-width: 80%;
