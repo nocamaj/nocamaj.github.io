@@ -247,7 +247,17 @@ main.metrics-main-content p { color: #F5F5F5; }
     transition: opacity 0.5s ease-out 0.1s, transform 0.5s ease-out 0.1s;
 }
 .category-item.visible { opacity: 1; transform: translateY(0); }
-.folder-icon { width: 150px; height: 150px; margin-bottom: 8px; object-fit: contain; transition: transform 0.3s ease; }
+.folder-art { position: relative; display: block; width: 150px; height: 150px; margin-bottom: -8px; }
+.folder-art .folder-icon {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: opacity 0.14s ease-out, transform 0.14s ease-out;
+}
+.folder-icon-open { opacity: 0; transform: translateY(3px); }
 .category-item .title-container {
     position: relative;
     display: grid;
@@ -269,11 +279,19 @@ main.metrics-main-content p { color: #F5F5F5; }
 .title-container .bl-v { bottom: 0; left: 0; transform-origin: bottom; }
 .title-container .br-h { bottom: 0; right: 0; transform-origin: right; }
 .title-container .br-v { bottom: 0; right: 0; transform-origin: bottom; }
-.category-item:hover .folder-icon { transform: scale(1.03); }
+.category-item:hover .folder-icon-closed { opacity: 0; transform: translateY(2px); }
+.category-item:hover .folder-icon-open {
+    opacity: 1;
+    transform: translateY(0);
+}
 .category-item:hover p { color: #ADD8E6; }
 .category-item:hover .corner-line { opacity: 1; }
 .category-item:hover .tl-h, .category-item:hover .tr-h, .category-item:hover .bl-h, .category-item:hover .br-h { width: 15px; } 
 .category-item:hover .tl-v, .category-item:hover .tr-v, .category-item:hover .bl-v, .category-item:hover .br-v { height: 10px; } 
+
+@media (prefers-reduced-motion: reduce) {
+    .folder-art .folder-icon { transition: none; }
+}
 
 /* === Modal Styles === */
 .modal-overlay {
@@ -353,7 +371,7 @@ main.metrics-main-content p { color: #F5F5F5; }
 .modal-article-list li:last-child { border-bottom: none; }
 .modal-article-list li.show-item { opacity: 1; transform: translateY(0); }
 .modal-article-list .article-icon-container { display: flex; align-items: center;}
-.modal-article-list .article-icon { width: 20px; height: 20px; object-fit: contain; filter: invert(70%) sepia(10%) saturate(100%) hue-rotate(180deg) brightness(100%) contrast(90%); }
+.modal-article-list .article-icon { width: 26px; height: 24px; object-fit: contain; }
 .modal-article-list .article-info { text-align: left; min-width: 0; } 
 .modal-article-list .article-title { font-size: 1.05em; color: #C8C8E0; text-decoration: none; display: inline; margin-bottom: 2px; transition: color .2s ease; white-space: normal; }
 .modal-article-list .article-title:hover { color: #E8E8FF; }
