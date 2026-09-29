@@ -1,4 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" shape-rendering="crispEdges">
   <title>Closed folder</title>
-  <path fill="#b4c8ff" fill-rule="evenodd" d="M8 18h16v3h5v3h27v29H8z M11 29h42v2H11z"/>
+  <path fill="#b4c8ff" fill-rule="evenodd" d="M8 18h16v3h5v3h27v29H8z M11 28h42v2H11z"/>
+  <path fill="#8ea8dc" d="M10 32h44v18H10z"/>
+  <path fill="#b4c8ff" d="M10 32h44v2H10z M10 34h2v16h-2z M16 39h16v2H16z"/>
 </svg>
