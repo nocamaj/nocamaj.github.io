@@ -1,6 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" shape-rendering="crispEdges">
   <title>Open folder</title>
-  <path fill="#b4c8ff" fill-rule="evenodd" d="M8 18h16v3h5v3h27v10H8z M20 18h24v16H20z"/>
-  <path fill="#b4c8ff" fill-rule="evenodd" d="M22 9h17v3h3v22H22z M25 17h12v2H25z M25 23h13v2H25z"/>
-  <path fill="#b4c8ff" fill-rule="evenodd" d="M8 37h48v2h-1v6h-1v5h-1v3H11v-3h-1v-5H9v-6H8z M12 39h40v2H12z"/>
+  <path fill="#b4c8ff" fill-rule="evenodd" d="M8 18h16v3h5v3h27v12H8z M20 18h24v18H20z"/>
+  <path fill="#b4c8ff" fill-rule="evenodd" d="M22 9h17v3h3v27H22z M25 17h12v2H25z M25 23h13v2H25z"/>
+  <path fill="#8ea8dc" d="M8 37h48v2h-1v6h-1v5h-1v3H11v-3h-1v-5H9v-6H8z"/>
+  <path fill="#b4c8ff" d="M8 37h48v2H8z M9 39h2v6H9z M10 45h2v5h-2z M16 44h16v2H16z"/>
 </svg>
