@@ -253,10 +253,10 @@ main.metrics-main-content p { color: #F5F5F5; }
     display: grid;
     place-items: center;
     width: max-content;
-    padding: 8px 24px;
+    padding: 6px 20px;
     box-sizing: border-box;
 }
-.category-item p { margin: 0; font-size: 0.9em; font-weight: 500; line-height: 1.2; text-align: center; color: #b0b0b0; transition: color 0.3s ease, opacity 0.3s ease 0.05s; opacity: 1; position: relative; z-index: 1;}
+.category-item p { margin: 0; font-size: 1em; font-weight: 500; line-height: 1.2; text-align: center; color: #b0b0b0; transition: color 0.3s ease, opacity 0.3s ease 0.05s; opacity: 1; position: relative; z-index: 1;}
 .category-item.visible p { opacity: 1; }
 .title-container .corner-line { position: absolute; background-color: #ADD8E6; opacity: 0; transition: opacity 0.2s ease, width 0.2s ease, height 0.2s ease; z-index: 0; }
 .title-container .tl-h, .title-container .tr-h, .title-container .bl-h, .title-container .br-h { height: 2px; width: 0; }
