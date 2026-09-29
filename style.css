@@ -247,7 +247,7 @@ main.metrics-main-content p { color: #F5F5F5; }
     transition: opacity 0.5s ease-out 0.1s, transform 0.5s ease-out 0.1s;
 }
 .category-item.visible { opacity: 1; transform: translateY(0); }
-.folder-art { position: relative; display: block; width: 150px; height: 150px; margin-bottom: 8px; }
+.folder-art { position: relative; display: block; width: 150px; height: 150px; margin-bottom: -8px; }
 .folder-art .folder-icon {
     position: absolute;
     inset: 0;
