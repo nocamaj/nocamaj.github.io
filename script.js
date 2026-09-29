@@ -46,7 +46,7 @@
             if (!ctx) throw new Error('Failed to get 2D context for main canvas');
             if (isHomepage && !offCtx) throw new Error('Failed to get 2D context for offscreen canvas on homepage');
 
-            let animationFrameId; let grid = []; let numCols, numRows; let time = Math.random() * 1000;
+            let hasStarted = false; let grid = []; let numCols, numRows; let time = Math.random() * 1000;
             let mouseX = -10000, mouseY = -10000; 
 
             const config = { // config object unchanged
@@ -93,7 +93,15 @@
             function clonePixelatedData(dataToClone) { if(!dataToClone||!dataToClone.data)return{width:0,height:0,data:[]}; return{width:dataToClone.width,height:dataToClone.height,data:dataToClone.data.slice()};}
 
             function setupAndRun() {
-                if(animationFrameId)cancelAnimationFrame(animationFrameId);SimplexNoise.shufflePermutations();canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+                const width = window.innerWidth;
+                const height = window.innerHeight;
+                const isFirstRun = !hasStarted;
+                // Browsers can fire resize while a new window is settling, even if its size did not change.
+                if (!isFirstRun && canvas.width === width && canvas.height === height) return;
+
+                const previousGrid = grid;
+                canvas.width = width;
+                canvas.height = height;
                 numCols=Math.floor(canvas.width/config.backgroundFontSize);numRows=Math.floor(canvas.height/config.backgroundFontSize);
                 
                 if (isHomepage) { 
@@ -104,26 +112,28 @@
                     borderRectCells.startRow=Math.max(0,Math.floor(textDisplayArea.y/config.backgroundFontSize)-1);borderRectCells.endRow=Math.min(numRows,Math.ceil((textDisplayArea.y+textDisplayArea.height)/config.backgroundFontSize)+1);
                     renderAndPixelateCurrentPhrase(currentPixelatedTextData); 
                     transitionDisplayPixelData = clonePixelatedData(currentPixelatedTextData);
-                    lastPhraseChangeTime=performance.now(); isTextTransitioning=false; textTransitionProgress=0; outgoingPixelatedTextData=null;
+                    if (isFirstRun || isTextTransitioning) {
+                        lastPhraseChangeTime=performance.now(); isTextTransitioning=false; textTransitionProgress=0; outgoingPixelatedTextData=null;
+                    }
                 }
                 
-                grid=[];for(let r=0;r<numRows;r++){let rowCells=[];for(let c=0;c<numCols;c++){rowCells.push(new GridCell(c,r));}grid.push(rowCells);}
-                ctx.font=`${config.backgroundFontSize}px monospace`;ctx.textAlign='center';ctx.textBaseline='alphabetic';time=Math.random()*1000;
-                
-                // Start animation, but keep container hidden
-                animate();
-                
-                // Fade in the container after a short delay to prevent flash
-                setTimeout(() => {
+                grid=[];for(let r=0;r<numRows;r++){let rowCells=[];for(let c=0;c<numCols;c++){rowCells.push(previousGrid[r]?.[c] || new GridCell(c,r));}grid.push(rowCells);}
+
+                if (isFirstRun) {
+                    hasStarted = true;
+                    animate();
                     backgroundContainer.classList.add('loaded');
-                }, 100);
+                } else {
+                    // Resizing clears a canvas, so repaint it immediately without restarting the animation.
+                    drawFrame();
+                }
             }
             
             let lastFrameDrawnTime = performance.now(); 
             const targetFPS = 30; const frameInterval = 1000 / targetFPS;
 
             function animate() {
-                animationFrameId = requestAnimationFrame(animate); 
+                requestAnimationFrame(animate);
                 const now = performance.now(); const elapsed = now - lastFrameDrawnTime;
 
                 if (elapsed >= frameInterval) {
@@ -134,12 +144,15 @@
                         } else if (now - lastPhraseChangeTime > config.phraseStableDisplayDuration) { isTextTransitioning = true; textTransitionProgress = 0; outgoingPixelatedTextData = clonePixelatedData(currentPixelatedTextData); currentPhraseIndex = (currentPhraseIndex + 1) % phrases.length; renderAndPixelateCurrentPhrase(currentPixelatedTextData); }
                     }
 
-                    ctx.clearRect(0, 0, canvas.width, canvas.height); 
-                    ctx.font = `${config.backgroundFontSize}px monospace`; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
-                    for(let r=0;r<numRows;r++){for(let c=0;c<numCols;c++){const noiseVal=(SimplexNoise.noise3D(c*config.noiseScale,r*config.noiseScale,time)+1)/2;grid[r][c].update(noiseVal);grid[r][c].draw();}}
-                    
-                    if (isHomepage) { drawPixelatedTextScramble(); }
+                    drawFrame();
                 }
+            }
+
+            function drawFrame() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.font = `${config.backgroundFontSize}px monospace`; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+                for(let r=0;r<numRows;r++){for(let c=0;c<numCols;c++){const noiseVal=(SimplexNoise.noise3D(c*config.noiseScale,r*config.noiseScale,time)+1)/2;grid[r][c].update(noiseVal);grid[r][c].draw();}}
+                if (isHomepage) { drawPixelatedTextScramble(); }
             }
             
             // Event Listeners for search bar focus on homepage
