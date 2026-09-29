@@ -93,10 +93,13 @@
             function clonePixelatedData(dataToClone) { if(!dataToClone||!dataToClone.data)return{width:0,height:0,data:[]}; return{width:dataToClone.width,height:dataToClone.height,data:dataToClone.data.slice()};}
 
             function setupAndRun() {
-                const width = window.innerWidth;
-                const height = window.innerHeight;
+                // Match the canvas bitmap to its actual on-screen size. CSS scaling an old
+                // bitmap to 100% width makes it visibly stretch before a delayed redraw.
+                const width = backgroundContainer.clientWidth;
+                const height = backgroundContainer.clientHeight;
+                if (!width || !height) return;
                 const isFirstRun = !hasStarted;
-                // Browsers can fire resize while a new window is settling, even if its size did not change.
+                // Ignore notifications that do not change the canvas's rendered size.
                 if (!isFirstRun && canvas.width === width && canvas.height === height) return;
 
                 const previousGrid = grid;
@@ -176,7 +179,12 @@
             
             if (backgroundContainer) { setupAndRun(); }
 
-            let resizeTimeout; window.addEventListener('resize', () => { if (backgroundContainer) { clearTimeout(resizeTimeout); resizeTimeout = setTimeout(setupAndRun, 300); }});
+            if (typeof ResizeObserver !== 'undefined') {
+                const resizeObserver = new ResizeObserver(setupAndRun);
+                resizeObserver.observe(backgroundContainer);
+            } else {
+                window.addEventListener('resize', setupAndRun);
+            }
             // console.log('ASCII animation script setup complete. Homepage features active: ' + isHomepage);
         } catch (error) { 
             console.error('Animation initialization failed:', error);
