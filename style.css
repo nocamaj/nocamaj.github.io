@@ -256,6 +256,9 @@ main.metrics-main-content p { color: #F5F5F5; }
 .category-item:focus-visible {
     outline: 2px solid #99D5FF;
     outline-offset: 4px;
+    opacity: 1;
+    transform: none;
+    transition: none;
 }
 .folder-art { position: relative; display: block; width: 150px; height: 150px; margin-bottom: -8px; }
 .folder-art .folder-icon {
