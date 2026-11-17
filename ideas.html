@@ -69,7 +69,6 @@
             const backgroundRegions = document.querySelectorAll('header, main');
             const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
             let activeFolder = null;
-            let previousFocus = null;
 
             const articlesByCategory = { /* ... Same article data with updated dates ... */
                 personal: [ { title: "Belgrade Bar Story", date: "July 18, 2024", url: "blog/belgrade-bar-story.html", revised: null }, { title: "Greece Hotel Story", date: "February 8, 2025", url: "blog/greece-hotel-story.html", revised: "May 05, 2025" } ],
@@ -131,7 +130,6 @@
             }
 
             function openFolder(item) {
-                if (!activeFolder) previousFocus = document.activeElement;
                 if (activeFolder) activeFolder.setAttribute('aria-expanded', 'false');
                 activeFolder = item;
                 item.setAttribute('aria-expanded', 'true');
@@ -145,8 +143,7 @@
 
             function closeFolder() {
                 if (!activeFolder) return;
-                const focusTarget = previousFocus && previousFocus !== document.body
-                    ? previousFocus : activeFolder;
+                const focusTarget = activeFolder;
                 activeFolder.setAttribute('aria-expanded', 'false');
                 activeFolder = null;
                 modalOverlay.classList.remove('visible');
