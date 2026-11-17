@@ -1,14 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" shape-rendering="crispEdges">
-  <title>Closed pixel folder</title>
-  <!-- Square silhouettes and a two-tone bevel echo early desktop icons. -->
-  <path d="M9 14h17v3h4v2h25v31H9z" fill="#0b1020"/>
-  <path d="M11 16h14v3h4v2h24v27H11z" fill="#526b90"/>
-  <path d="M11 16h14v3h4v2h24v2H29v-2h-4v-3H11z" fill="#afc7e7"/>
-  <path d="M11 46h42v2H11z" fill="#263b59"/>
-  <path d="M8 25h48v27H8z" fill="#0b1020"/>
-  <path d="M10 27h44v23H10z" fill="#354e71"/>
-  <path d="M10 27h44v2H10zM10 29h2v19h-2z" fill="#b0c9e8"/>
-  <path d="M12 48h42v2H12zM52 29h2v19h-2z" fill="#213751"/>
-  <path d="M16 33h2v2h-2zm6 0h2v2h-2zm6 0h2v2h-2zm6 0h2v2h-2zm6 0h2v2h-2zm6 0h2v2h-2zM19 38h2v2h-2zm6 0h2v2h-2zm6 0h2v2h-2zm6 0h2v2h-2zm6 0h2v2h-2zM16 43h2v2h-2zm6 0h2v2h-2zm6 0h2v2h-2zm6 0h2v2h-2zm6 0h2v2h-2zm6 0h2v2h-2z" fill="#8fa9ca" opacity=".27"/>
-  <path d="M15 46h17v1H15z" fill="#a5bfdf" opacity=".7"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 260" width="320" height="260" role="img" aria-label="closed blueprint folder"><path d="M32 220V68L56 44H124L148 68H248L264 84V220Z M42 210V72L60 54H120L144 78H244L254 88V210Z" fill="none" stroke="#173A63" stroke-width="7" stroke-linejoin="miter"/><path d="M32 220V68L56 44H124L148 68H248L264 84V220Z M42 210V72L60 54H120L144 78H244L254 88V210Z" fill="none" stroke="#99D5FF" stroke-width="3.5" stroke-linejoin="miter"/><path d="M42 100H254V210H42Z" fill="none" stroke="#173A63" stroke-width="7" stroke-linejoin="miter"/><path d="M42 100H254V210H42Z" fill="none" stroke="#99D5FF" stroke-width="3.5" stroke-linejoin="miter"/></svg>
